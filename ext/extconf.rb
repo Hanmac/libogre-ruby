@@ -24,7 +24,6 @@ with libogre-ruby; if not, write to the Free Software Foundation, Inc.,
 require 'mkmf'
 
 RbConfig::CONFIG["CC"] = RbConfig::CONFIG["CXX"]
-RbConfig::CONFIG["CPP"] = RbConfig::CONFIG["CXX"] + " -E"
 
 CONFIG["warnflags"] = RbConfig::CONFIG["warnflags"] = " -Wall"
 
@@ -39,7 +38,9 @@ end
 $CFLAGS += " -Wall"
 
 unless have_func("rb_string_value_cstr","ruby.h")
-	abort("missing VALUE to char convert!")
+	abort("missing VALUE to char convert! You need ruby version >= 1.9")
 end
+
+RbConfig::CONFIG["CPP"] = RbConfig::CONFIG["CXX"] + " -E"
 
 create_makefile("ogre")

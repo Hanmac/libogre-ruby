@@ -9,8 +9,7 @@ VALUE OgreSphere_alloc(VALUE self)
 	Ogre::Sphere *temp = new Ogre::Sphere;
 	return wrap(temp);
 }
-
-/*
+/*:nodoc:
 
 
 */
@@ -22,8 +21,7 @@ VALUE OgreSphere_set_center(VALUE self,VALUE vec)
 		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreVector3),rb_obj_classname(vec));
 	return vec;
 }
-
-/*
+/*:nodoc:
 
 
 */
@@ -32,8 +30,7 @@ VALUE OgreSphere_set_radius(VALUE self,VALUE radius)
 	_self->setRadius(NUM2DBL(radius));
 	return radius;
 }
-
-/*
+/*:nodoc:
 
 
 */
@@ -41,8 +38,7 @@ VALUE OgreSphere_get_center(VALUE self)
 {
 	return wrap(_self->getCenter());
 }
-
-/*
+/*:nodoc:
 
 
 */
@@ -50,11 +46,13 @@ VALUE OgreSphere_get_radius(VALUE self)
 {
 	return DBL2NUM(_self->getRadius());
 }
-
-
 /*
-
-
+ * call-seq:
+ *   sphere.inspect -> String
+ * 
+ * Human-readable description. 
+ * ===Return value
+ * String
 */
 VALUE OgreSphere_inspect(VALUE self)
 {
@@ -65,7 +63,6 @@ VALUE OgreSphere_inspect(VALUE self)
 	array[3]=OgreSphere_get_radius(self);
 	return rb_f_sprintf(4,array);
 }
-
 /*
 
 
@@ -76,8 +73,6 @@ VALUE OgreSphere_initialize(VALUE self,VALUE vec,VALUE radius)
 	OgreSphere_set_radius(self,radius);
 	return self;
 }
-
-
 /*
 
 
@@ -89,6 +84,24 @@ VALUE OgreSphere_equal(VALUE self,VALUE other)
 		return _self->getCenter() == cother->getCenter() && _self->getRadius() == cother->getRadius() ? Qtrue : Qfalse;
 	}else
 		return Qfalse;
+}
+/*
+
+
+*/
+VALUE OgreSphere_swap(VALUE self,VALUE other)
+{
+	if(rb_obj_is_kind_of(other,rb_cOgreSphere)){
+		Ogre::Sphere *cother = wrap<Ogre::Sphere*>(other);
+		Ogre::Real temp_radius = _self->getRadius();
+		Ogre::Vector3 temp_vec = _self->getCenter();
+		_self->setRadius(cother->getRadius());
+		_self->setCenter(cother->getCenter());
+		cother->setRadius(temp_radius);
+		cother->setCenter(temp_vec);		
+		return self;
+	}else
+		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreSphere),rb_obj_classname(other));
 }
 /*
 
@@ -108,10 +121,25 @@ VALUE OgreSphere_intersects(VALUE self,VALUE other)
 		rb_obj_classname(other));
 	return result ? Qtrue : Qfalse;
 }
+/*
+ * Document-class: Ogre::Sphere
+ * 
+ * This class represents an Sphere. 
+*/ 
+
+/* Document-attr: center
+ * The center Vector3 of the Sphere. */
+/* Document-attr: radius
+ * The radius of the Sphere. */
+
+
 void Init_OgreSphere(VALUE rb_mOgre)
 {
 #if 0
 	rb_mOgre = rb_define_module("Ogre");
+	
+	rb_define_attr(rb_cOgreSphere,"center",1,1);
+	rb_define_attr(rb_cOgreSphere,"radius",1,1);
 #endif
 	rb_cOgreSphere = rb_define_class_under(rb_mOgre,"Sphere",rb_cObject);
 	rb_define_alloc_func(rb_cOgreSphere,OgreSphere_alloc);
@@ -126,5 +154,6 @@ void Init_OgreSphere(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreSphere,"inspect",RUBY_METHOD_FUNC(OgreSphere_inspect),0);
 	rb_define_method(rb_cOgreSphere,"intersects?",RUBY_METHOD_FUNC(OgreSphere_intersects),1);
 	rb_define_method(rb_cOgreSphere,"==",RUBY_METHOD_FUNC(OgreSphere_equal),1);
+	rb_define_method(rb_cOgreSphere,"swap",RUBY_METHOD_FUNC(OgreSphere_swap),1);
 }
 

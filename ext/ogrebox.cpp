@@ -14,7 +14,7 @@ VALUE OgreBox_alloc(VALUE self)
 */
 VALUE OgreBox_get_left(VALUE self)
 {
-	return INT2NUM(_self->left);
+	return UINT2NUM(_self->left);
 }
 /*
 
@@ -22,7 +22,7 @@ VALUE OgreBox_get_left(VALUE self)
 */
 VALUE OgreBox_get_top(VALUE self)
 {
-	return INT2NUM(_self->top);
+	return UINT2NUM(_self->top);
 }
 /*
 
@@ -30,7 +30,7 @@ VALUE OgreBox_get_top(VALUE self)
 */
 VALUE OgreBox_get_right(VALUE self)
 {
-	return INT2NUM(_self->right);
+	return UINT2NUM(_self->right);
 }
 /*
 
@@ -38,7 +38,7 @@ VALUE OgreBox_get_right(VALUE self)
 */
 VALUE OgreBox_get_bottom(VALUE self)
 {
-	return INT2NUM(_self->bottom);
+	return UINT2NUM(_self->bottom);
 }
 /*
 
@@ -46,7 +46,7 @@ VALUE OgreBox_get_bottom(VALUE self)
 */
 VALUE OgreBox_get_front(VALUE self)
 {
-	return INT2NUM(_self->front);
+	return UINT2NUM(_self->front);
 }
 /*
 
@@ -54,7 +54,7 @@ VALUE OgreBox_get_front(VALUE self)
 */
 VALUE OgreBox_get_back(VALUE self)
 {
-	return INT2NUM(_self->back);
+	return UINT2NUM(_self->back);
 }
 /*
 
@@ -62,7 +62,7 @@ VALUE OgreBox_get_back(VALUE self)
 */
 VALUE OgreBox_set_left(VALUE self,VALUE val)
 {
-	_self->left = NUM2INT(val);
+	_self->left = NUM2UINT(val);
 	return val;
 }
 /*
@@ -71,7 +71,7 @@ VALUE OgreBox_set_left(VALUE self,VALUE val)
 */
 VALUE OgreBox_set_top(VALUE self,VALUE val)
 {
-	_self->top = NUM2INT(val);
+	_self->top = NUM2UINT(val);
 	return val;
 }
 /*
@@ -80,7 +80,7 @@ VALUE OgreBox_set_top(VALUE self,VALUE val)
 */
 VALUE OgreBox_set_right(VALUE self,VALUE val)
 {
-	_self->right = NUM2INT(val);
+	_self->right = NUM2UINT(val);
 	return val;
 }
 /*
@@ -89,7 +89,7 @@ VALUE OgreBox_set_right(VALUE self,VALUE val)
 */
 VALUE OgreBox_set_bottom(VALUE self,VALUE val)
 {
-	_self->bottom = NUM2INT(val);
+	_self->bottom = NUM2UINT(val);
 	return val;
 }
 /*
@@ -98,7 +98,7 @@ VALUE OgreBox_set_bottom(VALUE self,VALUE val)
 */
 VALUE OgreBox_set_front(VALUE self,VALUE val)
 {
-	_self->front = NUM2INT(val);
+	_self->front = NUM2UINT(val);
 	return val;
 }
 /*
@@ -107,7 +107,7 @@ VALUE OgreBox_set_front(VALUE self,VALUE val)
 */
 VALUE OgreBox_set_back(VALUE self,VALUE val)
 {
-	_self->back = NUM2INT(val);
+	_self->back = NUM2UINT(val);
 	return val;
 }
 /*
@@ -116,7 +116,7 @@ VALUE OgreBox_set_back(VALUE self,VALUE val)
 */
 VALUE OgreBox_width(VALUE self)
 {
-	return INT2NUM(_self->getWidth());
+	return UINT2NUM(_self->getWidth());
 }
 /*
 
@@ -124,7 +124,7 @@ VALUE OgreBox_width(VALUE self)
 */
 VALUE OgreBox_height(VALUE self)
 {
-	return INT2NUM(_self->getHeight());
+	return UINT2NUM(_self->getHeight());
 }
 /*
 
@@ -132,7 +132,7 @@ VALUE OgreBox_height(VALUE self)
 */
 VALUE OgreBox_depth(VALUE self)
 {
-	return INT2NUM(_self->getDepth());
+	return UINT2NUM(_self->getDepth());
 }
 
 
