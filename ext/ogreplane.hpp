@@ -13,14 +13,7 @@ inline VALUE wrap< Ogre::Plane >(Ogre::Plane *plane )
 }
 
 template <>
-inline VALUE wrap< Ogre::Plane >(Ogre::Plane plane )
-{
-	Ogre::Plane *temp = new Ogre::Plane(plane);
-	return wrap(temp);
-}
-
-template <>
-inline VALUE wrap< Ogre::Plane::Side >(Ogre::Plane::Side side )
+inline VALUE wrap< Ogre::Plane::Side >(const Ogre::Plane::Side &side )
 {
 	ID result;
 	switch(side){

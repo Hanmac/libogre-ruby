@@ -1,5 +1,6 @@
 #include "ogreresourcegroupmanager.hpp"
 #include "ogrefileinfo.hpp"
+#include "ogredatastream.hpp"
 #include "ogreexception.hpp"
 #define _self wrap<Ogre::ResourceGroupManager*>(self)
 VALUE rb_cOgreResourceGroupManager;
@@ -26,7 +27,7 @@ VALUE OgreResourceGroupManager_addResourceLocation(int argc,VALUE *argv,VALUE se
 	try{
 		_self->addResourceLocation(rb_string_value_cstr(&path),rb_string_value_cstr(&type),result,RTEST(recursive));
 	}catch(Ogre::ItemIdentityException& e){
-		rb_raise(rb_eOgreItemIdentityException,"%s",e.getDescription().c_str());
+		rb_raise(rb_eKeyError,"%s",e.getDescription().c_str());
 	}
 	return self;
 }
@@ -167,7 +168,9 @@ VALUE OgreResourceGroupManager_listResourceFileInfo(int argc,VALUE *argv,VALUE s
 		result = rb_string_value_cstr(&groupname);
 	if(NIL_P(dirs))
 		dirs = Qfalse;
-	return wrap(_self->listResourceFileInfo(result,RTEST(dirs)));
+	VALUE val = wrap<Ogre::FileInfo>(_self->listResourceFileInfo(result,RTEST(dirs)));
+	fputs("HILFE",stdout);
+	return val;
 }
 /*
 
@@ -284,7 +287,58 @@ VALUE OgreResourceGroupManager_undeclareResource(int argc,VALUE *argv,VALUE self
 	_self->undeclareResource(result,rb_string_value_cstr(&file));
 	return self;
 }
+/*
 
+
+*/
+VALUE OgreResourceGroupManager_openResources(int argc,VALUE *argv,VALUE self)
+{
+	VALUE file,groupname;
+	rb_scan_args(argc, argv, "11",&file,&groupname);
+	Ogre::String result;
+	if(NIL_P(groupname))
+		result = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
+	else
+		result = rb_string_value_cstr(&groupname);
+	return wrap(_self->openResources(rb_string_value_cstr(&file),result));
+}
+/*
+
+
+*/
+VALUE OgreResourceGroupManager_createResource(int argc,VALUE *argv,VALUE self)
+{
+	VALUE file,hash,temp;
+	bool overwrite;
+	rb_scan_args(argc, argv, "11",&file,&hash);
+	Ogre::String result,locationPattern;
+	if(!rb_obj_is_kind_of(hash,rb_cHash) || NIL_P(temp=rb_hash_aref(hash,ID2SYM(rb_intern("group_name")))))
+		result = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
+	else
+		result = rb_string_value_cstr(&temp);
+	if(!rb_obj_is_kind_of(hash,rb_cHash) || NIL_P(temp=rb_hash_aref(hash,ID2SYM(rb_intern("overwrite")))))
+		overwrite = false;
+	else
+		overwrite = RTEST(temp);
+	if(!rb_obj_is_kind_of(hash,rb_cHash) || NIL_P(temp=rb_hash_aref(hash,ID2SYM(rb_intern("pattern")))))
+		locationPattern = Ogre::StringUtil::BLANK;
+	else
+		locationPattern = rb_string_value_cstr(&temp);
+	try{
+		return wrap(_self->createResource(rb_string_value_cstr(&file),result,overwrite,locationPattern));
+	}catch(Ogre::ItemIdentityException& e){
+		rb_raise(rb_eKeyError,"%s",e.getDescription().c_str());
+	}
+}
+/*
+
+
+*/
+VALUE OgreResourceGroupManager_method_missing(int argc,VALUE *argv,VALUE self)
+{
+	VALUE temp = rb_funcall(self,rb_intern("instance"),0);
+	return rb_funcall2(temp,rb_intern("send"),argc,argv);
+}
 /*
 void loadResourceGroup(const String& name, bool loadMainResources = true, bool loadWorldGeom = true);
 void unloadResourceGroup(const String& name, bool reloadableOnly = true);
@@ -314,7 +368,8 @@ void Init_OgreResourceGroupManager(VALUE rb_mOgre)
 	rb_include_module(rb_cOgreResourceGroupManager,rb_mSingleton);
 	#endif
 	rb_funcall(rb_cOgreResourceGroupManager,rb_intern("include"),1,rb_mSingleton);
-	rb_define_method(rb_cOgreResourceGroupManager,"addResourceLocation",RUBY_METHOD_FUNC(OgreResourceGroupManager_addResourceLocation),2);
+	rb_define_singleton_method(rb_cOgreResourceGroupManager,"method_missing",RUBY_METHOD_FUNC(OgreResourceGroupManager_method_missing),-1);
+	rb_define_method(rb_cOgreResourceGroupManager,"addResourceLocation",RUBY_METHOD_FUNC(OgreResourceGroupManager_addResourceLocation),-1);
 	
 	rb_define_method(rb_cOgreResourceGroupManager,"removeResourceLocation",RUBY_METHOD_FUNC(OgreResourceGroupManager_removeResourceLocation),-1);
 	rb_define_method(rb_cOgreResourceGroupManager,"resourceLocationExists?",RUBY_METHOD_FUNC(OgreResourceGroupManager_resourceLocationExists),-1);
@@ -336,4 +391,6 @@ void Init_OgreResourceGroupManager(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreResourceGroupManager,"createResourceGroup",RUBY_METHOD_FUNC(OgreResourceGroupManager_createResourceGroup),-1);
 	rb_define_method(rb_cOgreResourceGroupManager,"unloadResourceGroup",RUBY_METHOD_FUNC(OgreResourceGroupManager_unloadResourceGroup),-1);
 	rb_define_method(rb_cOgreResourceGroupManager,"undeclareResource",RUBY_METHOD_FUNC(OgreResourceGroupManager_undeclareResource),-1);
+	rb_define_method(rb_cOgreResourceGroupManager,"openResources",RUBY_METHOD_FUNC(OgreResourceGroupManager_openResources),-1);
+	rb_define_method(rb_cOgreResourceGroupManager,"createResource",RUBY_METHOD_FUNC(OgreResourceGroupManager_createResource),-1);
 }

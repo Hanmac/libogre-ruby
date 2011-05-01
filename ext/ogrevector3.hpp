@@ -13,14 +13,6 @@ inline VALUE wrap< Ogre::Vector3 >(Ogre::Vector3 *vector )
 }
 
 template <>
-inline VALUE wrap< Ogre::Vector3 >(Ogre::Vector3 vector )
-{
-	Ogre::Vector3 *temp = new Ogre::Vector3(vector);
-	return wrap(temp);
-}
-
-
-template <>
 inline Ogre::Vector3* wrap< Ogre::Vector3* >(const VALUE &vvector)
 {
 	if ( ! rb_obj_is_kind_of(vvector, rb_cOgreVector3) )

@@ -386,6 +386,13 @@ VALUE Numeric_durch_OgreVector3(VALUE self, VALUE other)
 	else
 		return rb_funcall(self,rb_intern("durchOgreVector3"),1,other);
 }
+
+/* Document-attr: x
+ * the x Cordinate */
+/* Document-attr: y
+ * the y Cordinate */
+/* Document-attr: z
+ * the z Cordinate */
 void Init_OgreVector3(VALUE rb_mOgre)
 {
 #if 0

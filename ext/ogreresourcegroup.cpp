@@ -1,6 +1,8 @@
 #include "ogreresourcegroup.hpp"
 //#include "ogreresourcegroupmanager.hpp"
 #include "ogrefileinfo.hpp"
+#include "ogredatastream.hpp"
+#include "ogreexception.hpp"
 #define selfname wrap<ResourceGroup*>(self)->name
 #define manager Ogre::ResourceGroupManager::getSingletonPtr()
 VALUE rb_cOgreResourceGroup;
@@ -21,7 +23,8 @@ VALUE OgreResourceGroup_initialize(int argc, VALUE *argv,VALUE self)
 	if(NIL_P(inGlobalPool))
 		inGlobalPool = Qtrue;
 	selfname = rb_string_value_cstr(&name);
-	manager->createResourceGroup(selfname,RTEST(inGlobalPool));
+	if(!manager->resourceGroupExists(selfname))
+		manager->createResourceGroup(selfname,RTEST(inGlobalPool));
 	return self;
 }
 /*
@@ -130,8 +133,8 @@ VALUE OgreResourceGroup_undeclareResource(VALUE self,VALUE name)
 {
 	manager->undeclareResource(selfname,rb_string_value_cstr(&name));
 	return self;
-}/*
-
+}
+/*
 
 */
 VALUE OgreResourceGroup_unloadResourceGroup(int argc,VALUE *argv,VALUE self)
@@ -142,6 +145,38 @@ VALUE OgreResourceGroup_unloadResourceGroup(int argc,VALUE *argv,VALUE self)
 		reloadableOnly = Qtrue;
 	manager->unloadResourceGroup(selfname,RTEST(reloadableOnly));
 	return self;
+}
+/*
+
+*/
+VALUE OgreResourceGroup_openResources(VALUE self,VALUE file)
+{
+	Ogre::String result;
+	return wrap(manager->openResources(rb_string_value_cstr(&file),selfname));
+}
+/*
+
+
+*/
+VALUE OgreResourceGroup_createResource(int argc,VALUE *argv,VALUE self)
+{
+	VALUE file,hash,temp;
+	bool overwrite;
+	rb_scan_args(argc, argv, "11",&file,&hash);
+	Ogre::String locationPattern;
+	if(!rb_obj_is_kind_of(hash,rb_cHash) || NIL_P(temp=rb_hash_aref(hash,ID2SYM(rb_intern("overwrite")))))
+		overwrite = false;
+	else
+		overwrite = RTEST(temp);
+	if(!rb_obj_is_kind_of(hash,rb_cHash) || NIL_P(temp=rb_hash_aref(hash,ID2SYM(rb_intern("pattern")))))
+		locationPattern = Ogre::StringUtil::BLANK;
+	else
+		locationPattern = rb_string_value_cstr(&temp);
+	try{
+		return wrap(manager->createResource(rb_string_value_cstr(&file),selfname,overwrite,locationPattern));
+	}catch(Ogre::ItemIdentityException& e){
+		rb_raise(rb_eKeyError,"%s",e.getDescription().c_str());
+	}
 }
 
 //void initialiseResourceGroup(const String& name);
@@ -155,7 +190,7 @@ void Init_OgreResourceGroup(VALUE rb_mOgre)
 	rb_define_alloc_func(rb_cOgreResourceGroup,OgreResourceGroup_alloc);
 	rb_define_private_method(rb_cOgreResourceGroup,"initialize_copy",RUBY_METHOD_FUNC(OgreResourceGroup_initialize_copy),1);
 	
-	rb_define_method(rb_cOgreResourceGroup,"initialize",RUBY_METHOD_FUNC(OgreResourceGroup_initialize),1);
+	rb_define_method(rb_cOgreResourceGroup,"initialize",RUBY_METHOD_FUNC(OgreResourceGroup_initialize),-1);
 	rb_define_method(rb_cOgreResourceGroup,"resourceLocationExists?",RUBY_METHOD_FUNC(OgreResourceGroup_resourceLocationExists),1);
 	rb_define_method(rb_cOgreResourceGroup,"listResourceNames",RUBY_METHOD_FUNC(OgreResourceGroup_listResourceNames),1);
 	rb_define_method(rb_cOgreResourceGroup,"listResourceLocations",RUBY_METHOD_FUNC(OgreResourceGroup_listResourceLocations),0);
@@ -169,4 +204,7 @@ void Init_OgreResourceGroup(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreResourceGroup,"inGlobalPool?",RUBY_METHOD_FUNC(OgreResourceGroup_inGlobalPool),0);
 	rb_define_method(rb_cOgreResourceGroup,"undeclareResource",RUBY_METHOD_FUNC(OgreResourceGroup_undeclareResource),1);
 	rb_define_method(rb_cOgreResourceGroup,"unloadResourceGroup",RUBY_METHOD_FUNC(OgreResourceGroup_unloadResourceGroup),-1);
+	
+	rb_define_method(rb_cOgreResourceGroup,"openResources",RUBY_METHOD_FUNC(OgreResourceGroup_openResources),1);
+	rb_define_method(rb_cOgreResourceGroup,"createResource",RUBY_METHOD_FUNC(OgreResourceGroup_createResource),-1);
 }

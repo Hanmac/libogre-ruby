@@ -15,12 +15,6 @@ inline VALUE wrap< ResourceGroup >(ResourceGroup *resgroup )
 {
 	return Data_Wrap_Struct(rb_cOgreResourceGroup, NULL, free, resgroup);
 }
-template <>
-inline VALUE wrap< ResourceGroup >(ResourceGroup resgroup )
-{
-	ResourceGroup *temp = new ResourceGroup(resgroup);
-	return wrap(temp);
-}
 
 template <>
 inline ResourceGroup* wrap< ResourceGroup* >(const VALUE &vresgroup)

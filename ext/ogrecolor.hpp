@@ -13,14 +13,6 @@ inline VALUE wrap< Ogre::ColourValue >(Ogre::ColourValue *color )
 }
 
 template <>
-inline VALUE wrap< Ogre::ColourValue >(Ogre::ColourValue color )
-{
-	Ogre::ColourValue *temp = new Ogre::ColourValue(color);
-	return wrap(temp);
-}
-
-
-template <>
 inline Ogre::ColourValue* wrap< Ogre::ColourValue* >(const VALUE &vcolor)
 {
 	if ( ! rb_obj_is_kind_of(vcolor, rb_cOgreColor) )

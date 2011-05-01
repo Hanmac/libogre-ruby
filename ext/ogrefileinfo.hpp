@@ -11,33 +11,18 @@ inline VALUE wrap< Ogre::FileInfo >(Ogre::FileInfo *fileinfo )
 {
 	return Data_Wrap_Struct(rb_cOgreFileInfo, NULL, free, fileinfo);
 }
+/*
 template <>
-inline VALUE wrap< Ogre::FileInfo >(Ogre::FileInfo fileinfo )
-{
-	Ogre::FileInfo *temp = new Ogre::FileInfo(fileinfo);
-	return wrap(temp);
-}
-template <>
-inline VALUE wrap< Ogre::FileInfoList >(Ogre::FileInfoList vec )
+inline VALUE wrap< Ogre::FileInfoListPtr >(const Ogre::FileInfoListPtr &vec )
 {
 	VALUE result = rb_ary_new();
-	Ogre::FileInfoList::iterator it;
-	for ( it=vec.begin() ; it < vec.end(); it++ )
+	Ogre::FileInfoList::const_iterator it;
+	for ( it=vec->begin() ; it != vec->end(); ++it ){
 		rb_ary_push(result,wrap(*it));
+	}
 	return result;
 }
-
-template <>
-inline VALUE wrap< Ogre::FileInfoListPtr >(Ogre::FileInfoListPtr vec )
-{
-	VALUE result = rb_ary_new();
-	Ogre::FileInfoList::iterator it;
-	for ( it=vec->begin() ; it < vec->end(); it++ )
-		rb_ary_push(result,wrap(*it));
-	return result;
-}
-
-
+*/
 template <>
 inline Ogre::FileInfo* wrap< Ogre::FileInfo* >(const VALUE &vfileinfo)
 {

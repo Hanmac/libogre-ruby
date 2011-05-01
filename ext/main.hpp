@@ -6,8 +6,12 @@
 
 template <typename T>
 VALUE wrap(T *arg){ return Qnil;};
+
 template <typename T>
-VALUE wrap(T arg){ return Qnil;};
+VALUE wrap(const T &arg){
+	T *temp = new T(arg);
+	return wrap(temp);
+};
 template <typename T>
 T wrap(const VALUE &arg){};
 
@@ -15,7 +19,7 @@ extern VALUE rb_mSingleton;
 
 
 template <>
-inline VALUE wrap< Ogre::String >(Ogre::String st )
+inline VALUE wrap< Ogre::String >(const Ogre::String &st )
 {
 	return rb_str_new2(st.c_str());
 }
@@ -33,12 +37,54 @@ VALUE wrap(Ogre::multimap<T,Y,P,A> arg){
 	return result;
 };
 
+/*
+template <typename T>
+VALUE wrap(const Ogre::SharedPtr<T> &ptr){
+	rb_warn("ptr");
+	return wrap<T>(ptr.get());
+};
+*/
+template <typename T>
+VALUE wrap(Ogre::list<T> &vec){
+	VALUE result = rb_ary_new();
+	typename Ogre::list<T>::iterator it;
+	for ( it=vec.begin() ; it != vec.end(); it++ )
+		rb_ary_push(result,wrap(*it));
+	return result;
+};
+
+template <typename T>
+VALUE wrap(Ogre::list<T> *vec){
+	VALUE result = rb_ary_new();
+	typename Ogre::list<T>::iterator it;
+	for ( it=vec->begin() ; it != vec->end(); it++ )
+		rb_ary_push(result,wrap(*it));
+	return result;
+};
+template <typename T>
+VALUE wrap(const Ogre::vector<T> &vec){
+	VALUE result = rb_ary_new();
+	typename Ogre::vector<T>::iterator it;
+	for ( it=vec.begin() ; it != vec.end(); it++ )
+		rb_ary_push(result,wrap(*it));
+	return result;
+};
+
+template <typename T>
+VALUE wrap(const Ogre::SharedPtr<typename Ogre::vector<T>::type> &vec){
+	VALUE result = rb_ary_new();
+	typename Ogre::vector<T>::type::const_iterator it;
+	for ( it=vec->begin() ; it != vec->end(); ++it ){
+		rb_ary_push(result,wrap<T>(*it));
+	}
+	return result;
+}
 
 template <>
-inline VALUE wrap< Ogre::NameValuePairList >(Ogre::NameValuePairList map )
+inline VALUE wrap< Ogre::NameValuePairList >(const Ogre::NameValuePairList &map )
 {
 	VALUE result = rb_hash_new();
-	Ogre::NameValuePairList::iterator it;
+	Ogre::NameValuePairList::const_iterator it;
 	for ( it=map.begin() ; it != map.end(); it++ )
 		rb_hash_aset(result,wrap(it->first),wrap(it->second));
 	return result;
@@ -47,21 +93,21 @@ inline VALUE wrap< Ogre::NameValuePairList >(Ogre::NameValuePairList map )
 
 
 template <>
-inline VALUE wrap< Ogre::StringVectorPtr >(Ogre::StringVectorPtr vec )
+inline VALUE wrap< Ogre::StringVectorPtr >(const Ogre::StringVectorPtr &vec )
 {
 	VALUE result = rb_ary_new();
 	
-	Ogre::StringVector::iterator it;
+	Ogre::StringVector::const_iterator it;
 	for ( it=vec->begin() ; it < vec->end(); it++ )
 		rb_ary_push(result,wrap(*it));
 	return result;
 }
 template <>
-inline VALUE wrap< Ogre::StringVector >(Ogre::StringVector vec )
+inline VALUE wrap< Ogre::StringVector >(const Ogre::StringVector &vec )
 {
 	VALUE result = rb_ary_new();
 	
-	Ogre::StringVector::iterator it;
+	Ogre::StringVector::const_iterator it;
 	for ( it=vec.begin() ; it < vec.end(); it++ )
 		rb_ary_push(result,wrap(*it));
 	return result;

@@ -15,13 +15,6 @@ inline VALUE wrap< Ogre::Image >(Ogre::Image *image )
 	return Data_Wrap_Struct(rb_cOgreImage, NULL, freeimage, image);
 }
 
-template <>
-inline VALUE wrap< Ogre::Image >(Ogre::Image image )
-{
-	Ogre::Image *temp = new Ogre::Image(image);
-	return wrap(temp);
-}
-
 
 template <>
 inline Ogre::Image* wrap< Ogre::Image* >(const VALUE &vimage)

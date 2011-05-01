@@ -1,6 +1,7 @@
 #include "ogreimage.hpp"
 #include "ogreexception.hpp"
 #include "ogrecolor.hpp"
+#include "ogredatastream.hpp"
 #define _self wrap<Ogre::Image*>(self)
 VALUE rb_cOgreImage;
 
@@ -16,7 +17,18 @@ VALUE OgreImage_alloc(VALUE self)
 */
 VALUE OgreImage_initialize(int argc,VALUE* argv,VALUE self)
 {
-
+	VALUE path,groupname;
+	rb_scan_args(argc, argv, "11",&path,&groupname);
+	Ogre::String result;
+	if(NIL_P(groupname))
+		result = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
+	else
+		result = rb_string_value_cstr(&groupname);
+	try {
+	_self->load(rb_string_value_cstr(&path),result);
+	} catch (Ogre::Exception& e){
+		rb_raise(wrap(e));
+	}
 	return self;
 }
 /*
@@ -55,36 +67,13 @@ VALUE OgreImage_depth(VALUE self)
 
 
 */
-VALUE OgreImage_load(int argc,VALUE *argv,VALUE self)
-{
-	VALUE path,groupname;
-	rb_scan_args(argc, argv, "11",&path,&groupname);
-	Ogre::String result;
-	if(NIL_P(groupname))
-		result = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
-	else
-		result = rb_string_value_cstr(&groupname);
-	try {
-	_self->load(rb_string_value_cstr(&path),result);
-	} catch (Ogre::FileNotFoundException& e){
-		errno = e.getNumber();
-		rb_sys_fail(e.getDescription().c_str());
-	}
-	return self;
-}
-/*
-
-
-*/
 VALUE OgreImage_get(VALUE self,VALUE x,VALUE y,VALUE z)
 {
 	if(_self->getFormat()==Ogre::PF_UNKNOWN)
 		return Qnil;
 	if((_self->getWidth() <= NUM2UINT(x)) || (_self->getHeight() <= NUM2UINT(y)) || (_self->getDepth() <= NUM2UINT(z)))
 		return Qnil;
-	Ogre::ColourValue temp = _self->getColourAt(NUM2INT(x),NUM2INT(y),NUM2INT(z));
-	
-	return wrap(temp);
+	return wrap(_self->getColourAt(NUM2INT(x),NUM2INT(y),NUM2INT(z)));
 }
 /*
 
@@ -124,7 +113,6 @@ void Init_OgreImage(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreImage,"width",RUBY_METHOD_FUNC(OgreImage_width),0);
 	rb_define_method(rb_cOgreImage,"height",RUBY_METHOD_FUNC(OgreImage_height),0);
 	rb_define_method(rb_cOgreImage,"depth",RUBY_METHOD_FUNC(OgreImage_depth),0);
-	rb_define_method(rb_cOgreImage,"load",RUBY_METHOD_FUNC(OgreImage_load),1);
 	rb_define_method(rb_cOgreImage,"[]",RUBY_METHOD_FUNC(OgreImage_get),3);
 	rb_define_method(rb_cOgreImage,"alpha?",RUBY_METHOD_FUNC(OgreImage_hasAlpha),0);
 	rb_define_method(rb_cOgreImage,"flipAroundY",RUBY_METHOD_FUNC(OgreImage_flipAroundY),0);

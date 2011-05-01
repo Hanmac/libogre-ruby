@@ -13,14 +13,6 @@ inline VALUE wrap< Ogre::Degree >(Ogre::Degree *degree )
 }
 
 template <>
-inline VALUE wrap< Ogre::Degree >(Ogre::Degree degree )
-{
-	Ogre::Degree *temp = new Ogre::Degree(degree);
-	return wrap(temp);
-}
-
-
-template <>
 inline Ogre::Degree* wrap< Ogre::Degree* >(const VALUE &vdegree)
 {
 	if ( ! rb_obj_is_kind_of(vdegree, rb_cOgreDegree) )

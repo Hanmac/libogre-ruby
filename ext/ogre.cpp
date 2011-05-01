@@ -13,6 +13,8 @@
 #include "ogrefileinfo.hpp"
 #include "ogreresourcegroup.hpp"
 #include "ogrepolygon.hpp"
+#include "ogredatastream.hpp"
+#include "ogreconfigfile.hpp"
 VALUE rb_mOgre,rb_mSingleton;
 Ogre::Root *root;
 extern "C" void Init_ogre(void)
@@ -41,6 +43,9 @@ extern "C" void Init_ogre(void)
 	Init_OgreFileInfo(rb_mOgre);
 	Init_OgreResourceGroup(rb_mOgre);
 	Init_OgrePolygon(rb_mOgre);
+	Init_OgreDataStream(rb_mOgre);
+	Init_OgreConfigFile(rb_mOgre);
+	
 	VALUE array[4];
 	array[0]=rb_str_new2("%d.%d.%d");
 	array[1]=INT2NUM(OGRE_VERSION_MAJOR);

@@ -13,14 +13,6 @@ inline VALUE wrap< Ogre::Sphere >(Ogre::Sphere *sphere )
 }
 
 template <>
-inline VALUE wrap< Ogre::Sphere >(Ogre::Sphere sphere )
-{
-	Ogre::Sphere *temp = new Ogre::Sphere(sphere);
-	return wrap(temp);
-}
-
-
-template <>
 inline Ogre::Sphere* wrap< Ogre::Sphere* >(const VALUE &vsphere)
 {
 	if ( ! rb_obj_is_kind_of(vsphere, rb_cOgreSphere) )

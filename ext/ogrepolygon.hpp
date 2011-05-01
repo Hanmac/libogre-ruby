@@ -13,17 +13,10 @@ inline VALUE wrap< Ogre::Polygon >(Ogre::Polygon *polygon )
 }
 
 template <>
-inline VALUE wrap< Ogre::Polygon >(Ogre::Polygon polygon )
-{
-	Ogre::Polygon *temp = new Ogre::Polygon(polygon);
-	return wrap(temp);
-}
-
-template <>
-inline VALUE wrap< Ogre::Polygon::EdgeMap >(Ogre::Polygon::EdgeMap edge )
+inline VALUE wrap< Ogre::Polygon::EdgeMap >(const Ogre::Polygon::EdgeMap &edge )
 {
 	VALUE result = rb_hash_new();
-	Ogre::Polygon::EdgeMap::iterator it;
+	Ogre::Polygon::EdgeMap::const_iterator it;
 	for ( it=edge.begin() ; it != edge.end(); it++ ){
 		VALUE temp = wrap(it->first);
 		if(NIL_P(rb_hash_lookup(result,temp)))
