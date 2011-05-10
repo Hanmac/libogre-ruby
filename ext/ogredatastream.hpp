@@ -18,30 +18,8 @@ inline VALUE wrap< Ogre::DataStreamPtr >(const Ogre::DataStreamPtr &datastream )
 	return Data_Wrap_Struct(rb_cOgreDataStream, NULL, free, tmp);
 }
 template <>
-inline VALUE wrap< Ogre::DataStream >(Ogre::DataStream *datastream )
-{
-	return Data_Wrap_Struct(rb_cOgreDataStream, NULL, NULL, datastream);
-}
-template <>
-inline VALUE wrap< Ogre::DataStreamList >(const Ogre::DataStreamList &vec )
-{
-	VALUE result = rb_ary_new();
-	Ogre::DataStreamList::const_iterator it;
-	for ( it=vec.begin() ; it != vec.end(); it++ )
-		rb_ary_push(result,wrap(*it));
-	return result;
-}
-
-template <>
 inline VALUE wrap< Ogre::DataStreamListPtr >(const Ogre::DataStreamListPtr &vec )
-{
-	VALUE result = rb_ary_new();
-	Ogre::DataStreamList::const_iterator it;
-	for ( it=vec->begin() ; it != vec->end(); it++ )
-		rb_ary_push(result,wrap(*it));
-	return result;
-}
-
+{	return wrap<Ogre::DataStreamPtr>(vec);}
 template <>
 inline Ogre::DataStreamPtr wrap< Ogre::DataStreamPtr >(const VALUE &vdatastream)
 {
@@ -51,7 +29,6 @@ inline Ogre::DataStreamPtr wrap< Ogre::DataStreamPtr >(const VALUE &vdatastream)
   Data_Get_Struct( vdatastream, rb_ogre_datastream_holder, datastream);
 	return datastream->ptr;
 }
-
 template <>
 inline Ogre::DataStream* wrap< Ogre::DataStream* >(const VALUE &vdatastream)
 {

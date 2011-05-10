@@ -5,6 +5,8 @@ VALUE rb_eOgreIOError;
 VALUE rb_eOgreItemIdentityException;
 VALUE rb_eOgreFileNotFoundError;
 VALUE rb_eOgreUnimplementedException;
+VALUE rb_eOgreInvalidStateException;
+VALUE rb_eOgreInternalErrorException;
 VALUE rb_eErrnoENT;
 /*
 
@@ -64,9 +66,14 @@ void Init_OgreException(VALUE rb_mOgre)
 	rb_eOgreFileNotFoundError = rb_define_class_under(rb_mOgreError,"FileNotFound",rb_eErrnoENT);
 	rb_eOgreItemIdentityException = rb_define_class_under(rb_mOgreError,"ItemIdentityException",rb_eKeyError);
 	rb_eOgreUnimplementedException = rb_define_class_under(rb_mOgreError,"UnimplementedException",rb_eNotImpError);
+	rb_eOgreInvalidStateException = rb_define_class_under(rb_mOgreError,"InvalidStateException",rb_eException);
+	rb_eOgreInternalErrorException = rb_define_class_under(rb_mOgreError,"InternalErrorException",rb_eSyntaxError);
 	
 	rb_include_module(rb_eOgreIOError,rb_mOgreError);
 	rb_include_module(rb_eOgreFileNotFoundError,rb_mOgreError);
 	rb_include_module(rb_eOgreItemIdentityException,rb_mOgreError);
 	rb_include_module(rb_eOgreUnimplementedException,rb_mOgreError);
+	rb_include_module(rb_eOgreInvalidStateException,rb_mOgreError);
+	rb_include_module(rb_eOgreInternalErrorException,rb_mOgreError);
+
 }

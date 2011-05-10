@@ -7,7 +7,8 @@ extern VALUE rb_mOgreError;
 
 extern VALUE rb_eOgreFileNotFoundError,	rb_eOgreIOError,
 	rb_eOgreItemIdentityException, rb_eOgreInvalidParametersException, 
-	rb_eOgreUnimplementedException;
+	rb_eOgreUnimplementedException, rb_eOgreInvalidStateException, 
+	rb_eOgreInternalErrorException;
 
 extern VALUE rb_eErrnoENT;
 
@@ -41,6 +42,16 @@ inline VALUE wrap< Ogre::UnimplementedException >(Ogre::UnimplementedException *
 {
 	return Data_Wrap_Struct(rb_eOgreUnimplementedException, NULL, free, exception);
 }
+template <>
+inline VALUE wrap< Ogre::InvalidStateException >(Ogre::InvalidStateException *exception )
+{
+	return Data_Wrap_Struct(rb_eOgreInvalidStateException, NULL, free, exception);
+}
+template <>
+inline VALUE wrap< Ogre::InternalErrorException >(Ogre::InternalErrorException *exception )
+{
+	return Data_Wrap_Struct(rb_eOgreInternalErrorException, NULL, free, exception);
+}
 
 template <>
 inline VALUE wrap<Ogre::Exception >(const Ogre::Exception &e )
@@ -57,6 +68,10 @@ inline VALUE wrap<Ogre::Exception >(const Ogre::Exception &e )
 		return wrap(*reinterpret_cast<const Ogre::InvalidParametersException*>(&e));
 	case Ogre::Exception::ERR_NOT_IMPLEMENTED:
 		return wrap(*reinterpret_cast<const Ogre::UnimplementedException*>(&e));
+	case Ogre::Exception::ERR_INVALID_STATE:
+		return wrap(*reinterpret_cast<const Ogre::InvalidStateException*>(&e));
+	case Ogre::Exception::ERR_INTERNAL_ERROR:
+		return wrap(*reinterpret_cast<const Ogre::InternalErrorException*>(&e));
 	default:
 		return Qnil;
 	}

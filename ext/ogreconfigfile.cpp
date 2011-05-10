@@ -27,7 +27,7 @@ VALUE OgreConfigFile_initialize(int argc,VALUE* argv,VALUE self)
 		separators = rb_string_value_cstr(&temp);
 	try{
 		if(rb_obj_is_kind_of(file,rb_cOgreDataStream))
-			_self->load((Ogre::DataStreamPtr)wrap<Ogre::DataStream*>(file),separators,trimWhitespace);
+			_self->load(wrap<Ogre::DataStreamPtr>(file),separators,trimWhitespace);
 		if(!rb_obj_is_kind_of(hash,rb_cHash) || NIL_P(temp=rb_hash_aref(hash,ID2SYM(rb_intern("group_name")))))
 			_self->load(rb_string_value_cstr(&file),separators,trimWhitespace);
 		else

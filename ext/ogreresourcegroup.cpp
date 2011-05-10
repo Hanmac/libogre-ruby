@@ -53,7 +53,7 @@ VALUE OgreResourceGroup_listResourceNames(int argc,VALUE *argv,VALUE self)
 {
 	VALUE dirs;
 	rb_scan_args(argc, argv, "01",&dirs);
-	return wrap(manager->listResourceNames(selfname,RTEST(dirs)));	
+	return wrap<Ogre::String>(manager->listResourceNames(selfname,RTEST(dirs)));	
 }
 /*
 
@@ -61,7 +61,7 @@ VALUE OgreResourceGroup_listResourceNames(int argc,VALUE *argv,VALUE self)
 */
 VALUE OgreResourceGroup_listResourceLocations(VALUE self)
 {
-	return wrap(manager->listResourceLocations(selfname));
+	return wrap<Ogre::String>(manager->listResourceLocations(selfname));
 }
 /*
 
@@ -73,7 +73,7 @@ VALUE OgreResourceGroup_listResourceFileInfo(int argc,VALUE *argv,VALUE self)
 	rb_scan_args(argc, argv, "01",&dirs);
 	if(NIL_P(dirs))
 		dirs = Qfalse;
-	return wrap(manager->listResourceFileInfo(selfname,RTEST(dirs)));
+	return wrap<Ogre::FileInfo>(manager->listResourceFileInfo(selfname,RTEST(dirs)));
 }
 /*
 
@@ -151,8 +151,7 @@ VALUE OgreResourceGroup_unloadResourceGroup(int argc,VALUE *argv,VALUE self)
 */
 VALUE OgreResourceGroup_openResources(VALUE self,VALUE file)
 {
-	Ogre::String result;
-	return wrap(manager->openResources(rb_string_value_cstr(&file),selfname));
+	return wrap<Ogre::DataStreamPtr>(manager->openResources(rb_string_value_cstr(&file),selfname));
 }
 /*
 
@@ -174,9 +173,10 @@ VALUE OgreResourceGroup_createResource(int argc,VALUE *argv,VALUE self)
 		locationPattern = rb_string_value_cstr(&temp);
 	try{
 		return wrap(manager->createResource(rb_string_value_cstr(&file),selfname,overwrite,locationPattern));
-	}catch(Ogre::ItemIdentityException& e){
-		rb_raise(rb_eKeyError,"%s",e.getDescription().c_str());
+	}catch(Ogre::Exception& e){
+		rb_raise(wrap(e));
 	}
+	return Qnil;
 }
 
 //void initialiseResourceGroup(const String& name);
@@ -194,7 +194,7 @@ void Init_OgreResourceGroup(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreResourceGroup,"resourceLocationExists?",RUBY_METHOD_FUNC(OgreResourceGroup_resourceLocationExists),1);
 	rb_define_method(rb_cOgreResourceGroup,"listResourceNames",RUBY_METHOD_FUNC(OgreResourceGroup_listResourceNames),1);
 	rb_define_method(rb_cOgreResourceGroup,"listResourceLocations",RUBY_METHOD_FUNC(OgreResourceGroup_listResourceLocations),0);
-	rb_define_method(rb_cOgreResourceGroup,"listResourceFileInfo",RUBY_METHOD_FUNC(OgreResourceGroup_listResourceFileInfo),0);
+	rb_define_method(rb_cOgreResourceGroup,"listResourceFileInfo",RUBY_METHOD_FUNC(OgreResourceGroup_listResourceFileInfo),-1);
 	
 	rb_define_method(rb_cOgreResourceGroup,"clear",RUBY_METHOD_FUNC(OgreResourceGroup_clear),0);
 	rb_define_method(rb_cOgreResourceGroup,"destroy",RUBY_METHOD_FUNC(OgreResourceGroup_destroy),0);

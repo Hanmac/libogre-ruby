@@ -9,7 +9,7 @@ extern VALUE rb_cOgreResource;
 template <>
 inline VALUE wrap< Ogre::Resource >(Ogre::Resource *resource )
 {
-	return Data_Wrap_Struct(rb_cOgreResource, NULL, free, resource);
+	return Data_Wrap_Struct(rb_cOgreResource, NULL, NULL, resource);
 }
 
 template <>

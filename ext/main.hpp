@@ -3,26 +3,22 @@
 
 #include <ruby.h>
 #include <Ogre.h>
+#include <typeinfo>
 
 template <typename T>
-VALUE wrap(T *arg){ return Qnil;};
-
-template <typename T>
-VALUE wrap(const T &arg){
-	T *temp = new T(arg);
-	return wrap(temp);
+VALUE wrap(T *arg){
+	rb_warn("unknown convertion from %s to VALUE. return nil instat.",typeid(T).name());
+	return Qnil;
 };
+
 template <typename T>
-T wrap(const VALUE &arg){};
+T wrap(const VALUE &arg){
+	rb_warn("unknown convertion from VALUE to %s. return %s() instat.",typeid(T).name(),typeid(T).name());
+	return T();
+};
 
 extern VALUE rb_mSingleton;
 
-
-template <>
-inline VALUE wrap< Ogre::String >(const Ogre::String &st )
-{
-	return rb_str_new2(st.c_str());
-}
 
 template <typename T,typename Y,typename P,typename A>
 VALUE wrap(Ogre::multimap<T,Y,P,A> arg){
@@ -37,38 +33,61 @@ VALUE wrap(Ogre::multimap<T,Y,P,A> arg){
 	return result;
 };
 
+//*template <>
+template <typename T>
+VALUE wrap(const Ogre::Singleton<T> &s){
+	return wrap<T*>(s);
+}
+
+template <typename T>
+VALUE wrap(const T &arg){
+	return wrap(new T(arg));
+};
 /*
 template <typename T>
-VALUE wrap(const Ogre::SharedPtr<T> &ptr){
-	rb_warn("ptr");
+VALUE wrap(Ogre::SharedPtr<T> ptr){
 	return wrap<T>(ptr.get());
 };
 */
+
 template <typename T>
-VALUE wrap(Ogre::list<T> &vec){
+VALUE wrap(const std::vector<T> &vec){
 	VALUE result = rb_ary_new();
-	typename Ogre::list<T>::iterator it;
+	typename std::vector<T>::const_iterator it;
+	for ( it=vec.begin() ; it != vec.end(); it++ )
+		rb_ary_push(result,wrap(*it));
+	return result;
+};
+
+
+template <typename T>
+VALUE wrap(const typename Ogre::vector<T>::type &vec){
+	VALUE result = rb_ary_new();
+	typename Ogre::vector<T>::type::const_iterator it;
 	for ( it=vec.begin() ; it != vec.end(); it++ )
 		rb_ary_push(result,wrap(*it));
 	return result;
 };
 
 template <typename T>
-VALUE wrap(Ogre::list<T> *vec){
+VALUE wrap(const typename Ogre::vector<T*>::type &vec){
 	VALUE result = rb_ary_new();
-	typename Ogre::list<T>::iterator it;
-	for ( it=vec->begin() ; it != vec->end(); it++ )
-		rb_ary_push(result,wrap(*it));
-	return result;
-};
-template <typename T>
-VALUE wrap(const Ogre::vector<T> &vec){
-	VALUE result = rb_ary_new();
-	typename Ogre::vector<T>::iterator it;
+	typename Ogre::vector<T*>::type::const_iterator it;
 	for ( it=vec.begin() ; it != vec.end(); it++ )
-		rb_ary_push(result,wrap(*it));
+		rb_ary_push(result,wrap<T>(*it));
 	return result;
 };
+
+template <typename T>
+VALUE wrap(const Ogre::SharedPtr<typename Ogre::list<T>::type> &vec){
+	VALUE result = rb_ary_new();
+	typename Ogre::list<T>::type::const_iterator it;
+	for ( it=vec->begin() ; it != vec->end(); ++it ){
+		rb_ary_push(result,wrap<T>(*it));
+	}
+	return result;
+};
+
 
 template <typename T>
 VALUE wrap(const Ogre::SharedPtr<typename Ogre::vector<T>::type> &vec){
@@ -78,7 +97,20 @@ VALUE wrap(const Ogre::SharedPtr<typename Ogre::vector<T>::type> &vec){
 		rb_ary_push(result,wrap<T>(*it));
 	}
 	return result;
+};
+
+template <>
+inline VALUE wrap< Ogre::String >(const Ogre::String &st )
+{
+	return rb_str_new2(st.c_str());
 }
+/*
+template <>
+inline VALUE wrap< Ogre::StringVector >(const Ogre::StringVector &vec )
+{
+	return wrap((const Ogre::vector<Ogre::String>::type)vec);
+}
+*/
 
 template <>
 inline VALUE wrap< Ogre::NameValuePairList >(const Ogre::NameValuePairList &map )
@@ -89,29 +121,9 @@ inline VALUE wrap< Ogre::NameValuePairList >(const Ogre::NameValuePairList &map 
 		rb_hash_aset(result,wrap(it->first),wrap(it->second));
 	return result;
 }
+/*
 
-
-
-template <>
-inline VALUE wrap< Ogre::StringVectorPtr >(const Ogre::StringVectorPtr &vec )
-{
-	VALUE result = rb_ary_new();
-	
-	Ogre::StringVector::const_iterator it;
-	for ( it=vec->begin() ; it < vec->end(); it++ )
-		rb_ary_push(result,wrap(*it));
-	return result;
-}
-template <>
-inline VALUE wrap< Ogre::StringVector >(const Ogre::StringVector &vec )
-{
-	VALUE result = rb_ary_new();
-	
-	Ogre::StringVector::const_iterator it;
-	for ( it=vec.begin() ; it < vec.end(); it++ )
-		rb_ary_push(result,wrap(*it));
-	return result;
-}
-
+*/
+VALUE OgreSingleton_method_missing(int argc,VALUE *argv,VALUE self);
 #endif /* __RubyOgreMain_H__ */
 
