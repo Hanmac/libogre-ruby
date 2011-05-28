@@ -6,40 +6,28 @@ VALUE rb_cOgrePlane;
 
 VALUE OgrePlane_alloc(VALUE self)
 {
-	Ogre::Plane *temp = new Ogre::Plane;
-	return wrap(temp);
+	return wrap(new Ogre::Plane);
 }
-/*
-
-
+/*:nodoc:
 */
 VALUE OgrePlane_get_normal(VALUE self)
 {
 	return wrap(_self->normal);
 }
-/*
-
-
+/*:nodoc:
 */
 VALUE OgrePlane_get_d(VALUE self)
 {
 	return DBL2NUM(_self->d);
 }
-/*
-
-
+/*:nodoc:
 */
 VALUE OgrePlane_set_normal(VALUE self,VALUE vec)
 {
-	if(rb_obj_is_kind_of(vec,rb_cOgreVector3))
-		_self->normal = *wrap<Ogre::Vector3*>(vec);
-	else
-		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreVector3),rb_obj_classname(vec));
+	_self->normal = *wrap<Ogre::Vector3*>(vec);
 	return vec;
 }
-/*
-
-
+/*:nodoc:
 */
 VALUE OgrePlane_set_d(VALUE self,VALUE d)
 {
@@ -47,15 +35,11 @@ VALUE OgrePlane_set_d(VALUE self,VALUE d)
 	return d;
 }
 /*
-
-
 */
 VALUE OgrePlane_initialize(int argc,VALUE* argv,VALUE self)
 {
 	VALUE vec,other,vec3;
 	rb_scan_args(argc, argv, "21",&vec,&other,&vec3);
-	if(!rb_obj_is_kind_of(vec,rb_cOgreVector3))
-		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreVector3),rb_obj_classname(vec));
 	if(NIL_P(vec3))
 		_self->redefine(*wrap<Ogre::Vector3*>(vec),*wrap<Ogre::Vector3*>(other),*wrap<Ogre::Vector3*>(vec3));
 	else if(rb_obj_is_kind_of(other,rb_cOgreVector3)){
@@ -67,8 +51,6 @@ VALUE OgrePlane_initialize(int argc,VALUE* argv,VALUE self)
 	return self;
 }
 /*
-
-
 */
 VALUE OgrePlane_initialize_copy(VALUE self, VALUE other)
 {
@@ -78,8 +60,12 @@ VALUE OgrePlane_initialize_copy(VALUE self, VALUE other)
 	return result;
 }
 /*
-
-
+ * call-seq:
+ *   vector3.inspect -> String
+ * 
+ * Human-readable description. 
+ * ===Return value
+ * String
 */
 VALUE OgrePlane_inspect(VALUE self)
 {
@@ -91,8 +77,45 @@ VALUE OgrePlane_inspect(VALUE self)
 	return rb_f_sprintf(4,array);
 }
 /*
+ * call-seq:
+ *   vector.hash -> Integer
+ * 
+ * hash from the combined vector3 values.
+ * ===Return value
+ * Integer
+*/
+VALUE OgrePlane_hash(VALUE self)
+{
+	VALUE result = rb_ary_new();
+	rb_ary_push(result,OgrePlane_get_normal(self));
+	rb_ary_push(result,OgrePlane_get_d(self));
+	return rb_funcall(result,rb_intern("hash"),0);
+}
+/*
+	
+*/
+VALUE OgrePlane_marshal_dump(VALUE self)
+{
+	VALUE result = rb_ary_new();
+	rb_ary_push(result,DBL2NUM(_self->normal.x));
+	rb_ary_push(result,DBL2NUM(_self->normal.y));
+	rb_ary_push(result,DBL2NUM(_self->normal.z));
+	rb_ary_push(result,OgrePlane_get_d(self));
+	return rb_funcall(result,rb_intern("pack"),1,rb_str_new2("dddd"));
+}
+/*
 
-
+*/
+VALUE OgrePlane_marshal_load(VALUE self,VALUE load)
+{
+	VALUE result = rb_funcall(load,rb_intern("unpack"),1,rb_str_new2("dddd"));
+	OgrePlane_set_d(self,rb_ary_pop(result));
+	_self->normal.z = NUM2DBL(rb_ary_pop(result));
+	_self->normal.y = NUM2DBL(rb_ary_pop(result));
+	_self->normal.x = NUM2DBL(rb_ary_pop(result));
+	return self;
+}
+/*
 */
 VALUE OgrePlane_equal(VALUE self,VALUE other)
 {
@@ -102,32 +125,24 @@ VALUE OgrePlane_equal(VALUE self,VALUE other)
 		return Qfalse;
 }
 /*
-
-
 */
 VALUE OgrePlane_getDistance(VALUE self,VALUE vec)
 {
-	if(rb_obj_is_kind_of(vec,rb_cOgreVector3))
-		return DBL2NUM(_self->getDistance(*wrap<Ogre::Vector3*>(vec)));
-	else
-		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreVector3),rb_obj_classname(vec));
+	return DBL2NUM(_self->getDistance(*wrap<Ogre::Vector3*>(vec)));
 }
 /*
-
-
 */
 VALUE OgrePlane_projectVector(VALUE self,VALUE vec)
 {
-	if(rb_obj_is_kind_of(vec,rb_cOgreVector3))
-		return wrap(_self->projectVector(*wrap<Ogre::Vector3*>(vec)));
-	else
-		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreVector3),rb_obj_classname(vec));
+	return wrap(_self->projectVector(*wrap<Ogre::Vector3*>(vec)));
 }
 
 void Init_OgrePlane(VALUE rb_mOgre)
 {
 #if 0
 	rb_mOgre = rb_define_module("Ogre");
+	rb_define_attr(rb_cOgrePlane,"normal",1,1);
+	rb_define_attr(rb_cOgrePlane,"d",1,1);
 #endif
 	rb_cOgrePlane = rb_define_class_under(rb_mOgre,"Plane",rb_cObject);
 	rb_define_alloc_func(rb_cOgrePlane,OgrePlane_alloc);
@@ -142,5 +157,9 @@ void Init_OgrePlane(VALUE rb_mOgre)
 	rb_define_method(rb_cOgrePlane,"==",RUBY_METHOD_FUNC(OgrePlane_equal),1);
 	rb_define_method(rb_cOgrePlane,"distance",RUBY_METHOD_FUNC(OgrePlane_getDistance),1);
 	rb_define_method(rb_cOgrePlane,"projectVector",RUBY_METHOD_FUNC(OgrePlane_projectVector),1);
+	
+	rb_define_method(rb_cOgrePlane,"hash",RUBY_METHOD_FUNC(OgrePlane_hash),0);
+	rb_define_method(rb_cOgrePlane,"marshal_dump",RUBY_METHOD_FUNC(OgrePlane_marshal_dump),0);
+	rb_define_method(rb_cOgrePlane,"marshal_load",RUBY_METHOD_FUNC(OgrePlane_marshal_load),1);
 }
 

@@ -5,11 +5,13 @@ VALUE rb_cOgrePolygon;
 
 VALUE OgrePolygon_alloc(VALUE self)
 {
-	Ogre::Polygon *temp = new Ogre::Polygon;
-	return wrap(temp);
+	return wrap(new Ogre::Polygon);
 }
 /*
-
+ * call-seq:
+ *   [id] -> Vector3 or nil
+ * 
+ * returns the Vector3 of the given id. if id out of range, return nil.
 */
 VALUE OgrePolygon_get(VALUE self,VALUE i)
 {
@@ -19,27 +21,27 @@ VALUE OgrePolygon_get(VALUE self,VALUE i)
 		return Qnil;
 }
 /*
-
+ * call-seq:
+ *   [id]=Vector3
+ * 
+ * stets the vector3 on the position
 */
 VALUE OgrePolygon_set(VALUE self,VALUE i,VALUE val)
 {
 	if(NUM2UINT(i) > _self->getVertexCount())
 		rb_raise(rb_eRangeError,"index must be <= size");
-	if(rb_obj_is_kind_of(val,rb_cOgreVector3)){
-		_self->insertVertex(*wrap<Ogre::Vector3*>(val),NUM2UINT(i));
-	}else
-		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreVector3),rb_obj_classname(val));
+	_self->insertVertex(*wrap<Ogre::Vector3*>(val),NUM2UINT(i));
 	return val;
 }
 /*
-
+ * call-seq:
+ *   << Vector3
+ * 
+ * adds an Vector3 at the end 
 */
 VALUE OgrePolygon_push(VALUE self,VALUE val)
 {
-	if(rb_obj_is_kind_of(val,rb_cOgreVector3))
-		_self->insertVertex(*wrap<Ogre::Vector3*>(val));
-	else
-		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreVector3),rb_obj_classname(val));
+	_self->insertVertex(*wrap<Ogre::Vector3*>(val));
 	return val;
 }
 /*
@@ -51,7 +53,10 @@ VALUE OgrePolygon_delete(VALUE self,VALUE i)
 	return self;
 }
 /*
-
+ * call-seq:
+ *   size -> Integer
+ * 
+ * returns the size of the Polygon.
 */
 VALUE OgrePolygon_size(VALUE self)
 {
@@ -62,18 +67,19 @@ VALUE OgrePolygon_size(VALUE self)
 */
 VALUE OgrePolygon_pointinside(VALUE self,VALUE val)
 {
-	if(rb_obj_is_kind_of(val,rb_cOgreVector3))
-		return _self->isPointInside(*wrap<Ogre::Vector3*>(val)) ? Qtrue : Qfalse;
-	else
-		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreVector3),rb_obj_classname(val));
+	return _self->isPointInside(*wrap<Ogre::Vector3*>(val)) ? Qtrue : Qfalse;
 }
 /*
-
+ * call-seq:
+ *   each {|point| }
+ *   each -> Enumerator
+ * 
+ * iterates the Polygon
 */
 VALUE OgrePolygon_each(VALUE self)
 {
 	RETURN_ENUMERATOR(self,0,NULL);
-	for (size_t i = 0; i < _self->getVertexCount(); i++)
+	for (size_t i = 0; i < _self->getVertexCount(); ++i)
 		rb_yield(wrap(_self->getVertex(i)));
 	return self;
 }
@@ -95,7 +101,10 @@ VALUE OgrePolygon_edgemap(VALUE self)
 	return wrap(map);
 }
 /*
-
+ * call-seq:
+ *   == other -> bool
+ * 
+ * equals the Polygon with an other Polygon
 */
 VALUE OgrePolygon_equal(VALUE self,VALUE val)
 {
@@ -105,7 +114,10 @@ VALUE OgrePolygon_equal(VALUE self,VALUE val)
 		return Qfalse;
 }
 /*
-
+ * call-seq:
+ *   clear -> self
+ * 
+ * clears the Polygon
 */
 VALUE OgrePolygon_clear(VALUE self)
 {
@@ -113,6 +125,11 @@ VALUE OgrePolygon_clear(VALUE self)
 	return self;
 }
 
+/*
+ * Document-class: Ogre::Polygon
+ * 
+ * This class represents an Polygon of Vector3.
+*/ 
 void Init_OgrePolygon(VALUE rb_mOgre)
 {
 #if 0

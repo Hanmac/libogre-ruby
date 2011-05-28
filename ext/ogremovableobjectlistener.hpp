@@ -5,7 +5,7 @@
 void Init_OgreMovableObjectListener(VALUE rb_mOgre);
 extern VALUE rb_cOgreMovableObjectListener;
 
-class RubyMovableObjectListener : Ogre::MovableObject::Listener {
+class RubyMovableObjectListener : public Ogre::MovableObject::Listener {
 	public:
 	VALUE mRuby;
 	void objectDestroyed(Ogre::MovableObject* obj);

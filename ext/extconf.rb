@@ -38,7 +38,10 @@ end
 $CFLAGS += " -Wall"
 
 unless have_func("rb_string_value_cstr","ruby.h")
-	abort("missing VALUE to char convert! You need ruby version >= 1.9")
+	abort("missing VALUE to char convert! You need ruby version >= 1.8.7")
+end
+unless have_macro("RETURN_ENUMERATOR","ruby.h")
+	abort("missing RETURN_ENUMERATOR marco! You need ruby version >= 1.8.7")
 end
 
 

@@ -6,24 +6,16 @@ VALUE rb_cOgreSphere;
 
 VALUE OgreSphere_alloc(VALUE self)
 {
-	Ogre::Sphere *temp = new Ogre::Sphere;
-	return wrap(temp);
+	return wrap(new Ogre::Sphere);
 }
 /*:nodoc:
-
-
 */
 VALUE OgreSphere_set_center(VALUE self,VALUE vec)
 {
-	if(rb_obj_is_kind_of(vec,rb_cOgreVector3))
-		_self->setCenter(*wrap<Ogre::Vector3*>(vec));
-	else
-		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreVector3),rb_obj_classname(vec));
+	_self->setCenter(*wrap<Ogre::Vector3*>(vec));
 	return vec;
 }
 /*:nodoc:
-
-
 */
 VALUE OgreSphere_set_radius(VALUE self,VALUE radius)
 {
@@ -31,16 +23,12 @@ VALUE OgreSphere_set_radius(VALUE self,VALUE radius)
 	return radius;
 }
 /*:nodoc:
-
-
 */
 VALUE OgreSphere_get_center(VALUE self)
 {
 	return wrap(_self->getCenter());
 }
 /*:nodoc:
-
-
 */
 VALUE OgreSphere_get_radius(VALUE self)
 {
@@ -64,8 +52,6 @@ VALUE OgreSphere_inspect(VALUE self)
 	return rb_f_sprintf(4,array);
 }
 /*
-
-
 */
 VALUE OgreSphere_initialize(VALUE self,VALUE vec,VALUE radius)
 {
@@ -74,8 +60,15 @@ VALUE OgreSphere_initialize(VALUE self,VALUE vec,VALUE radius)
 	return self;
 }
 /*
-
-
+*/
+VALUE OgreSphere_initialize_copy(VALUE self, VALUE other)
+{
+	VALUE result = rb_call_super(1,&other);
+	OgreSphere_set_center(self,OgreSphere_get_center(other));
+	OgreSphere_set_radius(self,OgreSphere_get_radius(other));
+	return result;
+}
+/*
 */
 VALUE OgreSphere_equal(VALUE self,VALUE other)
 {
@@ -86,8 +79,6 @@ VALUE OgreSphere_equal(VALUE self,VALUE other)
 		return Qfalse;
 }
 /*
-
-
 */
 VALUE OgreSphere_swap(VALUE self,VALUE other)
 {
@@ -104,8 +95,6 @@ VALUE OgreSphere_swap(VALUE self,VALUE other)
 		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreSphere),rb_obj_classname(other));
 }
 /*
-
-
 */
 VALUE OgreSphere_intersects(VALUE self,VALUE other)
 {
@@ -121,6 +110,53 @@ VALUE OgreSphere_intersects(VALUE self,VALUE other)
 		rb_obj_classname(other));
 	return result ? Qtrue : Qfalse;
 }
+/*
+ * call-seq:
+ *   hash -> Integer
+ * 
+ * hash from the combined Sphere values.
+ * ===Return value
+ * Integer
+*/
+VALUE OgreSphere_hash(VALUE self)
+{
+	VALUE result = rb_ary_new();
+	rb_ary_push(result,OgreSphere_get_center(self));
+	rb_ary_push(result,OgreSphere_get_radius(self));
+	return rb_funcall(result,rb_intern("hash"),0);
+}
+/*
+ * call-seq:
+ *   marshal_dump -> string
+ * 
+ * packs a Sphere into an string.	
+*/
+VALUE OgreSphere_marshal_dump(VALUE self)
+{
+	VALUE result = rb_ary_new();
+	rb_ary_push(result,DBL2NUM(_self->getCenter().x));
+	rb_ary_push(result,DBL2NUM(_self->getCenter().y));
+	rb_ary_push(result,DBL2NUM(_self->getCenter().z));
+	rb_ary_push(result,OgreSphere_get_radius(self));
+	return rb_funcall(result,rb_intern("pack"),1,rb_str_new2("dddd"));
+}
+/*
+ * call-seq:
+ *   marshal_load(string) -> self
+ * 
+ * loads a string into an Box.
+*/
+VALUE OgreSphere_marshal_load(VALUE self,VALUE load)
+{
+	VALUE result = rb_funcall(load,rb_intern("unpack"),1,rb_str_new2("dddd"));
+	Ogre::Real x = NUM2DBL(rb_ary_pop(result));
+	Ogre::Real y = NUM2DBL(rb_ary_pop(result));
+	Ogre::Real z = NUM2DBL(rb_ary_pop(result));
+	_self->setCenter(Ogre::Vector3(x,y,z));
+	OgreSphere_set_radius(self,rb_ary_pop(result));
+	return self;
+}
+
 /*
  * Document-class: Ogre::Sphere
  * 
@@ -144,7 +180,8 @@ void Init_OgreSphere(VALUE rb_mOgre)
 	rb_cOgreSphere = rb_define_class_under(rb_mOgre,"Sphere",rb_cObject);
 	rb_define_alloc_func(rb_cOgreSphere,OgreSphere_alloc);
 	rb_define_method(rb_cOgreSphere,"initialize",RUBY_METHOD_FUNC(OgreSphere_initialize),2);
-	
+	rb_define_private_method(rb_cOgreSphere,"initialize_copy",RUBY_METHOD_FUNC(OgreSphere_initialize_copy),1);
+
 	rb_define_method(rb_cOgreSphere,"center",RUBY_METHOD_FUNC(OgreSphere_get_center),0);
 	rb_define_method(rb_cOgreSphere,"radius",RUBY_METHOD_FUNC(OgreSphere_get_radius),0);
 
@@ -155,5 +192,11 @@ void Init_OgreSphere(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreSphere,"intersects?",RUBY_METHOD_FUNC(OgreSphere_intersects),1);
 	rb_define_method(rb_cOgreSphere,"==",RUBY_METHOD_FUNC(OgreSphere_equal),1);
 	rb_define_method(rb_cOgreSphere,"swap",RUBY_METHOD_FUNC(OgreSphere_swap),1);
+	
+	
+	rb_define_method(rb_cOgreSphere,"hash",RUBY_METHOD_FUNC(OgreSphere_hash),0);
+	
+	rb_define_method(rb_cOgreSphere,"marshal_dump",RUBY_METHOD_FUNC(OgreSphere_marshal_dump),0);
+	rb_define_method(rb_cOgreSphere,"marshal_load",RUBY_METHOD_FUNC(OgreSphere_marshal_load),1);
 }
 

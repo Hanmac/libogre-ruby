@@ -1,5 +1,7 @@
 #include "ogrecolor.hpp"
+#include "ogrevector2.hpp"
 #include "ogrevector3.hpp"
+#include "ogrevector4.hpp"
 #include "ogreradian.hpp"
 #include "ogredegree.hpp"
 #include "ogresphere.hpp"
@@ -9,11 +11,9 @@
 #include "ogrerect.hpp"
 #include "ogrebox.hpp"
 #include "ogreimage.hpp"
-#include "ogreresourcegroupmanager.hpp"
 #include "ogreexception.hpp"
 #include "ogrefileinfo.hpp"
 #include "ogreresourcegroup.hpp"
-#include "ogreresourcemanager.hpp"
 #include "ogrepolygon.hpp"
 #include "ogredatastream.hpp"
 #include "ogreconfigfile.hpp"
@@ -24,47 +24,72 @@
 #include "ogremovableobject.hpp"
 #include "ogremovableobjectlistener.hpp"
 #include "ogrelight.hpp"
+#include "ogrenode.hpp"
+#include "ogreray.hpp"
+#include "ogrelog.hpp"
+#include "ogreloglistener.hpp"
+#include "ogreaxisalignedbox.hpp"
+#include "ogreplaneboundedvolume.hpp"
+#include "ogrematrix3.hpp"
+#include "ogrematrix4.hpp"
+#include "ogrequaternion.hpp"
+#include "ogretexture.hpp"
+#include "ogremesh.hpp"
+#include "ogresubmesh.hpp"
+#include "ogrematerial.hpp"
+#include "ogretechnique.hpp"
+#include "ogrepass.hpp"
+#include "ogretextureunitstate.hpp"
+#include "ogrelayerblendmode.hpp"
 VALUE rb_mOgre,rb_mSingleton;
-Ogre::Root *root;
 
 
-/*
 
-*/
-VALUE OgreSingleton_method_missing(int argc,VALUE *argv,VALUE self)
+
+
+VALUE Ogre_dummy0(VALUE self)
 {
-	VALUE temp = rb_funcall(self,rb_intern("instance"),0);
-	return rb_funcall2(temp,rb_intern("send"),argc,argv);
+	return Qnil;
+}
+VALUE Ogre_dummy1(VALUE self,VALUE obj1)
+{
+	return Qnil;
+}
+VALUE Ogre_dummy2(VALUE self,VALUE obj1,VALUE obj2)
+{
+	return Qnil;
+}
+VALUE Ogre_dummy3(VALUE self,VALUE obj1,VALUE obj2,VALUE obj3)
+{
+	return Qnil;
+}
+VALUE Ogre_dummy4(VALUE self,VALUE obj1,VALUE obj2,VALUE obj3,VALUE obj4)
+{
+	return Qnil;
 }
 
 extern "C" void Init_ogre(void)
 {
-
-	Ogre::LogManager *logManager = new Ogre::LogManager;
-	logManager->createLog("", true, false);   // 3rd parameter = false = don't write to stderr
-	
-	root = new Ogre::Root();
-	
-
 	rb_mOgre = rb_define_module("Ogre");
-	rb_require("singleton");
-	rb_mSingleton = rb_const_get(rb_cObject,rb_intern("Singleton"));
 	Init_OgreRoot(rb_mOgre);
 	Init_OgreColor(rb_mOgre);
+	Init_OgreVector2(rb_mOgre);
 	Init_OgreVector3(rb_mOgre);
+	Init_OgreVector4(rb_mOgre);
 	Init_OgreRadian(rb_mOgre);
 	Init_OgreDegree(rb_mOgre);
 	Init_OgreSphere(rb_mOgre);
+	Init_OgreRay(rb_mOgre);
 	Init_OgrePlane(rb_mOgre);
 	Init_OgreResource(rb_mOgre);
 	Init_OgreRect(rb_mOgre);
 	Init_OgreBox(rb_mOgre);
 	Init_OgreImage(rb_mOgre);
-	Init_OgreResourceGroupManager(rb_mOgre);
 	Init_OgreException(rb_mOgre);
 	Init_OgreFileInfo(rb_mOgre);
 	Init_OgreResourceGroup(rb_mOgre);
-	Init_OgreResourceManager(rb_mOgre);
+
+
 	Init_OgrePolygon(rb_mOgre);
 	Init_OgreDataStream(rb_mOgre);
 	Init_OgreConfigFile(rb_mOgre);
@@ -72,22 +97,32 @@ extern "C" void Init_ogre(void)
 	Init_OgreRenderWindow(rb_mOgre);
 	Init_OgreRenderSystem(rb_mOgre);
 	Init_OgreSceneManager(rb_mOgre);
+
 	Init_OgreMovableObject(rb_mOgre);
 	Init_OgreMovableObjectListener(rb_mOgre);
 	Init_OgreLight(rb_mOgre);
-	
-	
-/*TEST
-	Ogre::SceneManager *sm = root->createSceneManager("DefaultSceneManager");
-	VALUE v = wrap(sm->createLight());
-	Ogre::Light* l = wrap<Ogre::Light*>(v);
 
-	RubyMovableObjectListener *temp = new RubyMovableObjectListener;
-	temp->mRuby=Qnil;
-	wrap(temp);
-	l->setListener((Ogre::MovableObject::Listener*)temp);
-	sm->destroyLight(l);
-//*/
+	Init_OgreNode(rb_mOgre);
+	Init_OgreSceneNode(rb_mOgre);
+
+	Init_OgreLog(rb_mOgre);
+	Init_OgreLogListener(rb_mOgre);
+	Init_OgreAxisAlignedBox(rb_mOgre);
+	Init_OgrePlaneBoundedVolume(rb_mOgre);
+
+	Init_OgreMatrix3(rb_mOgre);
+	Init_OgreMatrix4(rb_mOgre);
+	Init_OgreQuaternion(rb_mOgre);
+
+	Init_OgreTexture(rb_mOgre);
+	Init_OgreMaterial(rb_mOgre);
+	Init_OgreMesh(rb_mOgre);
+	Init_OgreSubMesh(rb_mOgre);
+	
+	Init_OgreTechnique(rb_mOgre);
+	Init_OgrePass(rb_mOgre);
+	Init_OgreTextureUnitState(rb_mOgre);
+	Init_OgreLayerBlendMode(rb_mOgre);
 	VALUE array[4];
 	array[0]=rb_str_new2("%d.%d.%d");
 	array[1]=INT2NUM(OGRE_VERSION_MAJOR);

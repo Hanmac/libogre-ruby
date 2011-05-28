@@ -19,7 +19,6 @@ T wrap(const VALUE &arg){
 
 extern VALUE rb_mSingleton;
 
-
 template <typename T,typename Y,typename P,typename A>
 VALUE wrap(Ogre::multimap<T,Y,P,A> arg){
 	VALUE result = rb_hash_new();
@@ -43,12 +42,12 @@ template <typename T>
 VALUE wrap(const T &arg){
 	return wrap(new T(arg));
 };
-/*
+//*
 template <typename T>
-VALUE wrap(Ogre::SharedPtr<T> ptr){
+VALUE wrap(Ogre::SharedPtr<T> &ptr){
 	return wrap<T>(ptr.get());
 };
-*/
+//*/
 
 template <typename T>
 VALUE wrap(const std::vector<T> &vec){
@@ -122,8 +121,12 @@ inline VALUE wrap< Ogre::NameValuePairList >(const Ogre::NameValuePairList &map 
 	return result;
 }
 /*
-
 */
-VALUE OgreSingleton_method_missing(int argc,VALUE *argv,VALUE self);
+VALUE Ogre_dummy0(VALUE self);
+VALUE Ogre_dummy1(VALUE self,VALUE obj1);
+VALUE Ogre_dummy2(VALUE self,VALUE obj1,VALUE obj2);
+VALUE Ogre_dummy3(VALUE self,VALUE obj1,VALUE obj2,VALUE obj3);
+VALUE Ogre_dummy4(VALUE self,VALUE obj1,VALUE obj2,VALUE obj3,VALUE obj4);
+
 #endif /* __RubyOgreMain_H__ */
 

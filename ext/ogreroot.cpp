@@ -5,18 +5,11 @@
 #include "ogrerendersystem.hpp"
 #include "ogrescenemanager.hpp"
 #define _self wrap<Ogre::Root*>(self)
-VALUE rb_cOgreRoot;
+VALUE rb_mOgreRoot;
 
 std::vector<std::string> pluginFolder;
-
-VALUE OgreRoot_alloc(VALUE self)
-{
-	return wrap(Ogre::Root::getSingletonPtr());
-}
-
+Ogre::Root *root;
 /*
-
-
 */
 VALUE OgreRoot_addResourceLocation(int argc,VALUE *argv,VALUE self)
 {
@@ -35,8 +28,6 @@ VALUE OgreRoot_addResourceLocation(int argc,VALUE *argv,VALUE self)
 	return self;
 }
 /*
-
-
 */
 VALUE OgreRoot_removeResourceLocation(int argc,VALUE *argv,VALUE self)
 {
@@ -51,21 +42,18 @@ VALUE OgreRoot_removeResourceLocation(int argc,VALUE *argv,VALUE self)
 	return self;
 }
 /*
-
 */
 VALUE OgreRoot_hasMovableObjectFactory(VALUE self,VALUE typeName)
 {
 	return _self->hasMovableObjectFactory(rb_string_value_cstr(&typeName)) ? Qtrue : Qfalse;
 }
 /*
-
 */
 VALUE OgreRoot_isInitialised(VALUE self)
 {
 	return _self->isInitialised() ? Qtrue : Qfalse;
 }
 /*
-
 */
 VALUE OgreRoot_createFileStream(int argc,VALUE *argv,VALUE self)
 {
@@ -85,7 +73,6 @@ VALUE OgreRoot_createFileStream(int argc,VALUE *argv,VALUE self)
 	return wrap(_self->createFileStream(rb_string_value_cstr(&name),groupName,overwrite,pattern));
 }
 /*
-
 */
 VALUE OgreRoot_openFileStream(int argc,VALUE *argv,VALUE self)
 {
@@ -102,7 +89,6 @@ VALUE OgreRoot_openFileStream(int argc,VALUE *argv,VALUE self)
 	return wrap(_self->openFileStream(rb_string_value_cstr(&name),groupName,pattern));
 }
 /*
-
 */
 VALUE OgreRoot_createRenderWindow(int argc,VALUE *argv,VALUE self)
 {
@@ -116,14 +102,12 @@ VALUE OgreRoot_createRenderWindow(int argc,VALUE *argv,VALUE self)
 	return Qnil;
 }
 /*
-
 */
 VALUE OgreRoot_getAvailableRenderers(VALUE self)
 {
 	return wrap<Ogre::RenderSystem>(_self->getAvailableRenderers());
 }
 /*
-
 */
 VALUE OgreRoot_getRenderSystem(VALUE self)
 {
@@ -132,7 +116,6 @@ VALUE OgreRoot_getRenderSystem(VALUE self)
 }
 
 /*
-
 */
 VALUE OgreRoot_setRenderSystem(VALUE self,VALUE system)
 {
@@ -146,14 +129,12 @@ VALUE OgreRoot_setRenderSystem(VALUE self,VALUE system)
 }
 
 /*
-
 */
 VALUE OgreRoot_showConfigDialog(VALUE self)
 {
 	return _self->showConfigDialog() ? Qtrue : Qfalse;
 }
 /*
-
 */
 VALUE OgreRoot_loadPlugin(VALUE self,VALUE val)
 {
@@ -174,7 +155,6 @@ VALUE OgreRoot_loadPlugin(VALUE self,VALUE val)
 	return self;
 }
 /*
-
 */
 VALUE OgreRoot_addPluginFolder(VALUE self,VALUE path)
 {
@@ -185,14 +165,20 @@ VALUE OgreRoot_addPluginFolder(VALUE self,VALUE path)
 	return self;
 }
 /*
-
 */
 VALUE OgreRoot_listPluginFolders(VALUE self)
 {
 	return wrap<std::string>(pluginFolder);
 }
 /*
+*/
+VALUE OgreRoot_listPlugins(VALUE self)
+{
+	return wrap<Ogre::Plugin>(_self->getInstalledPlugins());
+}
 
+
+/*
 */
 VALUE OgreRoot_unloadPlugin(VALUE self,VALUE val)
 {
@@ -205,7 +191,6 @@ VALUE OgreRoot_unloadPlugin(VALUE self,VALUE val)
 }
 
 /*
-
 */
 VALUE OgreRoot_createSceneManager(int argc,VALUE *argv,VALUE self)
 {
@@ -224,7 +209,6 @@ VALUE OgreRoot_createSceneManager(int argc,VALUE *argv,VALUE self)
 	return Qnil;
 }
 /*
-
 */
 VALUE OgreRoot_each_metadata(VALUE self)
 {
@@ -237,46 +221,38 @@ VALUE OgreRoot_each_metadata(VALUE self)
 	return self;
 }
 /*
-
+ * Document-module: Ogre
+ * 
+ * This module hould the Ogre classes and modules. it has the methods of Root as singleton
 */
 void Init_OgreRoot(VALUE rb_mOgre)
 {
 #if 0
 	rb_mOgre = rb_define_module("Ogre");
-	rb_mSingleton = rb_define_module("Singleton");
 #endif
-	rb_cOgreRoot = rb_define_class_under(rb_mOgre,"Root",rb_cObject);
-	rb_define_alloc_func(rb_cOgreRoot,OgreRoot_alloc);
-	rb_funcall(rb_cOgreRoot,rb_intern("include"),1,rb_mSingleton);
-	#if 0
-	rb_include_module(rb_cOgreRoot,rb_mSingleton);
-	#endif
+	rb_define_singleton_method(rb_mOgre,"addResourceLocation",RUBY_METHOD_FUNC(OgreRoot_addResourceLocation),-1);
 	
-	rb_define_singleton_method(rb_cOgreRoot,"method_missing",RUBY_METHOD_FUNC(OgreSingleton_method_missing),-1);// in ogre.y
+	rb_define_singleton_method(rb_mOgre,"removeResourceLocation",RUBY_METHOD_FUNC(OgreRoot_removeResourceLocation),-1);
+	rb_define_singleton_method(rb_mOgre,"hasMovableObjectFactory?",RUBY_METHOD_FUNC(OgreRoot_hasMovableObjectFactory),1);
 
+	rb_define_singleton_method(rb_mOgre,"createFileStream",RUBY_METHOD_FUNC(OgreRoot_createFileStream),-1);
+	rb_define_singleton_method(rb_mOgre,"openFileStream",RUBY_METHOD_FUNC(OgreRoot_openFileStream),-1);
 
-	rb_define_method(rb_cOgreRoot,"addResourceLocation",RUBY_METHOD_FUNC(OgreRoot_addResourceLocation),-1);
+	rb_define_singleton_method(rb_mOgre,"createRenderWindow",RUBY_METHOD_FUNC(OgreRoot_createRenderWindow),-1);
+	rb_define_singleton_method(rb_mOgre,"getAvailableRenderers",RUBY_METHOD_FUNC(OgreRoot_getAvailableRenderers),0);
+	rb_define_singleton_method(rb_mOgre,"showConfigDialog",RUBY_METHOD_FUNC(OgreRoot_showConfigDialog),0);
 	
-	rb_define_method(rb_cOgreRoot,"removeResourceLocation",RUBY_METHOD_FUNC(OgreRoot_removeResourceLocation),-1);
-	rb_define_method(rb_cOgreRoot,"hasMovableObjectFactory?",RUBY_METHOD_FUNC(OgreRoot_hasMovableObjectFactory),1);
+	rb_define_singleton_method(rb_mOgre,"rendersystem",RUBY_METHOD_FUNC(OgreRoot_getRenderSystem),0);
+	rb_define_singleton_method(rb_mOgre,"rendersystem=",RUBY_METHOD_FUNC(OgreRoot_setRenderSystem),1);
+	rb_define_singleton_method(rb_mOgre,"initialised?",RUBY_METHOD_FUNC(OgreRoot_isInitialised),0);
 
-	rb_define_method(rb_cOgreRoot,"createFileStream",RUBY_METHOD_FUNC(OgreRoot_createFileStream),-1);
-	rb_define_method(rb_cOgreRoot,"openFileStream",RUBY_METHOD_FUNC(OgreRoot_openFileStream),-1);
-
-	rb_define_method(rb_cOgreRoot,"createRenderWindow",RUBY_METHOD_FUNC(OgreRoot_createRenderWindow),-1);
-	rb_define_method(rb_cOgreRoot,"getAvailableRenderers",RUBY_METHOD_FUNC(OgreRoot_getAvailableRenderers),0);
-	rb_define_method(rb_cOgreRoot,"showConfigDialog",RUBY_METHOD_FUNC(OgreRoot_showConfigDialog),0);
+	rb_define_singleton_method(rb_mOgre,"loadPlugin",RUBY_METHOD_FUNC(OgreRoot_loadPlugin),1);
+	rb_define_singleton_method(rb_mOgre,"unloadPlugin",RUBY_METHOD_FUNC(OgreRoot_unloadPlugin),1);
 	
-	rb_define_method(rb_cOgreRoot,"rendersystem",RUBY_METHOD_FUNC(OgreRoot_getRenderSystem),0);
-	rb_define_method(rb_cOgreRoot,"rendersystem=",RUBY_METHOD_FUNC(OgreRoot_setRenderSystem),1);
-	rb_define_method(rb_cOgreRoot,"initialised?",RUBY_METHOD_FUNC(OgreRoot_isInitialised),0);
+	rb_define_singleton_method(rb_mOgre,"addPluginFolder",RUBY_METHOD_FUNC(OgreRoot_addPluginFolder),1);
+	rb_define_singleton_method(rb_mOgre,"pluginfolders",RUBY_METHOD_FUNC(OgreRoot_listPluginFolders),0);
+	rb_define_singleton_method(rb_mOgre,"plugins",RUBY_METHOD_FUNC(OgreRoot_listPlugins),0);
+	rb_define_singleton_method(rb_mOgre,"each_metadata",RUBY_METHOD_FUNC(OgreRoot_each_metadata),0);
 
-	rb_define_method(rb_cOgreRoot,"loadPlugin",RUBY_METHOD_FUNC(OgreRoot_loadPlugin),1);
-	rb_define_method(rb_cOgreRoot,"unloadPlugin",RUBY_METHOD_FUNC(OgreRoot_unloadPlugin),1);
-	
-	rb_define_method(rb_cOgreRoot,"addPluginFolder",RUBY_METHOD_FUNC(OgreRoot_addPluginFolder),1);
-	rb_define_method(rb_cOgreRoot,"pluginfolders",RUBY_METHOD_FUNC(OgreRoot_listPluginFolders),0);
-	rb_define_method(rb_cOgreRoot,"each_metadata",RUBY_METHOD_FUNC(OgreRoot_each_metadata),0);
-
-	rb_define_method(rb_cOgreRoot,"createSceneManager",RUBY_METHOD_FUNC(OgreRoot_createSceneManager),-1);
+	rb_define_singleton_method(rb_mOgre,"createSceneManager",RUBY_METHOD_FUNC(OgreRoot_createSceneManager),-1);
 }

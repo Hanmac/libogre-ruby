@@ -6,8 +6,7 @@ VALUE rb_cOgreConfigFile;
 
 VALUE OgreConfigFile_alloc(VALUE self)
 {
-	Ogre::ConfigFile *temp = new Ogre::ConfigFile;
-	return wrap(temp);
+	return wrap(new Ogre::ConfigFile);
 }
 /*
 */
@@ -28,7 +27,7 @@ VALUE OgreConfigFile_initialize(int argc,VALUE* argv,VALUE self)
 	try{
 		if(rb_obj_is_kind_of(file,rb_cOgreDataStream))
 			_self->load(wrap<Ogre::DataStreamPtr>(file),separators,trimWhitespace);
-		if(!rb_obj_is_kind_of(hash,rb_cHash) || NIL_P(temp=rb_hash_aref(hash,ID2SYM(rb_intern("group_name")))))
+		else if(!rb_obj_is_kind_of(hash,rb_cHash) || NIL_P(temp=rb_hash_aref(hash,ID2SYM(rb_intern("group_name")))))
 			_self->load(rb_string_value_cstr(&file),separators,trimWhitespace);
 		else
 			_self->load(rb_string_value_cstr(&file),rb_string_value_cstr(&temp),separators,trimWhitespace);
@@ -37,8 +36,34 @@ VALUE OgreConfigFile_initialize(int argc,VALUE* argv,VALUE self)
 	}
 	return self;
 }
-
 /*
+ * call-seq:
+ *   [id[,sction]] -> [String] or nil
+ * 
+ * returns all settings of the given key.
+*/
+VALUE OgreConfigFile_get(int argc,VALUE* argv,VALUE self)
+{
+	VALUE key,section;
+	rb_scan_args(argc, argv, "11",&key,&section);
+	Ogre::String temp;
+	if(NIL_P(section))
+		temp = Ogre::StringUtil::BLANK;
+	else
+		temp = rb_string_value_cstr(&section);
+	try{
+		return wrap(_self->getMultiSetting(rb_string_value_cstr(&key),temp));
+	}catch(Ogre::Exception& e){
+		rb_raise(wrap(e));
+		return Qnil;
+	}
+}
+/*
+ * call-seq:
+ *   each {|section,key,value| }
+ *   each -> Enumerator
+ * 
+ * iterates the ConfigFile
 */
 VALUE OgreConfigFile_each(VALUE self)
 {
@@ -55,6 +80,9 @@ VALUE OgreConfigFile_each(VALUE self)
 }
 
 /*
+ * Document-class: Ogre::ConfigFile
+ * 
+ * This class represents an configfile.
 */
 void Init_OgreConfigFile(VALUE rb_mOgre)
 {
@@ -64,6 +92,7 @@ void Init_OgreConfigFile(VALUE rb_mOgre)
 	rb_cOgreConfigFile = rb_define_class_under(rb_mOgre,"ConfigFile",rb_cObject);
 	rb_define_alloc_func(rb_cOgreConfigFile,OgreConfigFile_alloc);
 	rb_define_method(rb_cOgreConfigFile,"initialize",RUBY_METHOD_FUNC(OgreConfigFile_initialize),-1);
+	rb_define_method(rb_cOgreConfigFile,"[]",RUBY_METHOD_FUNC(OgreConfigFile_get),-1);
 	rb_define_method(rb_cOgreConfigFile,"each",RUBY_METHOD_FUNC(OgreConfigFile_each),0);
 
 	rb_include_module(rb_cOgreConfigFile,rb_mEnumerable);

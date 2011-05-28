@@ -5,13 +5,10 @@ VALUE rb_cOgreRadian;
 
 VALUE OgreRadian_alloc(VALUE self)
 {
-	Ogre::Radian *temp = new Ogre::Radian;
-	return wrap(temp);
+	return wrap(new Ogre::Radian);
 }
 
 /*
-
-
 */
 VALUE OgreRadian_initialize(VALUE self,VALUE val)
 {
@@ -19,26 +16,38 @@ VALUE OgreRadian_initialize(VALUE self,VALUE val)
 	return self;
 }
 /*
-
-
+*/
+VALUE OgreRadian_initialize_copy(VALUE self, VALUE other)
+{
+	VALUE result = rb_call_super(1,&other);
+	*_self =*wrap<Ogre::Radian*>(other);
+	return result;
+}
+/*
+ * call-seq:
+ *   to_i -> int
+ * 
+ * returns a Integer
 */
 VALUE OgreRadian_to_i(VALUE self)
 {
 	return INT2NUM((int)(_self->valueRadians()));
 }
-
 /*
-
-
+ * call-seq:
+ *   to_f -> float
+ * 
+ * returns a Float
 */
 VALUE OgreRadian_to_f(VALUE self)
 {
 	return DBL2NUM(_self->valueRadians());
 }
-
 /*
-
-
+ * call-seq:
+ *   to_degree -> Degree
+ * 
+ * returns a Dregree
 */
 VALUE OgreRadian_to_degree(VALUE self)
 {
@@ -46,17 +55,20 @@ VALUE OgreRadian_to_degree(VALUE self)
 }
 
 /*
-
-
+ * call-seq:
+ *   to_radian -> Radian
+ * 
+ * return self.
 */
 VALUE OgreRadian_to_radian(VALUE self)
 {
 	return self;
 }
-
 /*
-
-
+ * call-seq:
+ *   -@ -> Radian
+ * 
+ * returns -self
 */
 VALUE OgreRadian_minusself(VALUE self)
 {
@@ -64,8 +76,12 @@ VALUE OgreRadian_minusself(VALUE self)
 }
 
 /*
-
-
+ * call-seq:
+ *   radian.inspect -> String
+ * 
+ * Human-readable description. 
+ * ===Return value
+ * String
 */
 VALUE OgreRadian_inspect(VALUE self)
 {
@@ -77,8 +93,6 @@ VALUE OgreRadian_inspect(VALUE self)
 }
 
 /*
-
-
 */
 VALUE OgreRadian_compare(VALUE self,VALUE other)
 {
@@ -95,8 +109,6 @@ VALUE OgreRadian_compare(VALUE self,VALUE other)
 }
 
 /*
-
-
 */
 VALUE OgreRadian_plus(VALUE self,VALUE other)
 {
@@ -109,8 +121,6 @@ VALUE OgreRadian_plus(VALUE self,VALUE other)
 }
 
 /*
-
-
 */
 VALUE OgreRadian_minus(VALUE self,VALUE other)
 {
@@ -123,8 +133,6 @@ VALUE OgreRadian_minus(VALUE self,VALUE other)
 }
 
 /*
-
-
 */
 VALUE OgreRadian_mal(VALUE self,VALUE other)
 {
@@ -137,14 +145,52 @@ VALUE OgreRadian_mal(VALUE self,VALUE other)
 }
 
 /*
-
-
 */
 VALUE OgreRadian_durch(VALUE self,VALUE other)
 {
 	return wrap(*_self / NUM2DBL(other));
 }
 //TODO: added "friend" methods for Float
+
+/*
+ * call-seq:
+ *   degree.hash -> Integer
+ * 
+ * hash from the combined Degree values.
+ * ===Return value
+ * Integer
+*/
+VALUE OgreRadian_hash(VALUE self)
+{
+	VALUE result = rb_ary_new();
+	rb_ary_push(result,OgreRadian_to_f(self));
+	return rb_funcall(result,rb_intern("hash"),0);
+}
+/*
+ * call-seq:
+ *   marshal_dump -> string
+ * 
+ * packs a Radian into an string.
+*/
+VALUE OgreRadian_marshal_dump(VALUE self)
+{
+	VALUE result = rb_ary_new();
+	rb_ary_push(result,OgreRadian_to_f(self));
+	return rb_funcall(result,rb_intern("pack"),1,rb_str_new2("d"));
+}
+/*
+ * call-seq:
+ *   marshal_load(string) -> self
+ * 
+ * loads a string into an Radian.
+*/
+VALUE OgreRadian_marshal_load(VALUE self,VALUE load)
+{
+	VALUE result = rb_funcall(load,rb_intern("unpack"),1,rb_str_new2("d"));
+	*_self= NUM2DBL(rb_ary_pop(result));
+	return self;
+}
+
 void Init_OgreRadian(VALUE rb_mOgre)
 {
 #if 0
@@ -153,6 +199,7 @@ void Init_OgreRadian(VALUE rb_mOgre)
 	rb_cOgreRadian = rb_define_class_under(rb_mOgre,"Radian",rb_cNumeric);
 	rb_define_alloc_func(rb_cOgreRadian,OgreRadian_alloc);
 	rb_define_method(rb_cOgreRadian,"initialize",RUBY_METHOD_FUNC(OgreRadian_initialize),1);
+	rb_define_private_method(rb_cOgreRadian,"initialize_copy",RUBY_METHOD_FUNC(OgreRadian_initialize_copy),1);
 
 	rb_define_method(rb_cOgreRadian,"to_i",RUBY_METHOD_FUNC(OgreRadian_to_i),0);
 	rb_define_method(rb_cOgreRadian,"to_f",RUBY_METHOD_FUNC(OgreRadian_to_f),0);
@@ -169,4 +216,10 @@ void Init_OgreRadian(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreRadian,"-",RUBY_METHOD_FUNC(OgreRadian_minus),1);
 	rb_define_method(rb_cOgreRadian,"*",RUBY_METHOD_FUNC(OgreRadian_mal),1);
 	rb_define_method(rb_cOgreRadian,"/",RUBY_METHOD_FUNC(OgreRadian_durch),1);
+	
+	
+	rb_define_method(rb_cOgreRadian,"hash",RUBY_METHOD_FUNC(OgreRadian_hash),0);
+	
+	rb_define_method(rb_cOgreRadian,"marshal_dump",RUBY_METHOD_FUNC(OgreRadian_marshal_dump),0);
+	rb_define_method(rb_cOgreRadian,"marshal_load",RUBY_METHOD_FUNC(OgreRadian_marshal_load),1);
 }

@@ -5,11 +5,17 @@
 void Init_OgreSceneManager(VALUE rb_mOgre);
 extern VALUE rb_cOgreSceneManager,rb_cOgreSceneManagerMetaData;
 
+#include "ogreexception.hpp"
+struct RubyOgreSceneManager{
+	Ogre::String name;
+};
 
 template <>
 inline VALUE wrap< Ogre::SceneManager >(Ogre::SceneManager *manager )
 {
-	return Data_Wrap_Struct(rb_cOgreSceneManager, NULL, NULL, manager);
+	RubyOgreSceneManager *temp = new RubyOgreSceneManager;
+	temp->name = manager->getName();
+	return Data_Wrap_Struct(rb_cOgreSceneManager, NULL, free, temp);
 }
 
 template <>
@@ -17,9 +23,14 @@ inline Ogre::SceneManager* wrap< Ogre::SceneManager* >(const VALUE &vmanager)
 {
 	if ( ! rb_obj_is_kind_of(vmanager, rb_cOgreSceneManager) )
 		return NULL;
-	Ogre::SceneManager *manager;
-  Data_Get_Struct( vmanager, Ogre::SceneManager, manager);
-	return manager;
+	RubyOgreSceneManager *manager;
+  Data_Get_Struct( vmanager, RubyOgreSceneManager, manager);
+  try{
+		return Ogre::Root::getSingletonPtr()->getSceneManager(manager->name);
+	}catch(Ogre::Exception& e){
+		rb_raise(wrap(e));
+		return NULL;
+	}
 }
 
 template <>

@@ -8,12 +8,9 @@ VALUE rb_cOgreImage;
 
 VALUE OgreImage_alloc(VALUE self)
 {
-	Ogre::Image *temp = new Ogre::Image;
-	return wrap(temp);
+	return wrap(new Ogre::Image);
 }
 /*
-
-
 */
 VALUE OgreImage_initialize(int argc,VALUE* argv,VALUE self)
 {
@@ -26,7 +23,7 @@ VALUE OgreImage_initialize(int argc,VALUE* argv,VALUE self)
 				result = Ogre::StringUtil::BLANK;
 			else
 				result = rb_string_value_cstr(&groupname);
-				Ogre::DataStreamPtr stream = wrap<Ogre::DataStreamPtr>(path);
+			Ogre::DataStreamPtr stream = wrap<Ogre::DataStreamPtr>(path);
 			_self->load(stream, result);
 		}else{
 			if(NIL_P(groupname))
@@ -41,40 +38,50 @@ VALUE OgreImage_initialize(int argc,VALUE* argv,VALUE self)
 	return self;
 }
 /*
-
-
+ * call-seq:
+ *   size -> Integer
+ * 
+ * Returns the size of the data buffer.
 */
 VALUE OgreImage_size(VALUE self)
 {
 	return INT2NUM(_self->getSize());
 }
 /*
-
-
+ * call-seq:
+ *   width -> Integer
+ * 
+ * Gets the width of the image in pixels.
 */
 VALUE OgreImage_width(VALUE self)
 {
 	return INT2NUM(_self->getWidth());
 }
 /*
-
-
+ * call-seq:
+ *   height -> Integer
+ * 
+ * Gets the height of the image in pixels.
 */
 VALUE OgreImage_height(VALUE self)
 {
 	return INT2NUM(_self->getHeight());
 }
 /*
-
-
+ * call-seq:
+ *   depth -> Integer
+ * 
+ * Gets the depth of the image.
 */
 VALUE OgreImage_depth(VALUE self)
 {
 	return INT2NUM(_self->getDepth());
 }
 /*
-
-
+ * call-seq:
+ *   [x,y,z] -> Color or nil
+ * 
+ * returns an color
 */
 VALUE OgreImage_get(VALUE self,VALUE x,VALUE y,VALUE z)
 {
@@ -85,8 +92,6 @@ VALUE OgreImage_get(VALUE self,VALUE x,VALUE y,VALUE z)
 	return wrap(_self->getColourAt(NUM2INT(x),NUM2INT(y),NUM2INT(z)));
 }
 /*
-
-
 */
 VALUE OgreImage_flipAroundY(VALUE self)
 {
@@ -94,8 +99,6 @@ VALUE OgreImage_flipAroundY(VALUE self)
 	return self;
 }
 /*
-
-
 */
 VALUE OgreImage_flipAroundX(VALUE self)
 {
@@ -109,6 +112,11 @@ VALUE OgreImage_hasAlpha(VALUE self)
 	return _self->getHasAlpha() ? Qtrue : Qfalse;
 }
 /*
+ * call-seq:
+ *   each {|x,y,z,color| }
+ *   each -> Enumerator
+ * 
+ * iterates the Image
 */
 VALUE OgreImage_each(VALUE self)
 {

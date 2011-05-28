@@ -69,6 +69,8 @@ void Init_OgreException(VALUE rb_mOgre)
 	rb_eOgreInvalidStateException = rb_define_class_under(rb_mOgreError,"InvalidStateException",rb_eException);
 	rb_eOgreInternalErrorException = rb_define_class_under(rb_mOgreError,"InternalErrorException",rb_eSyntaxError);
 	
+	
+	
 	rb_include_module(rb_eOgreIOError,rb_mOgreError);
 	rb_include_module(rb_eOgreFileNotFoundError,rb_mOgreError);
 	rb_include_module(rb_eOgreItemIdentityException,rb_mOgreError);

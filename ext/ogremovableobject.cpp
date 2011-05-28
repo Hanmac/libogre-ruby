@@ -19,17 +19,30 @@ VALUE OgreMovableObject_getMovableType(VALUE self)
 }
 
 /*
+ * call-seq:
+ *   inspect -> String
+ * 
+ * Human-readable description. 
+ * ===Return value
+ * String
 */
 VALUE OgreMovableObject_inspect(VALUE self)
 {
 	VALUE array[3];
 	array[0]=rb_str_new2("#<%s:%s>");
 	array[1]=rb_class_of(self);
-	array[2]=OgreMovableObject_getName(self);
+	if(_self==NULL)
+		array[2]=rb_str_new2("(destroyed)");
+	else
+		array[2]=OgreMovableObject_getName(self);
 	return rb_f_sprintf(3,array);
 }
 
 /*
+ * call-seq:
+ *   listener -> MovableObject::Listener
+ * 
+ * returns the listener.
 */
 VALUE OgreMovableObject_getListener(VALUE self)
 {
@@ -37,12 +50,22 @@ VALUE OgreMovableObject_getListener(VALUE self)
 	return temp ? wrap(temp) : Qnil;
 }
 /*
+ * call-seq:
+ *   listener = MovableObject::Listener
+ * 
+ * sets the listener.
 */
 VALUE OgreMovableObject_setListener(VALUE self,VALUE val)
 {
 	_self->setListener(wrap<Ogre::MovableObject::Listener*>(val));
 	return val;
 }
+
+/*
+ * Document-module: Ogre::MovableObject
+ * 
+ * This module represents an Movable Object.
+*/ 
 
 void Init_OgreMovableObject(VALUE rb_mOgre)
 {
@@ -56,7 +79,7 @@ void Init_OgreMovableObject(VALUE rb_mOgre)
 	rb_define_method(rb_mOgreMovableObject,"movableType",RUBY_METHOD_FUNC(OgreMovableObject_getMovableType),0);
 	
 	rb_define_method(rb_mOgreMovableObject,"inspect",RUBY_METHOD_FUNC(OgreMovableObject_inspect),0);
-
+	
 	rb_define_method(rb_mOgreMovableObject,"listener",RUBY_METHOD_FUNC(OgreMovableObject_getListener),0);
 	rb_define_method(rb_mOgreMovableObject,"listener=",RUBY_METHOD_FUNC(OgreMovableObject_setListener),1);
 }

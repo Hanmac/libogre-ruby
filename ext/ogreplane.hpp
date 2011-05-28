@@ -34,6 +34,24 @@ inline VALUE wrap< Ogre::Plane::Side >(const Ogre::Plane::Side &side )
 }
 
 
+
+template <>
+inline Ogre::Plane::Side wrap< Ogre::Plane::Side >(const VALUE &arg)
+{
+	ID id = rb_to_id(arg);
+	if(id==rb_intern("no_side"))
+		return Ogre::Plane::NO_SIDE;
+	else if(id==rb_intern("positive_side"))
+		return Ogre::Plane::POSITIVE_SIDE;
+	else if(id==rb_intern("negative_side"))
+		return Ogre::Plane::NEGATIVE_SIDE;
+	else if(id==rb_intern("both_side"))
+		return Ogre::Plane::BOTH_SIDE;
+	else
+		return Ogre::Plane::NO_SIDE;
+}
+
+
 template <>
 inline Ogre::Plane* wrap< Ogre::Plane* >(const VALUE &vplane)
 {

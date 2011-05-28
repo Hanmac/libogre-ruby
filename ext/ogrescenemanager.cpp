@@ -19,9 +19,11 @@ VALUE OgreSceneManagerMetaData_description(VALUE meta)
 {
 	return wrap(_meta->description);
 }
-
-
 /*
+ * call-seq:
+ *   createLight([name]) -> Light
+ * 
+ * creates a Light.
 */
 VALUE OgreSceneManager_createLight(int argc,VALUE *argv,VALUE self)
 {
@@ -33,6 +35,10 @@ VALUE OgreSceneManager_createLight(int argc,VALUE *argv,VALUE self)
 		return wrap(_self->createLight(rb_string_value_cstr(&name)));
 }
 /*
+ * call-seq:
+ *   getLight(name) -> Light or nil
+ * 
+ * get a Light or nil
 */
 VALUE OgreSceneManager_getLight(VALUE self,VALUE name)
 {
@@ -40,6 +46,10 @@ VALUE OgreSceneManager_getLight(VALUE self,VALUE name)
 	return light ? wrap(light) : Qnil;
 }
 /*
+ * call-seq:
+ *   hasLight?(name) -> bool
+ * 
+ * return true if light with that name not exist
 */
 VALUE OgreSceneManager_hasLight(VALUE self,VALUE name)
 {
@@ -47,6 +57,11 @@ VALUE OgreSceneManager_hasLight(VALUE self,VALUE name)
 }
 
 /*
+ * call-seq:
+ *   destroyLight([name]) -> nil
+ * 
+ * destroy a Light.
+ * if not name is given, destroy all lights
 */
 VALUE OgreSceneManager_destroyLight(int argc,VALUE *argv,VALUE self)
 {
@@ -74,7 +89,7 @@ void Init_OgreSceneManager(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreSceneManager,"hasLight?",RUBY_METHOD_FUNC(OgreSceneManager_hasLight),1);
 	rb_define_method(rb_cOgreSceneManager,"destroyLight",RUBY_METHOD_FUNC(OgreSceneManager_destroyLight),-1);
 
-	rb_cOgreSceneManagerMetaData = rb_define_class_under(rb_cOgreSceneManager,"SceneManagerMetaData",rb_cObject);
+	rb_cOgreSceneManagerMetaData = rb_define_class_under(rb_cOgreSceneManager,"MetaData",rb_cObject);
 	
 	rb_define_method(rb_cOgreSceneManagerMetaData,"name",RUBY_METHOD_FUNC(OgreSceneManagerMetaData_name),0);
 	rb_define_method(rb_cOgreSceneManagerMetaData,"description",RUBY_METHOD_FUNC(OgreSceneManagerMetaData_description),0);
