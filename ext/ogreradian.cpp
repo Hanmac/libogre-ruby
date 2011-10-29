@@ -8,6 +8,11 @@ VALUE OgreRadian_alloc(VALUE self)
 	return wrap(new Ogre::Radian);
 }
 
+Ogre::Radian* rb_to_radian(const VALUE &vradian)
+{
+	return wrap<Ogre::Radian*>(vradian);
+}
+
 /*
 */
 VALUE OgreRadian_initialize(VALUE self,VALUE val)
@@ -96,52 +101,29 @@ VALUE OgreRadian_inspect(VALUE self)
 */
 VALUE OgreRadian_compare(VALUE self,VALUE other)
 {
-	if(rb_obj_is_kind_of(other,rb_cOgreRadian)){
-		Ogre::Radian temp = *wrap<Ogre::Radian*>(other);
-		return INT2NUM(*_self > temp ? 1 : *_self < temp ? -1 : 0);
-	}else if(rb_obj_is_kind_of(other,rb_cOgreDegree)){
-		Ogre::Radian temp = Ogre::Radian(*wrap<Ogre::Degree*>(other));
-		return INT2NUM(*_self > temp ? 1 : *_self < temp ? -1 : 0);
-	}else{
-		Ogre::Radian temp = Ogre::Radian(NUM2DBL(other));
-		return INT2NUM(*_self > temp ? 1 : *_self < temp ? -1 : 0);
-	}
+	Ogre::Radian temp = *wrap<Ogre::Radian*>(other);
+	return INT2NUM(*_self > temp ? 1 : *_self < temp ? -1 : 0);
 }
 
 /*
 */
 VALUE OgreRadian_plus(VALUE self,VALUE other)
 {
-	if(rb_obj_is_kind_of(other,rb_cOgreDegree)){
-		return wrap(*_self + *wrap<Ogre::Degree*>(other));
-	}else if(rb_obj_is_kind_of(other,rb_cOgreRadian)){
-		return wrap(*_self + *wrap<Ogre::Radian*>(other));
-	}else
-		return wrap(*_self + Ogre::Radian(NUM2DBL(other)));
+	return wrap(*_self + *wrap<Ogre::Radian*>(other));
 }
 
 /*
 */
 VALUE OgreRadian_minus(VALUE self,VALUE other)
 {
-	if(rb_obj_is_kind_of(other,rb_cOgreRadian)){
-		return wrap(*_self - *wrap<Ogre::Radian*>(other));
-	}else if(rb_obj_is_kind_of(other,rb_cOgreDegree)){
-		return wrap(*_self - *wrap<Ogre::Degree*>(other));
-	}else
-		return wrap(*_self - Ogre::Radian(NUM2DBL(other)));
+	return wrap(*_self - *wrap<Ogre::Radian*>(other));
 }
 
 /*
 */
 VALUE OgreRadian_mal(VALUE self,VALUE other)
 {
-	if(rb_obj_is_kind_of(other,rb_cOgreRadian)){
-		return wrap(*_self * *wrap<Ogre::Radian*>(other));
-	}else if(rb_obj_is_kind_of(other,rb_cOgreDegree)){
-		return wrap(*_self * Ogre::Radian(*wrap<Ogre::Degree*>(other)));
-	}else
-		return wrap(*_self * Ogre::Radian(NUM2DBL(other)));
+	return wrap(*_self * *wrap<Ogre::Radian*>(other));
 }
 
 /*

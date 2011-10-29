@@ -8,32 +8,8 @@ VALUE OgreRay_alloc(VALUE self)
 {
 	return wrap(new Ogre::Ray);
 }
-/*:nodoc:
-*/
-VALUE OgreRay_set_origin(VALUE self,VALUE vec)
-{
-	_self->setOrigin(*wrap<Ogre::Vector3*>(vec));
-	return vec;
-}
-/*:nodoc:
-*/
-VALUE OgreRay_set_direction(VALUE self,VALUE vec)
-{
-	_self->setDirection(*wrap<Ogre::Vector3*>(vec));
-	return vec;
-}
-/*:nodoc:
-*/
-VALUE OgreRay_get_origin(VALUE self)
-{
-	return wrap(_self->getOrigin());
-}
-/*:nodoc:
-*/
-VALUE OgreRay_get_direction(VALUE self)
-{
-	return wrap(_self->getDirection());
-}
+macro_attr(Ray,Origin,Ogre::Vector3)
+macro_attr(Ray,Direction,Ogre::Vector3)
 /*
  * call-seq:
  *   sphere.inspect -> String
@@ -47,16 +23,16 @@ VALUE OgreRay_inspect(VALUE self)
 	VALUE array[4];
 	array[0]=rb_str_new2("#<%s:%s, %s>");
 	array[1]=rb_class_of(self);
-	array[2]=rb_funcall(OgreRay_get_origin(self),rb_intern("inspect"),0);
-	array[3]=rb_funcall(OgreRay_get_direction(self),rb_intern("inspect"),0);
+	array[2]=rb_funcall(OgreRay_getOrigin(self),rb_intern("inspect"),0);
+	array[3]=rb_funcall(OgreRay_getDirection(self),rb_intern("inspect"),0);
 	return rb_f_sprintf(4,array);
 }
 /*
 */
 VALUE OgreRay_initialize(VALUE self,VALUE vec,VALUE direction)
 {
-	OgreRay_set_origin(self,vec);
-	OgreRay_set_direction(self,direction);
+	OgreRay_setOrigin(self,vec);
+	OgreRay_setDirection(self,direction);
 	return self;
 }
 /*
@@ -64,8 +40,8 @@ VALUE OgreRay_initialize(VALUE self,VALUE vec,VALUE direction)
 VALUE OgreRay_initialize_copy(VALUE self, VALUE other)
 {
 	VALUE result = rb_call_super(1,&other);
-	OgreRay_set_origin(self,OgreRay_get_origin(other));
-	OgreRay_set_direction(self,OgreRay_get_direction(other));
+	OgreRay_setOrigin(self,OgreRay_getOrigin(other));
+	OgreRay_setDirection(self,OgreRay_getDirection(other));
 	return result;
 }
 /*
@@ -112,8 +88,8 @@ VALUE OgreRay_intersects(VALUE self,VALUE other)
 VALUE OgreRay_hash(VALUE self)
 {
 	VALUE result = rb_ary_new();
-	rb_ary_push(result,OgreRay_get_origin(self));
-	rb_ary_push(result,OgreRay_get_direction(self));
+	rb_ary_push(result,OgreRay_getOrigin(self));
+	rb_ary_push(result,OgreRay_getDirection(self));
 	return rb_funcall(result,rb_intern("hash"),0);
 }
 /*
@@ -172,11 +148,9 @@ void Init_OgreRay(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreRay,"initialize",RUBY_METHOD_FUNC(OgreRay_initialize),2);
 	rb_define_private_method(rb_cOgreRay,"initialize_copy",RUBY_METHOD_FUNC(OgreRay_initialize_copy),1);
 
-	rb_define_method(rb_cOgreRay,"origin",RUBY_METHOD_FUNC(OgreRay_get_origin),0);
-	rb_define_method(rb_cOgreRay,"direction",RUBY_METHOD_FUNC(OgreRay_get_direction),0);
-
-	rb_define_method(rb_cOgreRay,"origin=",RUBY_METHOD_FUNC(OgreRay_set_origin),1);
-	rb_define_method(rb_cOgreRay,"direction=",RUBY_METHOD_FUNC(OgreRay_set_direction),1);
+	rb_define_attr_method(rb_cOgreRay,"origin",OgreRay_getOrigin,OgreRay_setOrigin);
+	
+	rb_define_attr_method(rb_cOgreRay,"direction",OgreRay_getDirection,OgreRay_setDirection);
 
 	rb_define_method(rb_cOgreRay,"inspect",RUBY_METHOD_FUNC(OgreRay_inspect),0);
 //	rb_define_method(rb_cOgreRay,"intersects?",RUBY_METHOD_FUNC(OgreRay_intersects),1);

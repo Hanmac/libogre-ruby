@@ -4,10 +4,15 @@
 #define _self wrap<Ogre::Matrix4*>(self)
 VALUE rb_cOgreMatrix4;
 
+
+macro_attr(Matrix4,Trans,Ogre::Vector3)
+
 VALUE OgreMatrix4_alloc(VALUE self)
 {
 	return wrap(new Ogre::Matrix4);
-}/*
+}
+
+/*
 */
 VALUE OgreMatrix4_initialize(VALUE self,VALUE x,VALUE y,VALUE z)
 {

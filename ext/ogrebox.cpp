@@ -7,84 +7,13 @@ VALUE OgreBox_alloc(VALUE self)
 {
 	return wrap(new Ogre::Box);
 }
-/*:nodoc:
-*/
-VALUE OgreBox_get_left(VALUE self)
-{
-	return UINT2NUM(_self->left);
-}
-/*:nodoc:
-*/
-VALUE OgreBox_get_top(VALUE self)
-{
-	return UINT2NUM(_self->top);
-}
-/*:nodoc:
-*/
-VALUE OgreBox_get_right(VALUE self)
-{
-	return UINT2NUM(_self->right);
-}
-/*:nodoc:
-*/
-VALUE OgreBox_get_bottom(VALUE self)
-{
-	return UINT2NUM(_self->bottom);
-}
-/*:nodoc:
-*/
-VALUE OgreBox_get_front(VALUE self)
-{
-	return UINT2NUM(_self->front);
-}
-/*:nodoc:
-*/
-VALUE OgreBox_get_back(VALUE self)
-{
-	return UINT2NUM(_self->back);
-}
-/*:nodoc:
-*/
-VALUE OgreBox_set_left(VALUE self,VALUE val)
-{
-	_self->left = NUM2UINT(val);
-	return val;
-}
-/*:nodoc:
-*/
-VALUE OgreBox_set_top(VALUE self,VALUE val)
-{
-	_self->top = NUM2UINT(val);
-	return val;
-}
-/*:nodoc:
-*/
-VALUE OgreBox_set_right(VALUE self,VALUE val)
-{
-	_self->right = NUM2UINT(val);
-	return val;
-}
-/*:nodoc:
-*/
-VALUE OgreBox_set_bottom(VALUE self,VALUE val)
-{
-	_self->bottom = NUM2UINT(val);
-	return val;
-}
-/*:nodoc:
-*/
-VALUE OgreBox_set_front(VALUE self,VALUE val)
-{
-	_self->front = NUM2UINT(val);
-	return val;
-}
-/*:nodoc:
-*/
-VALUE OgreBox_set_back(VALUE self,VALUE val)
-{
-	_self->back = NUM2UINT(val);
-	return val;
-}
+macro_attr_prop_with_func(Box,left,UINT2NUM,NUM2UINT)
+macro_attr_prop_with_func(Box,top,UINT2NUM,NUM2UINT)
+macro_attr_prop_with_func(Box,right,UINT2NUM,NUM2UINT)
+macro_attr_prop_with_func(Box,bottom,UINT2NUM,NUM2UINT)
+macro_attr_prop_with_func(Box,front,UINT2NUM,NUM2UINT)
+macro_attr_prop_with_func(Box,back,UINT2NUM,NUM2UINT)
+
 /*
 */
 VALUE OgreBox_width(VALUE self)
@@ -239,19 +168,13 @@ void Init_OgreBox(VALUE rb_mOgre)
 	rb_define_alloc_func(rb_cOgreBox,OgreBox_alloc);
 
 
-	rb_define_method(rb_cOgreBox,"left",RUBY_METHOD_FUNC(OgreBox_get_left),0);
-	rb_define_method(rb_cOgreBox,"top",RUBY_METHOD_FUNC(OgreBox_get_top),0);
-	rb_define_method(rb_cOgreBox,"right",RUBY_METHOD_FUNC(OgreBox_get_right),0);
-	rb_define_method(rb_cOgreBox,"bottom",RUBY_METHOD_FUNC(OgreBox_get_bottom),0);
-	rb_define_method(rb_cOgreBox,"front",RUBY_METHOD_FUNC(OgreBox_get_front),0);
-	rb_define_method(rb_cOgreBox,"back",RUBY_METHOD_FUNC(OgreBox_get_back),0);
+	rb_define_attr_method(rb_cOgreBox,"left",OgreBox_get_left,OgreBox_set_left);
+	rb_define_attr_method(rb_cOgreBox,"top",OgreBox_get_top,OgreBox_set_top);
+	rb_define_attr_method(rb_cOgreBox,"right",OgreBox_get_right,OgreBox_set_right);
+	rb_define_attr_method(rb_cOgreBox,"bottom",OgreBox_get_bottom,OgreBox_set_bottom);
+	rb_define_attr_method(rb_cOgreBox,"front",OgreBox_get_front,OgreBox_set_front);
+	rb_define_attr_method(rb_cOgreBox,"back",OgreBox_get_back,OgreBox_set_back);
 
-	rb_define_method(rb_cOgreBox,"left=",RUBY_METHOD_FUNC(OgreBox_set_left),1);
-	rb_define_method(rb_cOgreBox,"top=",RUBY_METHOD_FUNC(OgreBox_set_top),1);
-	rb_define_method(rb_cOgreBox,"right=",RUBY_METHOD_FUNC(OgreBox_set_right),1);
-	rb_define_method(rb_cOgreBox,"bottom=",RUBY_METHOD_FUNC(OgreBox_set_bottom),1);
-	rb_define_method(rb_cOgreBox,"front=",RUBY_METHOD_FUNC(OgreBox_set_front),1);
-	rb_define_method(rb_cOgreBox,"back=",RUBY_METHOD_FUNC(OgreBox_set_back),1);
 
 
 	rb_define_method(rb_cOgreBox,"width",RUBY_METHOD_FUNC(OgreBox_width),0);

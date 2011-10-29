@@ -3,18 +3,23 @@
 #define _self wrap<Ogre::Font*>(self)
 VALUE rb_cOgreFont;
 
-/*:nodoc:
-*/
 VALUE OgreFont_getSource(VALUE self)
 {
 	return wrap(_self->getSource());
 }
-/*:nodoc:
-*/
 VALUE OgreFont_setSource(VALUE self,VALUE val)
 {
 	_self->setSource(rb_string_value_cstr(&val));
 	return val;
+}
+
+
+
+/*
+*/
+VALUE OgreFont_getMaterial(VALUE self)
+{
+	return wrap(_self->getMaterial().get());
 }
 
 /*
@@ -44,6 +49,7 @@ void Init_OgreFont(VALUE rb_mOgre)
 	rb_define_attr(rb_cOgreFont,"antialiasColour",1,1);
 #endif
 	rb_cOgreFont = rb_define_class_under(rb_mOgre,"Font",rb_cOgreResource);
-	rb_define_method(rb_cOgreFont,"source",RUBY_METHOD_FUNC(OgreFont_getSource),0);
-	rb_define_method(rb_cOgreFont,"source=",RUBY_METHOD_FUNC(OgreFont_setSource),1);
+	rb_define_attr_method(rb_cOgreFont,"source",OgreFont_getSource,OgreFont_setSource);
+	
+	rb_define_method(rb_cOgreFont,"material",RUBY_METHOD_FUNC(OgreFont_getMaterial),0);
 }

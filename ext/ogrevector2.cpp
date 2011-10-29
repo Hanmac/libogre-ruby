@@ -6,32 +6,8 @@ VALUE OgreVector2_alloc(VALUE self)
 {
 	return wrap(new Ogre::Vector2);
 }
-/*:nodoc:
-*/
-VALUE OgreVector2_get_x(VALUE self)
-{
-	return DBL2NUM(_self->x);
-}
-/*:nodoc:
-*/
-VALUE OgreVector2_get_y(VALUE self)
-{
-	return DBL2NUM(_self->y);
-}
-/*:nodoc:
-*/
-VALUE OgreVector2_set_x(VALUE self,VALUE c)
-{
-	_self->x = NUM2DBL(c);
-	return c;
-}
-/*:nodoc:
-*/
-VALUE OgreVector2_set_y(VALUE self,VALUE c)
-{
-	_self->y = NUM2DBL(c);
-	return c;
-}
+macro_attr_prop_with_func(Vector2,x,DBL2NUM,NUM2DBL)
+macro_attr_prop_with_func(Vector2,y,DBL2NUM,NUM2DBL)
 /*
 */
 VALUE OgreVector2_initialize(VALUE self,VALUE x,VALUE y)
@@ -263,11 +239,8 @@ void Init_OgreVector2(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreVector2,"initialize",RUBY_METHOD_FUNC(OgreVector2_initialize),2);
 	rb_define_private_method(rb_cOgreVector2,"initialize_copy",RUBY_METHOD_FUNC(OgreVector2_initialize_copy),1);
 	
-	rb_define_method(rb_cOgreVector2,"x",RUBY_METHOD_FUNC(OgreVector2_get_x),0);
-	rb_define_method(rb_cOgreVector2,"y",RUBY_METHOD_FUNC(OgreVector2_get_y),0);
-
-	rb_define_method(rb_cOgreVector2,"x=",RUBY_METHOD_FUNC(OgreVector2_set_x),1);
-	rb_define_method(rb_cOgreVector2,"y=",RUBY_METHOD_FUNC(OgreVector2_set_y),1);
+	rb_define_attr_method(rb_cOgreVector2,"x",OgreVector2_get_x,OgreVector2_set_x);
+	rb_define_attr_method(rb_cOgreVector2,"y",OgreVector2_get_y,OgreVector2_set_y);
 
 	rb_define_method(rb_cOgreVector2,"inspect",RUBY_METHOD_FUNC(OgreVector2_inspect),0);
 	rb_define_method(rb_cOgreVector2,"-@",RUBY_METHOD_FUNC(OgreVector2_minusself),0);

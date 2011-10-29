@@ -41,11 +41,22 @@
 #include "ogrepass.hpp"
 #include "ogretextureunitstate.hpp"
 #include "ogrelayerblendmode.hpp"
-VALUE rb_mOgre,rb_mSingleton;
 
+#include "ogrecompositor.hpp"
+#include "ogretexturedefinition.hpp"
+#include "ogrecompositiontechnique.hpp"
 
+#include "ogreviewport.hpp"
 
+#include "ogrebillboard.hpp"
+#include "ogrebillboardchain.hpp"
+#include "ogrebillboardchainelement.hpp"
 
+#include "ogreparticle.hpp"
+#include "ogreparticleemitter.hpp"
+
+#include "ogrestringinterface.hpp"
+VALUE rb_mOgre;
 
 VALUE Ogre_dummy0(VALUE self)
 {
@@ -71,6 +82,7 @@ VALUE Ogre_dummy4(VALUE self,VALUE obj1,VALUE obj2,VALUE obj3,VALUE obj4)
 extern "C" void Init_ogre(void)
 {
 	rb_mOgre = rb_define_module("Ogre");
+	
 	Init_OgreRoot(rb_mOgre);
 	Init_OgreColor(rb_mOgre);
 	Init_OgreVector2(rb_mOgre);
@@ -81,7 +93,16 @@ extern "C" void Init_ogre(void)
 	Init_OgreSphere(rb_mOgre);
 	Init_OgreRay(rb_mOgre);
 	Init_OgrePlane(rb_mOgre);
+	
+	Init_OgreStringInterface(rb_mOgre);
+	
 	Init_OgreResource(rb_mOgre);
+	Init_OgreFont(rb_mOgre);
+	Init_OgreSkeleton(rb_mOgre);
+	
+	Init_OgreBillboard(rb_mOgre);
+	
+	
 	Init_OgreRect(rb_mOgre);
 	Init_OgreBox(rb_mOgre);
 	Init_OgreImage(rb_mOgre);
@@ -101,10 +122,20 @@ extern "C" void Init_ogre(void)
 	Init_OgreMovableObject(rb_mOgre);
 	Init_OgreMovableObjectListener(rb_mOgre);
 	Init_OgreLight(rb_mOgre);
+	Init_OgreMovablePlane(rb_mOgre);
+	Init_OgreFrustum(rb_mOgre);
+	Init_OgreCamera(rb_mOgre);
+	Init_OgreBillboard(rb_mOgre);
+	Init_OgreBillboardSet(rb_mOgre);
+	Init_OgreBillboardChain(rb_mOgre);
+	Init_OgreBillboardChainElement(rb_mOgre);
+
+	Init_OgreRibbonTrail(rb_mOgre);
 
 	Init_OgreNode(rb_mOgre);
 	Init_OgreSceneNode(rb_mOgre);
-
+	Init_OgreBone(rb_mOgre);
+	
 	Init_OgreLog(rb_mOgre);
 	Init_OgreLogListener(rb_mOgre);
 	Init_OgreAxisAlignedBox(rb_mOgre);
@@ -123,6 +154,16 @@ extern "C" void Init_ogre(void)
 	Init_OgrePass(rb_mOgre);
 	Init_OgreTextureUnitState(rb_mOgre);
 	Init_OgreLayerBlendMode(rb_mOgre);
+	
+	Init_OgreCompositor(rb_mOgre);
+	Init_OgreCompositionTechnique(rb_mOgre);
+	Init_OgreTextureDefinition(rb_mOgre);
+	
+	Init_OgreParticleSystem(rb_mOgre);
+	Init_OgreParticle(rb_mOgre);
+	Init_OgreParticleEmitter(rb_mOgre);
+	
+	
 	VALUE array[4];
 	array[0]=rb_str_new2("%d.%d.%d");
 	array[1]=INT2NUM(OGRE_VERSION_MAJOR);

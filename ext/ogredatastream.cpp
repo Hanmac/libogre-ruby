@@ -163,7 +163,7 @@ void Init_OgreDataStream(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreDataStream,"pos=",RUBY_METHOD_FUNC(OgreDataStream_pos_set),1);
 	
 	rb_define_method(rb_cOgreDataStream,"skip",RUBY_METHOD_FUNC(OgreDataStream_skip),1);
-	rb_define_method(rb_cOgreDataStream,"read",RUBY_METHOD_FUNC(OgreDataStream_read),-1);//TODO: more parameter
+	rb_define_method(rb_cOgreDataStream,"read",RUBY_METHOD_FUNC(OgreDataStream_read),-1);
 	rb_define_method(rb_cOgreDataStream,"write",RUBY_METHOD_FUNC(OgreDataStream_write),1);
 	rb_define_method(rb_cOgreDataStream,"close",RUBY_METHOD_FUNC(OgreDataStream_close),0);
 	//rb_define_method(rb_cOgreDataStream,"readline",RUBY_METHOD_FUNC(OgreDataStream_readLine),0);

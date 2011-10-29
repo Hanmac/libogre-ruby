@@ -7,14 +7,11 @@ VALUE OgreLayerBlendMode_alloc(VALUE self)
 {
 	return wrap(new Ogre::LayerBlendModeEx);
 }
-/*:nodoc:
-*/
-VALUE OgreLayerBlendMode_get_blendType(VALUE self)
-{
-	return wrap(_self->blendType);
-}
-/*:nodoc:
-*/
+
+macro_attr_prop(LayerBlendMode,blendType,Ogre::LayerBlendType)
+macro_attr_prop_with_func(LayerBlendMode,factor,DBL2NUM,NUM2DBL)
+
+
 VALUE OgreLayerBlendMode_get_arg1(VALUE self)
 {
 	VALUE result = Qnil;
@@ -28,8 +25,6 @@ VALUE OgreLayerBlendMode_get_arg1(VALUE self)
 	}
 	return result;
 }
-/*:nodoc:
-*/
 VALUE OgreLayerBlendMode_get_arg2(VALUE self)
 {
 	VALUE result = Qnil;
@@ -43,29 +38,7 @@ VALUE OgreLayerBlendMode_get_arg2(VALUE self)
 	}
 	return result;
 }
-/*:nodoc:
-*/
-VALUE OgreLayerBlendMode_get_factor(VALUE self)
-{
-	return DBL2NUM(_self->factor);
-}
-/*:nodoc:
-*/
-VALUE OgreLayerBlendMode_set_blendType(VALUE self,VALUE type)
-{
-	_self->blendType = wrap<Ogre::LayerBlendType>(type);
-	return type;
-}
-/*:nodoc:
-*/
-VALUE OgreLayerBlendMode_set_factor(VALUE self,VALUE fac)
-{
-	_self->factor = NUM2DBL(fac);
-	return fac;
-}
 
-/*:nodoc:
-*/
 VALUE OgreLayerBlendMode_set_arg1(VALUE self,VALUE val)
 {
 	switch(_self->blendType){
@@ -77,8 +50,6 @@ VALUE OgreLayerBlendMode_set_arg1(VALUE self,VALUE val)
 	}
 	return val;
 }
-/*:nodoc:
-*/
 VALUE OgreLayerBlendMode_set_arg2(VALUE self,VALUE val)
 {
 	switch(_self->blendType){
@@ -104,14 +75,9 @@ void Init_OgreLayerBlendMode(VALUE rb_mOgre)
 	rb_cOgreLayerBlendMode = rb_define_class_under(rb_mOgre,"LayerBlendMode",rb_cObject);
 	rb_define_alloc_func(rb_cOgreLayerBlendMode,OgreLayerBlendMode_alloc);
 	
-	rb_define_method(rb_cOgreLayerBlendMode,"blendType",RUBY_METHOD_FUNC(OgreLayerBlendMode_get_blendType),0);
-	rb_define_method(rb_cOgreLayerBlendMode,"blendType=",RUBY_METHOD_FUNC(OgreLayerBlendMode_set_blendType),1);
+	rb_define_attr_method(rb_cOgreLayerBlendMode,"blendType",OgreLayerBlendMode_get_blendType,OgreLayerBlendMode_set_blendType);
 	
-	rb_define_method(rb_cOgreLayerBlendMode,"arg1",RUBY_METHOD_FUNC(OgreLayerBlendMode_get_arg1),0);
-	rb_define_method(rb_cOgreLayerBlendMode,"arg2",RUBY_METHOD_FUNC(OgreLayerBlendMode_get_arg2),0);
-	rb_define_method(rb_cOgreLayerBlendMode,"factor",RUBY_METHOD_FUNC(OgreLayerBlendMode_get_factor),0);
-	
-	rb_define_method(rb_cOgreLayerBlendMode,"arg1=",RUBY_METHOD_FUNC(OgreLayerBlendMode_set_arg1),1);
-	rb_define_method(rb_cOgreLayerBlendMode,"arg2=",RUBY_METHOD_FUNC(OgreLayerBlendMode_set_arg2),1);
-	rb_define_method(rb_cOgreLayerBlendMode,"factor=",RUBY_METHOD_FUNC(OgreLayerBlendMode_set_factor),1);
+	rb_define_attr_method(rb_cOgreLayerBlendMode,"arg1",OgreLayerBlendMode_get_arg1,OgreLayerBlendMode_set_arg1);
+	rb_define_attr_method(rb_cOgreLayerBlendMode,"arg2",OgreLayerBlendMode_get_arg2,OgreLayerBlendMode_set_arg2);
+	rb_define_attr_method(rb_cOgreLayerBlendMode,"factor",OgreLayerBlendMode_get_factor,OgreLayerBlendMode_set_factor);
 }

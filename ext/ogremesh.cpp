@@ -9,9 +9,7 @@ VALUE rb_cOgreMesh;
 VALUE OgreMesh_each(VALUE self)
 {
 	RETURN_ENUMERATOR(self,0,NULL);
-	Ogre::Mesh::SubMeshIterator smit = _self->getSubMeshIterator();
-	for (Ogre::Mesh::SubMeshIterator::iterator it = smit.begin(); it != smit.end(); ++it)
-		rb_yield(wrap(*it));
+	wrap<Ogre::SubMesh*>(_self->getSubMeshIterator());
 	return self;
 }
 

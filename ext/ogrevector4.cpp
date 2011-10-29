@@ -7,58 +7,11 @@ VALUE OgreVector4_alloc(VALUE self)
 {
 	return wrap(new Ogre::Vector4);
 }
-/*:nodoc:
-*/
-VALUE OgreVector4_get_x(VALUE self)
-{
-	return DBL2NUM(_self->x);
-}
-/*:nodoc:
-*/
-VALUE OgreVector4_get_y(VALUE self)
-{
-	return DBL2NUM(_self->y);
-}
-/*:nodoc:
-*/
-VALUE OgreVector4_get_z(VALUE self)
-{
-	return DBL2NUM(_self->z);
-}
-/*:nodoc:
-*/
-VALUE OgreVector4_get_w(VALUE self)
-{
-	return DBL2NUM(_self->w);
-}
-/*:nodoc:
-*/
-VALUE OgreVector4_set_x(VALUE self,VALUE c)
-{
-	_self->x = NUM2DBL(c);
-	return c;
-}
-/*:nodoc:
-*/
-VALUE OgreVector4_set_y(VALUE self,VALUE c)
-{
-	_self->y = NUM2DBL(c);
-	return c;
-}
-/*:nodoc:
-*/
-VALUE OgreVector4_set_z(VALUE self,VALUE c)
-{
-	_self->z = NUM2DBL(c);
-	return c;
-}
-/*:nodoc:
-*/
-VALUE OgreVector4_set_w(VALUE self,VALUE c)
-{
-	_self->w = NUM2DBL(c);
-	return c;
-}
+
+macro_attr_prop_with_func(Vector4,x,DBL2NUM,NUM2DBL)
+macro_attr_prop_with_func(Vector4,y,DBL2NUM,NUM2DBL)
+macro_attr_prop_with_func(Vector4,z,DBL2NUM,NUM2DBL)
+macro_attr_prop_with_func(Vector4,w,DBL2NUM,NUM2DBL)
 /*
 */
 VALUE OgreVector4_initialize(VALUE self,VALUE x,VALUE y,VALUE z,VALUE w)
@@ -259,15 +212,10 @@ void Init_OgreVector4(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreVector4,"initialize",RUBY_METHOD_FUNC(OgreVector4_initialize),4);
 	rb_define_private_method(rb_cOgreVector4,"initialize_copy",RUBY_METHOD_FUNC(OgreVector4_initialize_copy),1);
 	
-	rb_define_method(rb_cOgreVector4,"x",RUBY_METHOD_FUNC(OgreVector4_get_x),0);
-	rb_define_method(rb_cOgreVector4,"y",RUBY_METHOD_FUNC(OgreVector4_get_y),0);
-	rb_define_method(rb_cOgreVector4,"z",RUBY_METHOD_FUNC(OgreVector4_get_z),0);
-	rb_define_method(rb_cOgreVector4,"w",RUBY_METHOD_FUNC(OgreVector4_get_w),0);
-	
-	rb_define_method(rb_cOgreVector4,"x=",RUBY_METHOD_FUNC(OgreVector4_set_x),1);
-	rb_define_method(rb_cOgreVector4,"y=",RUBY_METHOD_FUNC(OgreVector4_set_y),1);
-	rb_define_method(rb_cOgreVector4,"z=",RUBY_METHOD_FUNC(OgreVector4_set_z),1);
-	rb_define_method(rb_cOgreVector4,"w=",RUBY_METHOD_FUNC(OgreVector4_set_w),1);
+	rb_define_attr_method(rb_cOgreVector4,"x",OgreVector4_get_x,OgreVector4_set_x);
+	rb_define_attr_method(rb_cOgreVector4,"y",OgreVector4_get_y,OgreVector4_set_y);
+	rb_define_attr_method(rb_cOgreVector4,"z",OgreVector4_get_z,OgreVector4_set_z);
+	rb_define_attr_method(rb_cOgreVector4,"w",OgreVector4_get_w,OgreVector4_set_w);
 	
 	rb_define_method(rb_cOgreVector4,"inspect",RUBY_METHOD_FUNC(OgreVector4_inspect),0);
 	rb_define_method(rb_cOgreVector4,"-@",RUBY_METHOD_FUNC(OgreVector4_minusself),0);

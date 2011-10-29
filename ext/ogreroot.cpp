@@ -15,10 +15,8 @@ VALUE OgreRoot_addResourceLocation(int argc,VALUE *argv,VALUE self)
 {
 	VALUE path,type,resGroup,recursive;
 	rb_scan_args(argc, argv, "22",&path,&type,&resGroup,&recursive);
-	Ogre::String result;
-	if(NIL_P(resGroup))
-		result = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
-	else
+	Ogre::String result = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
+	if(!NIL_P(resGroup))
 		result = rb_string_value_cstr(&resGroup);
 	try{
 		_self->addResourceLocation(rb_string_value_cstr(&path),rb_string_value_cstr(&type),result,RTEST(recursive));
@@ -33,10 +31,8 @@ VALUE OgreRoot_removeResourceLocation(int argc,VALUE *argv,VALUE self)
 {
 	VALUE name,resGroup;
 	rb_scan_args(argc, argv, "11",&name,&resGroup);
-	Ogre::String result;
-	if(NIL_P(resGroup))
-		result = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
-	else
+	Ogre::String result = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
+	if(!NIL_P(resGroup))
 		result = rb_string_value_cstr(&resGroup);
 	_self->removeResourceLocation(rb_string_value_cstr(&name),result);
 	return self;
@@ -196,10 +192,8 @@ VALUE OgreRoot_createSceneManager(int argc,VALUE *argv,VALUE self)
 {
 	VALUE typeName,insatanceName;
 	rb_scan_args(argc, argv, "11",&typeName,&insatanceName);
-	Ogre::String result;
-	if(NIL_P(insatanceName))
-		result = Ogre::StringUtil::BLANK;
-	else
+	Ogre::String result = Ogre::StringUtil::BLANK;
+	if(!NIL_P(insatanceName))
 		result = rb_string_value_cstr(&insatanceName);
 	try{
 		return wrap(_self->createSceneManager(rb_string_value_cstr(&typeName),result));
@@ -213,13 +207,18 @@ VALUE OgreRoot_createSceneManager(int argc,VALUE *argv,VALUE self)
 VALUE OgreRoot_each_metadata(VALUE self)
 {
 	RETURN_ENUMERATOR(self,0,NULL);
-	Ogre::SceneManagerEnumerator::MetaDataIterator map = _self->getSceneManagerMetaDataIterator();
-	Ogre::SceneManagerEnumerator::MetaDataIterator::iterator it;
-	for (it = map.begin(); it != map.end(); ++it) {
-		rb_yield(wrap(*it));
-	}
+	wrap<const Ogre::SceneManagerMetaData*>(_self->getSceneManagerMetaDataIterator());
 	return self;
 }
+/*
+*/
+VALUE OgreRoot_each_sceneManager(VALUE self)
+{
+	RETURN_ENUMERATOR(self,0,NULL);
+	wrap<Ogre::String,Ogre::SceneManager*>(_self->getSceneManagerIterator());
+	return self;
+}
+
 /*
  * Document-module: Ogre
  * 
@@ -252,7 +251,9 @@ void Init_OgreRoot(VALUE rb_mOgre)
 	rb_define_singleton_method(rb_mOgre,"addPluginFolder",RUBY_METHOD_FUNC(OgreRoot_addPluginFolder),1);
 	rb_define_singleton_method(rb_mOgre,"pluginfolders",RUBY_METHOD_FUNC(OgreRoot_listPluginFolders),0);
 	rb_define_singleton_method(rb_mOgre,"plugins",RUBY_METHOD_FUNC(OgreRoot_listPlugins),0);
+	
 	rb_define_singleton_method(rb_mOgre,"each_metadata",RUBY_METHOD_FUNC(OgreRoot_each_metadata),0);
+	rb_define_singleton_method(rb_mOgre,"each_sceneManager",RUBY_METHOD_FUNC(OgreRoot_each_sceneManager),0);
 
 	rb_define_singleton_method(rb_mOgre,"createSceneManager",RUBY_METHOD_FUNC(OgreRoot_createSceneManager),-1);
 }

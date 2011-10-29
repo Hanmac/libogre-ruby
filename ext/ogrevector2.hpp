@@ -21,4 +21,9 @@ inline Ogre::Vector2* wrap< Ogre::Vector2* >(const VALUE &vvector)
   Data_Get_Struct( vvector, Ogre::Vector2, vector);
 	return vector;
 }
+template <>
+inline Ogre::Vector2 wrap< Ogre::Vector2 >(const VALUE &vvector)
+{
+	return *wrap< Ogre::Vector2* >(vvector);
+}
 #endif /* __RubyOgreVector2_H__ */

@@ -7,58 +7,10 @@ VALUE OgreRect_alloc(VALUE self)
 {
 	return wrap(new Ogre::Rect);
 }
-/*:nodoc:
-*/
-VALUE OgreRect_get_left(VALUE self)
-{
-	return INT2NUM(_self->left);
-}
-/*:nodoc:
-*/
-VALUE OgreRect_get_top(VALUE self)
-{
-	return INT2NUM(_self->top);
-}
-/*:nodoc:
-*/
-VALUE OgreRect_get_right(VALUE self)
-{
-	return INT2NUM(_self->right);
-}
-/*:nodoc:
-*/
-VALUE OgreRect_get_bottom(VALUE self)
-{
-	return INT2NUM(_self->bottom);
-}
-/*:nodoc:
-*/
-VALUE OgreRect_set_left(VALUE self,VALUE val)
-{
-	_self->left = NUM2INT(val);
-	return val;
-}
-/*:nodoc:
-*/
-VALUE OgreRect_set_top(VALUE self,VALUE val)
-{
-	_self->top = NUM2INT(val);
-	return val;
-}
-/*:nodoc:
-*/
-VALUE OgreRect_set_right(VALUE self,VALUE val)
-{
-	_self->right = NUM2INT(val);
-	return val;
-}
-/*:nodoc:
-*/
-VALUE OgreRect_set_bottom(VALUE self,VALUE val)
-{
-	_self->bottom = NUM2INT(val);
-	return val;
-}
+macro_attr_prop_with_func(Rect,left,INT2NUM,NUM2INT)
+macro_attr_prop_with_func(Rect,top,INT2NUM,NUM2INT)
+macro_attr_prop_with_func(Rect,right,INT2NUM,NUM2INT)
+macro_attr_prop_with_func(Rect,bottom,INT2NUM,NUM2INT)
 
 
 /*
@@ -215,15 +167,10 @@ void Init_OgreRect(VALUE rb_mOgre)
 	rb_define_alloc_func(rb_cOgreRect,OgreRect_alloc);
 	rb_define_private_method(rb_cOgreRect,"initialize_copy",RUBY_METHOD_FUNC(OgreRect_initialize_copy),1);
 
-	rb_define_method(rb_cOgreRect,"left",RUBY_METHOD_FUNC(OgreRect_get_left),0);
-	rb_define_method(rb_cOgreRect,"top",RUBY_METHOD_FUNC(OgreRect_get_top),0);
-	rb_define_method(rb_cOgreRect,"right",RUBY_METHOD_FUNC(OgreRect_get_right),0);
-	rb_define_method(rb_cOgreRect,"bottom",RUBY_METHOD_FUNC(OgreRect_get_bottom),0);
-
-	rb_define_method(rb_cOgreRect,"left=",RUBY_METHOD_FUNC(OgreRect_set_left),1);
-	rb_define_method(rb_cOgreRect,"top=",RUBY_METHOD_FUNC(OgreRect_set_top),1);
-	rb_define_method(rb_cOgreRect,"right=",RUBY_METHOD_FUNC(OgreRect_set_right),1);
-	rb_define_method(rb_cOgreRect,"bottom=",RUBY_METHOD_FUNC(OgreRect_set_bottom),1);
+	rb_define_attr_method(rb_cOgreRect,"left",OgreRect_get_left,OgreRect_set_left);
+	rb_define_attr_method(rb_cOgreRect,"top",OgreRect_get_top,OgreRect_set_top);
+	rb_define_attr_method(rb_cOgreRect,"right",OgreRect_get_right,OgreRect_set_right);
+	rb_define_attr_method(rb_cOgreRect,"bottom",OgreRect_get_bottom,OgreRect_set_bottom);
 
 	rb_define_method(rb_cOgreRect,"null?",RUBY_METHOD_FUNC(OgreRect_isNull),0);
 	rb_define_method(rb_cOgreRect,"setnull",RUBY_METHOD_FUNC(OgreRect_setNull),0);

@@ -8,32 +8,8 @@ VALUE OgreSphere_alloc(VALUE self)
 {
 	return wrap(new Ogre::Sphere);
 }
-/*:nodoc:
-*/
-VALUE OgreSphere_set_center(VALUE self,VALUE vec)
-{
-	_self->setCenter(*wrap<Ogre::Vector3*>(vec));
-	return vec;
-}
-/*:nodoc:
-*/
-VALUE OgreSphere_set_radius(VALUE self,VALUE radius)
-{
-	_self->setRadius(NUM2DBL(radius));
-	return radius;
-}
-/*:nodoc:
-*/
-VALUE OgreSphere_get_center(VALUE self)
-{
-	return wrap(_self->getCenter());
-}
-/*:nodoc:
-*/
-VALUE OgreSphere_get_radius(VALUE self)
-{
-	return DBL2NUM(_self->getRadius());
-}
+macro_attr(Sphere,Center,Ogre::Vector3)
+macro_attr_with_func(Sphere,Radius,DBL2NUM,NUM2DBL)
 /*
  * call-seq:
  *   sphere.inspect -> String
@@ -47,16 +23,16 @@ VALUE OgreSphere_inspect(VALUE self)
 	VALUE array[4];
 	array[0]=rb_str_new2("#<%s:%s, %f>");
 	array[1]=rb_class_of(self);
-	array[2]=rb_funcall(OgreSphere_get_center(self),rb_intern("inspect"),0);
-	array[3]=OgreSphere_get_radius(self);
+	array[2]=rb_funcall(OgreSphere_getCenter(self),rb_intern("inspect"),0);
+	array[3]=OgreSphere_getRadius(self);
 	return rb_f_sprintf(4,array);
 }
 /*
 */
 VALUE OgreSphere_initialize(VALUE self,VALUE vec,VALUE radius)
 {
-	OgreSphere_set_center(self,vec);
-	OgreSphere_set_radius(self,radius);
+	OgreSphere_setCenter(self,vec);
+	OgreSphere_setRadius(self,radius);
 	return self;
 }
 /*
@@ -64,8 +40,8 @@ VALUE OgreSphere_initialize(VALUE self,VALUE vec,VALUE radius)
 VALUE OgreSphere_initialize_copy(VALUE self, VALUE other)
 {
 	VALUE result = rb_call_super(1,&other);
-	OgreSphere_set_center(self,OgreSphere_get_center(other));
-	OgreSphere_set_radius(self,OgreSphere_get_radius(other));
+	OgreSphere_setCenter(self,OgreSphere_getCenter(other));
+	OgreSphere_setRadius(self,OgreSphere_getRadius(other));
 	return result;
 }
 /*
@@ -121,8 +97,8 @@ VALUE OgreSphere_intersects(VALUE self,VALUE other)
 VALUE OgreSphere_hash(VALUE self)
 {
 	VALUE result = rb_ary_new();
-	rb_ary_push(result,OgreSphere_get_center(self));
-	rb_ary_push(result,OgreSphere_get_radius(self));
+	rb_ary_push(result,OgreSphere_getCenter(self));
+	rb_ary_push(result,OgreSphere_getRadius(self));
 	return rb_funcall(result,rb_intern("hash"),0);
 }
 /*
@@ -137,7 +113,7 @@ VALUE OgreSphere_marshal_dump(VALUE self)
 	rb_ary_push(result,DBL2NUM(_self->getCenter().x));
 	rb_ary_push(result,DBL2NUM(_self->getCenter().y));
 	rb_ary_push(result,DBL2NUM(_self->getCenter().z));
-	rb_ary_push(result,OgreSphere_get_radius(self));
+	rb_ary_push(result,OgreSphere_getRadius(self));
 	return rb_funcall(result,rb_intern("pack"),1,rb_str_new2("dddd"));
 }
 /*
@@ -153,7 +129,7 @@ VALUE OgreSphere_marshal_load(VALUE self,VALUE load)
 	Ogre::Real y = NUM2DBL(rb_ary_pop(result));
 	Ogre::Real z = NUM2DBL(rb_ary_pop(result));
 	_self->setCenter(Ogre::Vector3(x,y,z));
-	OgreSphere_set_radius(self,rb_ary_pop(result));
+	OgreSphere_setRadius(self,rb_ary_pop(result));
 	return self;
 }
 
@@ -182,11 +158,9 @@ void Init_OgreSphere(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreSphere,"initialize",RUBY_METHOD_FUNC(OgreSphere_initialize),2);
 	rb_define_private_method(rb_cOgreSphere,"initialize_copy",RUBY_METHOD_FUNC(OgreSphere_initialize_copy),1);
 
-	rb_define_method(rb_cOgreSphere,"center",RUBY_METHOD_FUNC(OgreSphere_get_center),0);
-	rb_define_method(rb_cOgreSphere,"radius",RUBY_METHOD_FUNC(OgreSphere_get_radius),0);
+	rb_define_attr_method(rb_cOgreSphere,"center",OgreSphere_getCenter,OgreSphere_setCenter);
 
-	rb_define_method(rb_cOgreSphere,"center=",RUBY_METHOD_FUNC(OgreSphere_set_center),1);
-	rb_define_method(rb_cOgreSphere,"radius=",RUBY_METHOD_FUNC(OgreSphere_set_radius),1);
+	rb_define_attr_method(rb_cOgreSphere,"radius",OgreSphere_getRadius,OgreSphere_setRadius);
 
 	rb_define_method(rb_cOgreSphere,"inspect",RUBY_METHOD_FUNC(OgreSphere_inspect),0);
 	rb_define_method(rb_cOgreSphere,"intersects?",RUBY_METHOD_FUNC(OgreSphere_intersects),1);

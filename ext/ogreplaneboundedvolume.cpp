@@ -31,11 +31,8 @@ VALUE OgrePlaneBoundedVolume_swap(VALUE self,VALUE other)
 */
 VALUE OgrePlaneBoundedVolume_each(VALUE self)
 {
-	Ogre::PlaneBoundedVolume::PlaneList::iterator it;
-	for (it = _self->planes.begin(); it != _self->planes.begin(); ++it)
-	{
-		rb_yield(wrap(*it));
-	}
+	RETURN_ENUMERATOR(self,0,NULL);
+	wrap<Ogre::Plane>(Ogre::VectorIterator<Ogre::PlaneBoundedVolume::PlaneList>(_self->planes.begin(),_self->planes.begin()));
 	return self;
 }
 /*

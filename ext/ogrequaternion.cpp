@@ -8,58 +8,12 @@ VALUE OgreQuaternion_alloc(VALUE self)
 {
 	return wrap(new Ogre::Quaternion);
 }
-/*:nodoc:
-*/
-VALUE OgreQuaternion_get_w(VALUE self)
-{
-	return DBL2NUM(_self->w);
-}
-/*:nodoc:
-*/
-VALUE OgreQuaternion_get_x(VALUE self)
-{
-	return DBL2NUM(_self->x);
-}
-/*:nodoc:
-*/
-VALUE OgreQuaternion_get_y(VALUE self)
-{
-	return DBL2NUM(_self->y);
-}
-/*:nodoc:
-*/
-VALUE OgreQuaternion_get_z(VALUE self)
-{
-	return DBL2NUM(_self->z);
-}
-/*:nodoc:
-*/
-VALUE OgreQuaternion_set_w(VALUE self,VALUE c)
-{
-	_self->w = NUM2DBL(c);
-	return c;
-}
-/*:nodoc:
-*/
-VALUE OgreQuaternion_set_x(VALUE self,VALUE c)
-{
-	_self->x = NUM2DBL(c);
-	return c;
-}
-/*:nodoc:
-*/
-VALUE OgreQuaternion_set_y(VALUE self,VALUE c)
-{
-	_self->y = NUM2DBL(c);
-	return c;
-}
-/*:nodoc:
-*/
-VALUE OgreQuaternion_set_z(VALUE self,VALUE c)
-{
-	_self->z = NUM2DBL(c);
-	return c;
-}
+
+
+macro_attr_prop_with_func(Quaternion,x,DBL2NUM,NUM2DBL)
+macro_attr_prop_with_func(Quaternion,y,DBL2NUM,NUM2DBL)
+macro_attr_prop_with_func(Quaternion,z,DBL2NUM,NUM2DBL)
+macro_attr_prop_with_func(Quaternion,w,DBL2NUM,NUM2DBL)
 
 /*
 */
@@ -103,19 +57,19 @@ VALUE OgreQuaternion_minusself(VALUE self)
 {
 	return wrap(- *_self);
 }
-/*:nodoc:
+/*
 */
 VALUE OgreQuaternion_xAxis(VALUE self)
 {
 	return wrap(_self->xAxis());
 }
-/*:nodoc:
+/*
 */
 VALUE OgreQuaternion_yAxis(VALUE self)
 {
 	return wrap(_self->yAxis());
 }
-/*:nodoc:
+/*
 */
 VALUE OgreQuaternion_zAxis(VALUE self)
 {
@@ -224,24 +178,16 @@ void Init_OgreQuaternion(VALUE rb_mOgre)
 	rb_define_attr(rb_cOgreQuaternion,"x",1,1);
 	rb_define_attr(rb_cOgreQuaternion,"y",1,1);
 	rb_define_attr(rb_cOgreQuaternion,"z",1,1);
-	rb_define_attr(rb_cOgreQuaternion,"xAxis",1,0);
-	rb_define_attr(rb_cOgreQuaternion,"yAxis",1,0);
-	rb_define_attr(rb_cOgreQuaternion,"zAxis",1,0);
 #endif
 	rb_cOgreQuaternion = rb_define_class_under(rb_mOgre,"Quaternion",rb_cObject);
 	rb_define_alloc_func(rb_cOgreQuaternion,OgreQuaternion_alloc);
 	rb_define_method(rb_cOgreQuaternion,"initialize",RUBY_METHOD_FUNC(OgreQuaternion_initialize),-1);
 	rb_define_private_method(rb_cOgreQuaternion,"initialize_copy",RUBY_METHOD_FUNC(OgreQuaternion_initialize_copy),1);
 
-	rb_define_method(rb_cOgreQuaternion,"w",RUBY_METHOD_FUNC(OgreQuaternion_get_w),0);	
-	rb_define_method(rb_cOgreQuaternion,"x",RUBY_METHOD_FUNC(OgreQuaternion_get_x),0);
-	rb_define_method(rb_cOgreQuaternion,"y",RUBY_METHOD_FUNC(OgreQuaternion_get_y),0);
-	rb_define_method(rb_cOgreQuaternion,"z",RUBY_METHOD_FUNC(OgreQuaternion_get_z),0);
-	
-	rb_define_method(rb_cOgreQuaternion,"w=",RUBY_METHOD_FUNC(OgreQuaternion_set_w),1);	
-	rb_define_method(rb_cOgreQuaternion,"x=",RUBY_METHOD_FUNC(OgreQuaternion_set_x),1);
-	rb_define_method(rb_cOgreQuaternion,"y=",RUBY_METHOD_FUNC(OgreQuaternion_set_y),1);
-	rb_define_method(rb_cOgreQuaternion,"z=",RUBY_METHOD_FUNC(OgreQuaternion_set_z),1);
+	rb_define_attr_method(rb_cOgreQuaternion,"w",OgreQuaternion_get_w,OgreQuaternion_set_w);
+	rb_define_attr_method(rb_cOgreQuaternion,"x",OgreQuaternion_get_x,OgreQuaternion_set_x);
+	rb_define_attr_method(rb_cOgreQuaternion,"y",OgreQuaternion_get_y,OgreQuaternion_set_y);
+	rb_define_attr_method(rb_cOgreQuaternion,"z",OgreQuaternion_get_z,OgreQuaternion_set_z);
 
 	
 	rb_define_method(rb_cOgreQuaternion,"inspect",RUBY_METHOD_FUNC(OgreQuaternion_inspect),0);

@@ -2,8 +2,10 @@
 #define __RubyOgrePlane_H__
 
 #include "main.hpp"
+#include "ogremovableplane.hpp"
 void Init_OgrePlane(VALUE rb_mOgre);
 extern VALUE rb_cOgrePlane;
+
 
 
 template <>
@@ -57,6 +59,8 @@ inline Ogre::Plane* wrap< Ogre::Plane* >(const VALUE &vplane)
 {
 	if ( ! rb_obj_is_kind_of(vplane, rb_cOgrePlane) )
 		return NULL;
+	if (rb_obj_is_kind_of(vplane, rb_cOgreMovablePlane) )
+		return wrap<Ogre::MovablePlane*>(vplane);
 	Ogre::Plane *plane;
 	Data_Get_Struct( vplane, Ogre::Plane, plane);
 	return plane;

@@ -15,12 +15,9 @@ VALUE OgreMaterial_count(VALUE self)
 VALUE OgreMaterial_each(VALUE self)
 {
 	RETURN_ENUMERATOR(self,0,NULL);
-	Ogre::Material::TechniqueIterator tit = _self->getTechniqueIterator();
-	for (Ogre::Material::TechniqueIterator::iterator it = tit.begin(); it != tit.end(); ++it)
-		rb_yield(wrap(*it));
+	wrap<Ogre::Technique*>(_self->getTechniqueIterator());
 	return self;
 }
-
 /*
 */
 VALUE OgreMaterial_singleton_getActiveScheme(VALUE self)

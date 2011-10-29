@@ -32,4 +32,9 @@ inline Ogre::Vector3* wrap< Ogre::Vector3* >(const VALUE &vvector)
 		return NULL;
 	}
 }
+template <>
+inline Ogre::Vector3 wrap< Ogre::Vector3 >(const VALUE &vvector)
+{
+	return *wrap< Ogre::Vector3* >(vvector);
+}
 #endif /* __RubyOgreVector3_H__ */

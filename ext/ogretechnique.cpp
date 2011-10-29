@@ -3,32 +3,8 @@
 #define _self wrap<Ogre::Technique*>(self)
 VALUE rb_cOgreTechnique;
 
-/*:nodoc:
-*/
-VALUE OgreTechnique_getName(VALUE self)
-{
-	return wrap(_self->getName());
-}
-/*:nodoc:
-*/
-VALUE OgreTechnique_setName(VALUE self,VALUE val)
-{
-	_self->setName(rb_string_value_cstr(&val));
-	return val;
-}
-/*:nodoc:
-*/
-VALUE OgreTechnique_getSchemeName(VALUE self)
-{
-	return wrap(_self->getSchemeName());
-}
-/*:nodoc:
-*/
-VALUE OgreTechnique_setSchemeName(VALUE self,VALUE val)
-{
-	_self->setSchemeName(rb_string_value_cstr(&val));
-	return val;
-}
+macro_attr(Technique,Name,Ogre::String)
+macro_attr(Technique,SchemeName,Ogre::String)
 /*
 */
 VALUE OgreTechnique_isSupported(VALUE self)
@@ -60,15 +36,12 @@ VALUE OgreTechnique_isLoaded(VALUE self)
 	return _self->isLoaded() ? Qtrue : Qfalse;
 }
 
-
 /*
 */
 VALUE OgreTechnique_each(VALUE self)
 {
 	RETURN_ENUMERATOR(self,0,NULL);
-	Ogre::Technique::PassIterator pit = _self->getPassIterator();
-	for (Ogre::Technique::PassIterator::iterator it = pit.begin(); it != pit.end(); ++it)
-		rb_yield(wrap(*it));
+	wrap<Ogre::Pass*>(_self->getPassIterator());
 	return self;
 }
 /*
@@ -93,10 +66,8 @@ void Init_OgreTechnique(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreTechnique,"each",RUBY_METHOD_FUNC(OgreTechnique_each),0);
 	rb_include_module(rb_cOgreTechnique,rb_mEnumerable);
 	
-	rb_define_method(rb_cOgreTechnique,"name",RUBY_METHOD_FUNC(OgreTechnique_getName),0);	
-	rb_define_method(rb_cOgreTechnique,"name=",RUBY_METHOD_FUNC(OgreTechnique_setName),1);
-	rb_define_method(rb_cOgreTechnique,"schemename",RUBY_METHOD_FUNC(OgreTechnique_getSchemeName),0);	
-	rb_define_method(rb_cOgreTechnique,"schemename=",RUBY_METHOD_FUNC(OgreTechnique_setSchemeName),1);
+	rb_define_attr_method(rb_cOgreTechnique,"name",OgreTechnique_getName,OgreTechnique_setName);
+	rb_define_attr_method(rb_cOgreTechnique,"schemename",OgreTechnique_getSchemeName,OgreTechnique_setSchemeName);
 	
 	rb_define_method(rb_cOgreTechnique,"supported?",RUBY_METHOD_FUNC(OgreTechnique_isSupported),0);	
 	rb_define_method(rb_cOgreTechnique,"transparent?",RUBY_METHOD_FUNC(OgreTechnique_isTransparent),0);

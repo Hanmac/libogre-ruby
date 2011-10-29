@@ -3,6 +3,7 @@
 
 #include "main.hpp"
 #include <OgreFont.h>
+#include <OgreFontManager.h>
 void Init_OgreFont(VALUE rb_mOgre);
 extern VALUE rb_cOgreFont;
 

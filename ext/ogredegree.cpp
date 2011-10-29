@@ -1,5 +1,6 @@
-#include "ogredegree.hpp"
 #include "ogreradian.hpp"
+#include "ogredegree.hpp"
+
 #define _self wrap<Ogre::Degree*>(self)
 VALUE rb_cOgreDegree;
 
@@ -8,6 +9,10 @@ VALUE OgreDegree_alloc(VALUE self)
 	return wrap(new Ogre::Degree);
 }
 
+Ogre::Degree* rb_to_degree(const VALUE &vdegree)
+{
+	return wrap<Ogre::Degree*>(vdegree);
+}
 /*
 */
 VALUE OgreDegree_initialize(VALUE self,VALUE val)
@@ -93,52 +98,29 @@ VALUE OgreDegree_inspect(VALUE self)
 */
 VALUE OgreDegree_compare(VALUE self,VALUE other)
 {
-	if(rb_obj_is_kind_of(other,rb_cOgreDegree)){
-		Ogre::Degree temp = *wrap<Ogre::Degree*>(other);
-		return INT2NUM(*_self > temp ? 1 : *_self < temp ? -1 : 0);
-	}else if(rb_obj_is_kind_of(other,rb_cOgreRadian)){
-		Ogre::Degree temp = Ogre::Degree(*wrap<Ogre::Radian*>(other));
-		return INT2NUM(*_self > temp ? 1 : *_self < temp ? -1 : 0);
-	}else{
-		Ogre::Degree temp = Ogre::Degree(NUM2DBL(other));
-		return INT2NUM(*_self > temp ? 1 : *_self < temp ? -1 : 0);
-	}
+	Ogre::Degree temp = *wrap<Ogre::Degree*>(other);
+	return INT2NUM(*_self > temp ? 1 : *_self < temp ? -1 : 0);
 }
 
 /*
 */
 VALUE OgreDegree_plus(VALUE self,VALUE other)
 {
-	if(rb_obj_is_kind_of(other,rb_cOgreDegree)){
-		return wrap(*_self + *wrap<Ogre::Degree*>(other));
-	}else if(rb_obj_is_kind_of(other,rb_cOgreRadian)){
-		return wrap(*_self + *wrap<Ogre::Radian*>(other));
-	}else
-		return wrap(*_self + Ogre::Degree(NUM2DBL(other)));
+	return wrap(*_self + *wrap<Ogre::Degree*>(other));
 }
 
 /*
 */
 VALUE OgreDegree_minus(VALUE self,VALUE other)
 {
-	if(rb_obj_is_kind_of(other,rb_cOgreDegree)){
-		return wrap(*_self - *wrap<Ogre::Degree*>(other));
-	}else if(rb_obj_is_kind_of(other,rb_cOgreRadian)){
-		return wrap(*_self - *wrap<Ogre::Radian*>(other));
-	}else
-		return wrap(*_self - Ogre::Degree(NUM2DBL(other)));
+	return wrap(*_self - *wrap<Ogre::Degree*>(other));
 }
 
 /*
 */
 VALUE OgreDegree_mal(VALUE self,VALUE other)
 {
-	if(rb_obj_is_kind_of(other,rb_cOgreDegree)){
-		return wrap(*_self * *wrap<Ogre::Degree*>(other));
-	}else if(rb_obj_is_kind_of(other,rb_cOgreRadian)){
-		return wrap(*_self * Ogre::Degree(*wrap<Ogre::Radian*>(other)));
-	}else
-		return wrap(*_self * Ogre::Degree(NUM2DBL(other)));
+	return wrap(*_self * *wrap<Ogre::Degree*>(other));
 }
 
 /*

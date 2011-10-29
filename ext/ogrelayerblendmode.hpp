@@ -15,17 +15,10 @@ template <>
 inline VALUE wrap< Ogre::LayerBlendType >(const Ogre::LayerBlendType &type )
 {
 	ID id;
-	switch(type){
-	case Ogre::LBT_COLOUR:
-		id = rb_intern("color");
-		break;
-	case Ogre::LBT_ALPHA:
+	if(type ==Ogre::LBT_ALPHA)
 		id = rb_intern("alpha");
-		break;
-	default:
+	else
 		id = rb_intern("color");
-		break;	
-	}
 	return ID2SYM(id);
 }
 

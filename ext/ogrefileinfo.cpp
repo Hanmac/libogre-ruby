@@ -6,96 +6,22 @@ VALUE rb_cOgreFileInfo;
 
 VALUE OgreFileInfo_alloc(VALUE self)
 {
-	Ogre::FileInfo *temp = new Ogre::FileInfo;
-	return wrap(temp);
+	return wrap(new Ogre::FileInfo);
 }
+
+macro_attr_prop(FileInfo,filename,Ogre::String)
+macro_attr_prop(FileInfo,path,Ogre::String)
+macro_attr_prop(FileInfo,basename,Ogre::String)
+macro_attr_prop_with_func(FileInfo,compressedSize,UINT2NUM,NUM2UINT)
+macro_attr_prop_with_func(FileInfo,uncompressedSize,UINT2NUM,NUM2UINT)
+
 /*
-/// multi-Archive searches, note you should still open through ResourceGroupManager)
-		Archive* archive;
-        /// The file's fully qualified name
-        String filename;
-        /// Path name; separated by '/' and ending with '/'
-        String path;
-        /// Base filename
-        String basename;
-        /// Compressed size
-        size_t compressedSize;
-        /// Uncompressed size
-        size_t uncompressedSize;
-*/
-
-/*:nodoc:
-
-
-*/
-VALUE OgreFileInfo_get_filename(VALUE self)
-{
-	return wrap(_self->filename);
-}
-/*:nodoc:
-
-
-*/
-VALUE OgreFileInfo_get_path(VALUE self)
-{
-	return wrap(_self->path);
-}
-/*:nodoc:
-
-
-*/
-VALUE OgreFileInfo_get_basename(VALUE self)
-{
-	return wrap(_self->basename);
-}
-/*:nodoc:
-
-
-*/
-VALUE OgreFileInfo_get_compressedSize(VALUE self)
-{
-	return INT2NUM(_self->compressedSize);
-}
-/*:nodoc:
-
-
-*/
-VALUE OgreFileInfo_get_uncompressedSize(VALUE self)
-{
-	return INT2NUM(_self->uncompressedSize);
-}
-/*:nodoc:
-
-
-*/
-VALUE OgreFileInfo_set_filename(VALUE self,VALUE val)
-{
-	_self->filename = rb_string_value_cstr(&val);
-	return val;
-}
-/*:nodoc:
-
-
-*/
-VALUE OgreFileInfo_set_path(VALUE self,VALUE val)
-{
-	_self->path = rb_string_value_cstr(&val);
-	return val;
-
-}
-/*:nodoc:
-
-
-*/
-VALUE OgreFileInfo_set_basename(VALUE self,VALUE val)
-{
-	_self->basename = rb_string_value_cstr(&val);
-	return val;
-
-}
-/*
-
-
+ * call-seq:
+ *   inspect -> String
+ * 
+ * Human-readable description. 
+ * ===Return value
+ * String
 */
 VALUE OgreFileInfo_inspect(VALUE self)
 {
@@ -122,16 +48,11 @@ void Init_OgreFileInfo(VALUE rb_mOgre)
 	#endif
 	rb_cOgreFileInfo = rb_define_class_under(rb_mOgre,"FileInfo",rb_cObject);
 	rb_define_alloc_func(rb_cOgreFileInfo,OgreFileInfo_alloc);
-	rb_define_method(rb_cOgreFileInfo,"filename",RUBY_METHOD_FUNC(OgreFileInfo_get_filename),0);
-	rb_define_method(rb_cOgreFileInfo,"path",RUBY_METHOD_FUNC(OgreFileInfo_get_path),0);
-	rb_define_method(rb_cOgreFileInfo,"basename",RUBY_METHOD_FUNC(OgreFileInfo_get_basename),0);
-	rb_define_method(rb_cOgreFileInfo,"compressedSize",RUBY_METHOD_FUNC(OgreFileInfo_get_compressedSize),0);
-	rb_define_method(rb_cOgreFileInfo,"uncompressedSize",RUBY_METHOD_FUNC(OgreFileInfo_get_uncompressedSize),0);
-	
-	
-	rb_define_method(rb_cOgreFileInfo,"filename=",RUBY_METHOD_FUNC(OgreFileInfo_set_filename),1);
-	rb_define_method(rb_cOgreFileInfo,"path=",RUBY_METHOD_FUNC(OgreFileInfo_set_path),1);
-	rb_define_method(rb_cOgreFileInfo,"basename=",RUBY_METHOD_FUNC(OgreFileInfo_set_basename),1);
+	rb_define_attr_method(rb_cOgreFileInfo,"filename",OgreFileInfo_get_filename,OgreFileInfo_set_filename);
+	rb_define_attr_method(rb_cOgreFileInfo,"path",OgreFileInfo_get_path,OgreFileInfo_set_path);
+	rb_define_attr_method(rb_cOgreFileInfo,"basename",OgreFileInfo_get_basename,OgreFileInfo_set_basename);
+	rb_define_attr_method(rb_cOgreFileInfo,"compressedSize",OgreFileInfo_get_compressedSize,OgreFileInfo_set_compressedSize);
+	rb_define_attr_method(rb_cOgreFileInfo,"uncompressedSize",OgreFileInfo_get_uncompressedSize,OgreFileInfo_set_uncompressedSize);
 	
 	rb_define_method(rb_cOgreFileInfo,"inspect",RUBY_METHOD_FUNC(OgreFileInfo_inspect),0);
 }

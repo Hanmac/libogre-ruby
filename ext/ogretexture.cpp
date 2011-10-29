@@ -2,23 +2,51 @@
 #include "ogretexture.hpp"
 #define _self wrap<Ogre::Texture*>(self)
 VALUE rb_cOgreTexture;
-/*:nodoc:
-*/
+
 VALUE OgreTexture_getHeight(VALUE self)
 {
-	return DBL2NUM(_self->getHeight());
+	return ULONG2NUM(_self->getHeight());
 }
-/*:nodoc:
-*/
+
 VALUE OgreTexture_getWidth(VALUE self)
 {
-	return DBL2NUM(_self->getWidth());
+	return ULONG2NUM(_self->getWidth());
 }
-/*:nodoc:
-*/
+
 VALUE OgreTexture_getDepth(VALUE self)
 {
-	return DBL2NUM(_self->getDepth());
+	return ULONG2NUM(_self->getDepth());
+}
+
+VALUE OgreTexture_getUsage(VALUE self)
+{
+	return INT2NUM(_self->getUsage());
+}
+
+
+
+VALUE OgreTexture_setHeight(VALUE self,VALUE val)
+{
+	_self->setHeight(NUM2ULONG(val));
+	return val;
+}
+
+VALUE OgreTexture_setWidth(VALUE self,VALUE val)
+{
+	_self->setWidth(NUM2ULONG(val));
+	return val;
+}
+
+VALUE OgreTexture_setDepth(VALUE self,VALUE val)
+{
+	_self->setDepth(NUM2ULONG(val));
+	return val;
+}
+
+VALUE OgreTexture_setUsage(VALUE self,VALUE val)
+{
+	_self->setUsage(NUM2INT(val));
+	return val;
 }
 
 /*
@@ -52,7 +80,13 @@ void Init_OgreTexture(VALUE rb_mOgre)
 	rb_define_attr(rb_cOgreTexture,"height",1,1);
 	rb_define_attr(rb_cOgreTexture,"width",1,1);
 	rb_define_attr(rb_cOgreTexture,"depth",1,1);
+	
+	rb_define_attr(rb_cOgreTexture,"usage",1,1);
 #endif
 	rb_cOgreTexture = rb_define_class_under(rb_mOgre,"Texture",rb_cOgreResource);
-	
+
+	rb_define_attr_method(rb_cOgreTexture,"height",OgreTexture_getHeight,OgreTexture_setHeight);
+	rb_define_attr_method(rb_cOgreTexture,"width",OgreTexture_getWidth,OgreTexture_setWidth);
+	rb_define_attr_method(rb_cOgreTexture,"depth",OgreTexture_getDepth,OgreTexture_setDepth);
+	rb_define_attr_method(rb_cOgreTexture,"usage",OgreTexture_getUsage,OgreTexture_setUsage);
 }

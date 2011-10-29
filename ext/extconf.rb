@@ -23,11 +23,8 @@ with libogre-ruby; if not, write to the Free Software Foundation, Inc.,
 
 require 'mkmf'
 
-RbConfig::CONFIG["CC"] = RbConfig::CONFIG["CXX"]
-RbConfig::CONFIG["CPP"] = RbConfig::CONFIG["CXX"] + " -E"
-CONFIG["warnflags"] = RbConfig::CONFIG["warnflags"] = " -Wall"
-
 dir_config("ogre")
+with_cflags("-x c++"){
 pkg_config("OGRE")
 unless(find_library("OgreMain","main") && find_header("Ogre.h"))
 	abort("need ogre-dev package.")
@@ -44,6 +41,6 @@ unless have_macro("RETURN_ENUMERATOR","ruby.h")
 	abort("missing RETURN_ENUMERATOR marco! You need ruby version >= 1.8.7")
 end
 
-
-
 create_makefile("ogre")
+}
+

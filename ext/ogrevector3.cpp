@@ -7,45 +7,9 @@ VALUE OgreVector3_alloc(VALUE self)
 {
 	return wrap(new Ogre::Vector3);
 }
-/*:nodoc:
-*/
-VALUE OgreVector3_get_x(VALUE self)
-{
-	return DBL2NUM(_self->x);
-}
-/*:nodoc:
-*/
-VALUE OgreVector3_get_y(VALUE self)
-{
-	return DBL2NUM(_self->y);
-}
-/*:nodoc:
-*/
-VALUE OgreVector3_get_z(VALUE self)
-{
-	return DBL2NUM(_self->z);
-}
-/*:nodoc:
-*/
-VALUE OgreVector3_set_x(VALUE self,VALUE c)
-{
-	_self->x = NUM2DBL(c);
-	return c;
-}
-/*:nodoc:
-*/
-VALUE OgreVector3_set_y(VALUE self,VALUE c)
-{
-	_self->y = NUM2DBL(c);
-	return c;
-}
-/*:nodoc:
-*/
-VALUE OgreVector3_set_z(VALUE self,VALUE c)
-{
-	_self->z = NUM2DBL(c);
-	return c;
-}
+macro_attr_prop_with_func(Vector3,x,DBL2NUM,NUM2DBL)
+macro_attr_prop_with_func(Vector3,y,DBL2NUM,NUM2DBL)
+macro_attr_prop_with_func(Vector3,z,DBL2NUM,NUM2DBL)
 /*
 */
 VALUE OgreVector3_initialize(VALUE self,VALUE x,VALUE y,VALUE z)
@@ -347,13 +311,9 @@ void Init_OgreVector3(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreVector3,"initialize",RUBY_METHOD_FUNC(OgreVector3_initialize),3);
 	rb_define_private_method(rb_cOgreVector3,"initialize_copy",RUBY_METHOD_FUNC(OgreVector3_initialize_copy),1);
 	
-	rb_define_method(rb_cOgreVector3,"x",RUBY_METHOD_FUNC(OgreVector3_get_x),0);
-	rb_define_method(rb_cOgreVector3,"y",RUBY_METHOD_FUNC(OgreVector3_get_y),0);
-	rb_define_method(rb_cOgreVector3,"z",RUBY_METHOD_FUNC(OgreVector3_get_z),0);
-	
-	rb_define_method(rb_cOgreVector3,"x=",RUBY_METHOD_FUNC(OgreVector3_set_x),1);
-	rb_define_method(rb_cOgreVector3,"y=",RUBY_METHOD_FUNC(OgreVector3_set_y),1);
-	rb_define_method(rb_cOgreVector3,"z=",RUBY_METHOD_FUNC(OgreVector3_set_z),1);
+	rb_define_attr_method(rb_cOgreVector3,"x",OgreVector3_get_x,OgreVector3_set_x);
+	rb_define_attr_method(rb_cOgreVector3,"y",OgreVector3_get_y,OgreVector3_set_y);
+	rb_define_attr_method(rb_cOgreVector3,"z",OgreVector3_get_z,OgreVector3_set_z);
 	
 	rb_define_method(rb_cOgreVector3,"inspect",RUBY_METHOD_FUNC(OgreVector3_inspect),0);
 	rb_define_method(rb_cOgreVector3,"-@",RUBY_METHOD_FUNC(OgreVector3_minusself),0);

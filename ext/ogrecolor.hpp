@@ -49,4 +49,9 @@ inline Ogre::ColourValue* wrap< Ogre::ColourValue* >(const VALUE &vcolor)
 		return NULL;
 	}
 }
+template <>
+inline Ogre::ColourValue wrap< Ogre::ColourValue >(const VALUE &vcolor)
+{
+	return *wrap< Ogre::ColourValue* >(vcolor);
+}
 #endif /* __RubyOgreColor_H__ */

@@ -8,32 +8,11 @@ VALUE OgrePlane_alloc(VALUE self)
 {
 	return wrap(new Ogre::Plane);
 }
-/*:nodoc:
-*/
-VALUE OgrePlane_get_normal(VALUE self)
-{
-	return wrap(_self->normal);
-}
-/*:nodoc:
-*/
-VALUE OgrePlane_get_d(VALUE self)
-{
-	return DBL2NUM(_self->d);
-}
-/*:nodoc:
-*/
-VALUE OgrePlane_set_normal(VALUE self,VALUE vec)
-{
-	_self->normal = *wrap<Ogre::Vector3*>(vec);
-	return vec;
-}
-/*:nodoc:
-*/
-VALUE OgrePlane_set_d(VALUE self,VALUE d)
-{
-	_self->d = NUM2DBL(d);
-	return d;
-}
+
+macro_attr_prop(Plane,normal,Ogre::Vector3)
+macro_attr_prop_with_func(Plane,d,DBL2NUM,NUM2DBL)
+
+
 /*
 */
 VALUE OgrePlane_initialize(int argc,VALUE* argv,VALUE self)
@@ -148,10 +127,9 @@ void Init_OgrePlane(VALUE rb_mOgre)
 	rb_define_alloc_func(rb_cOgrePlane,OgrePlane_alloc);
 	rb_define_method(rb_cOgrePlane,"initialize",RUBY_METHOD_FUNC(OgrePlane_initialize),-1);
 	rb_define_private_method(rb_cOgrePlane,"initialize_copy",RUBY_METHOD_FUNC(OgrePlane_initialize_copy),1);
-	rb_define_method(rb_cOgrePlane,"normal",RUBY_METHOD_FUNC(OgrePlane_get_normal),0);
-	rb_define_method(rb_cOgrePlane,"d",RUBY_METHOD_FUNC(OgrePlane_get_d),0);
-	rb_define_method(rb_cOgrePlane,"normal=",RUBY_METHOD_FUNC(OgrePlane_set_normal),1);
-	rb_define_method(rb_cOgrePlane,"d=",RUBY_METHOD_FUNC(OgrePlane_set_d),1);
+
+	rb_define_attr_method(rb_cOgrePlane,"normal",OgrePlane_get_normal,OgrePlane_set_normal);
+	rb_define_attr_method(rb_cOgrePlane,"d",OgrePlane_get_d,OgrePlane_set_d);
 	
 	rb_define_method(rb_cOgrePlane,"inspect",RUBY_METHOD_FUNC(OgrePlane_inspect),0);
 	rb_define_method(rb_cOgrePlane,"==",RUBY_METHOD_FUNC(OgrePlane_equal),1);
