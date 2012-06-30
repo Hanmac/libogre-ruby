@@ -1,82 +1,90 @@
 #include "ogrebox.hpp"
+#include "ogreexception.hpp"
 
 #define _self wrap<Ogre::Box*>(self)
 VALUE rb_cOgreBox;
 
-VALUE OgreBox_alloc(VALUE self)
+template <>
+VALUE wrap< Ogre::Box >(Ogre::Box *box )
+{
+	return Data_Wrap_Struct(rb_cOgreBox, NULL, free, box);
+}
+
+
+namespace RubyOgre {
+namespace Box {
+
+VALUE _alloc(VALUE self)
 {
 	return wrap(new Ogre::Box);
 }
-macro_attr_prop_with_func(Box,left,UINT2NUM,NUM2UINT)
-macro_attr_prop_with_func(Box,top,UINT2NUM,NUM2UINT)
-macro_attr_prop_with_func(Box,right,UINT2NUM,NUM2UINT)
-macro_attr_prop_with_func(Box,bottom,UINT2NUM,NUM2UINT)
-macro_attr_prop_with_func(Box,front,UINT2NUM,NUM2UINT)
-macro_attr_prop_with_func(Box,back,UINT2NUM,NUM2UINT)
+macro_attr_prop(left,uint)
+macro_attr_prop(top,uint)
+macro_attr_prop(right,uint)
+macro_attr_prop(bottom,uint)
+macro_attr_prop(front,uint)
+macro_attr_prop(back,uint)
 
 /*
 */
-VALUE OgreBox_width(VALUE self)
+VALUE _width(VALUE self)
 {
 	return UINT2NUM(_self->getWidth());
 }
 /*
 */
-VALUE OgreBox_height(VALUE self)
+VALUE _height(VALUE self)
 {
 	return UINT2NUM(_self->getHeight());
 }
 /*
 */
-VALUE OgreBox_depth(VALUE self)
+VALUE _depth(VALUE self)
 {
 	return UINT2NUM(_self->getDepth());
 }
 
 /*
 */
-VALUE OgreBox_equal(VALUE self,VALUE other)
+VALUE _equal(VALUE self,VALUE other)
 {
 	if(rb_obj_is_kind_of(other,rb_cOgreBox)){
 		Ogre::Box *cother = wrap<Ogre::Box*>(other);
-		return _self->left == cother->left && _self->top == cother->top &&
+		return wrap(_self->left == cother->left && _self->top == cother->top &&
 		_self->right == cother->right && _self->bottom == cother->bottom &&
-		_self->front == cother->front && _self->back == cother->back ? Qtrue : Qfalse;
+		_self->front == cother->front && _self->back == cother->back);
 	}else
 		return Qfalse;
 }
 
 /*
 */
-VALUE OgreBox_swap(VALUE self,VALUE other)
+VALUE _swap(VALUE self,VALUE other)
 {
-	if(rb_obj_is_kind_of(other,rb_cOgreBox)){
-		Ogre::Box *cother = wrap<Ogre::Box*>(other);
-		Ogre::Real temp[6];
-		temp[0] = _self->left;
-		temp[1] = _self->top;
-		temp[2] = _self->right;
-		temp[3] = _self->bottom;
-		temp[4] = _self->front;
-		temp[5] = _self->back;
-		
-		_self->left = cother->left;
-		_self->top = cother->top;
-		_self->right = cother->right;
-		_self->bottom = cother->bottom;
-		_self->front = cother->front;
-		_self->back = cother->back;
-		
-		cother->left =temp[0];
-		cother->top =temp[1];
-		cother->right =temp[2];
-		cother->bottom =temp[3];
-		cother->front =temp[4];
-		cother->back =temp[5];
+	Ogre::Box *cother = wrap<Ogre::Box*>(other);
+	Ogre::Real temp[6];
+	temp[0] = _self->left;
+	temp[1] = _self->top;
+	temp[2] = _self->right;
+	temp[3] = _self->bottom;
+	temp[4] = _self->front;
+	temp[5] = _self->back;
 
-		return self;
-	}else
-		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreBox),rb_obj_classname(other));
+	_self->left = cother->left;
+	_self->top = cother->top;
+	_self->right = cother->right;
+	_self->bottom = cother->bottom;
+	_self->front = cother->front;
+	_self->back = cother->back;
+
+	cother->left =temp[0];
+	cother->top =temp[1];
+	cother->right =temp[2];
+	cother->bottom =temp[3];
+	cother->front =temp[4];
+	cother->back =temp[5];
+
+	return self;
 }
 
 /*
@@ -87,15 +95,15 @@ VALUE OgreBox_swap(VALUE self,VALUE other)
  * ===Return value
  * Integer
 */
-VALUE OgreBox_hash(VALUE self)
+VALUE _hash(VALUE self)
 {
 	VALUE result = rb_ary_new();
-	rb_ary_push(result,OgreBox_get_left(self));
-	rb_ary_push(result,OgreBox_get_top(self));
-	rb_ary_push(result,OgreBox_get_right(self));
-	rb_ary_push(result,OgreBox_get_bottom(self));
-	rb_ary_push(result,OgreBox_get_front(self));
-	rb_ary_push(result,OgreBox_get_back(self));
+	rb_ary_push(result,_get_left(self));
+	rb_ary_push(result,_get_top(self));
+	rb_ary_push(result,_get_right(self));
+	rb_ary_push(result,_get_bottom(self));
+	rb_ary_push(result,_get_front(self));
+	rb_ary_push(result,_get_back(self));
 	return rb_funcall(result,rb_intern("hash"),0);
 }
 /*
@@ -104,16 +112,16 @@ VALUE OgreBox_hash(VALUE self)
  * 
  * packs a Box into an string.	
 */
-VALUE OgreBox_marshal_dump(VALUE self)
+VALUE _marshal_dump(VALUE self)
 {
 	VALUE result = rb_ary_new();
-	rb_ary_push(result,OgreBox_get_left(self));
-	rb_ary_push(result,OgreBox_get_top(self));
-	rb_ary_push(result,OgreBox_get_right(self));
-	rb_ary_push(result,OgreBox_get_bottom(self));
-	rb_ary_push(result,OgreBox_get_front(self));
-	rb_ary_push(result,OgreBox_get_back(self));
-	return rb_funcall(result,rb_intern("pack"),1,rb_str_new2("dddddd"));
+	rb_ary_push(result,_get_left(self));
+	rb_ary_push(result,_get_top(self));
+	rb_ary_push(result,_get_right(self));
+	rb_ary_push(result,_get_bottom(self));
+	rb_ary_push(result,_get_front(self));
+	rb_ary_push(result,_get_back(self));
+	return rb_funcall(result,rb_intern("pack"),1,rb_str_new2("d*"));
 }
 /*
  * call-seq:
@@ -121,19 +129,20 @@ VALUE OgreBox_marshal_dump(VALUE self)
  * 
  * loads a string into an Box.
 */
-VALUE OgreBox_marshal_load(VALUE self,VALUE load)
+VALUE _marshal_load(VALUE self,VALUE load)
 {
-	VALUE result = rb_funcall(load,rb_intern("unpack"),1,rb_str_new2("dddddd"));
+	VALUE result = rb_funcall(load,rb_intern("unpack"),1,rb_str_new2("d*"));
 	
-	OgreBox_set_back(self,rb_ary_pop(result));
-	OgreBox_set_front(self,rb_ary_pop(result));
-	OgreBox_set_bottom(self,rb_ary_pop(result));
-	OgreBox_set_right(self,rb_ary_pop(result));
-	OgreBox_set_top(self,rb_ary_pop(result));
-	OgreBox_set_left(self,rb_ary_pop(result));
+	_set_back(self,rb_ary_pop(result));
+	_set_front(self,rb_ary_pop(result));
+	_set_bottom(self,rb_ary_pop(result));
+	_set_right(self,rb_ary_pop(result));
+	_set_top(self,rb_ary_pop(result));
+	_set_left(self,rb_ary_pop(result));
 	return self;
 }
 
+}}
 
 /*
  * Document-class: Ogre::Box
@@ -164,27 +173,31 @@ void Init_OgreBox(VALUE rb_mOgre)
 	rb_define_attr(rb_cOgreBox,"front",1,1);
 	rb_define_attr(rb_cOgreBox,"back",1,1);
 #endif
+	using namespace RubyOgre::Box;
+
 	rb_cOgreBox = rb_define_class_under(rb_mOgre,"Box",rb_cObject);
-	rb_define_alloc_func(rb_cOgreBox,OgreBox_alloc);
+	rb_define_alloc_func(rb_cOgreBox,_alloc);
 
 
-	rb_define_attr_method(rb_cOgreBox,"left",OgreBox_get_left,OgreBox_set_left);
-	rb_define_attr_method(rb_cOgreBox,"top",OgreBox_get_top,OgreBox_set_top);
-	rb_define_attr_method(rb_cOgreBox,"right",OgreBox_get_right,OgreBox_set_right);
-	rb_define_attr_method(rb_cOgreBox,"bottom",OgreBox_get_bottom,OgreBox_set_bottom);
-	rb_define_attr_method(rb_cOgreBox,"front",OgreBox_get_front,OgreBox_set_front);
-	rb_define_attr_method(rb_cOgreBox,"back",OgreBox_get_back,OgreBox_set_back);
+	rb_define_attr_method(rb_cOgreBox,"left",_get_left,_set_left);
+	rb_define_attr_method(rb_cOgreBox,"top",_get_top,_set_top);
+	rb_define_attr_method(rb_cOgreBox,"right",_get_right,_set_right);
+	rb_define_attr_method(rb_cOgreBox,"bottom",_get_bottom,_set_bottom);
+	rb_define_attr_method(rb_cOgreBox,"front",_get_front,_set_front);
+	rb_define_attr_method(rb_cOgreBox,"back",_get_back,_set_back);
 
 
 
-	rb_define_method(rb_cOgreBox,"width",RUBY_METHOD_FUNC(OgreBox_width),0);
-	rb_define_method(rb_cOgreBox,"height",RUBY_METHOD_FUNC(OgreBox_height),0);
-	rb_define_method(rb_cOgreBox,"depth",RUBY_METHOD_FUNC(OgreBox_depth),0);
+	rb_define_method(rb_cOgreBox,"width",RUBY_METHOD_FUNC(_width),0);
+	rb_define_method(rb_cOgreBox,"height",RUBY_METHOD_FUNC(_height),0);
+	rb_define_method(rb_cOgreBox,"depth",RUBY_METHOD_FUNC(_depth),0);
 
-	rb_define_method(rb_cOgreBox,"==",RUBY_METHOD_FUNC(OgreBox_equal),1);
-	rb_define_method(rb_cOgreBox,"swap",RUBY_METHOD_FUNC(OgreBox_swap),1);
-	rb_define_method(rb_cOgreBox,"hash",RUBY_METHOD_FUNC(OgreBox_hash),0);
+	rb_define_method(rb_cOgreBox,"==",RUBY_METHOD_FUNC(_equal),1);
+	rb_define_method(rb_cOgreBox,"swap",RUBY_METHOD_FUNC(_swap),1);
+	rb_define_method(rb_cOgreBox,"hash",RUBY_METHOD_FUNC(_hash),0);
 	
-	rb_define_method(rb_cOgreBox,"marshal_dump",RUBY_METHOD_FUNC(OgreBox_marshal_dump),0);
-	rb_define_method(rb_cOgreBox,"marshal_load",RUBY_METHOD_FUNC(OgreBox_marshal_load),1);
+	rb_define_method(rb_cOgreBox,"marshal_dump",RUBY_METHOD_FUNC(_marshal_dump),0);
+	rb_define_method(rb_cOgreBox,"marshal_load",RUBY_METHOD_FUNC(_marshal_load),1);
+
+	registerklass<Ogre::Box>(rb_cOgreBox);
 }

@@ -8,43 +8,20 @@ VALUE rb_eOgreUnimplementedException;
 VALUE rb_eOgreInvalidStateException;
 VALUE rb_eOgreInternalErrorException;
 VALUE rb_eErrnoENT;
-/*
 
-*/
-VALUE OgreException_getFullDescription(VALUE self)
-{
-	return wrap(_self->getFullDescription());
-}
-/*
-*/
-VALUE OgreException_getDescription(VALUE self)
-{
-	return wrap(_self->getDescription());
-}
-/*
-*/
-VALUE OgreException_getNumber(VALUE self)
-{
-	return INT2NUM(_self->getNumber());
-}
-/*
-*/
-VALUE OgreException_getSource(VALUE self)
-{
-	return wrap(_self->getSource());
-}
-/*
-*/
-VALUE OgreException_getFile(VALUE self)
-{
-	return wrap(_self->getFile());
-}
-/*
-*/
-VALUE OgreException_getLine(VALUE self)
-{
-	return INT2NUM(_self->getLine());
-}
+namespace RubyOgre {
+namespace Exception {
+
+singlereturn(getFullDescription)
+singlereturn(getDescription)
+
+singlereturn(getNumber)
+singlereturn(getSource)
+singlereturn(getFile)
+singlereturn(getLine)
+
+}}
+
 void Init_OgreException(VALUE rb_mOgre)
 {
 	#if 0
@@ -52,14 +29,16 @@ void Init_OgreException(VALUE rb_mOgre)
 	rb_mErrno = rb_define_module("Errno");
 	rb_eErrnoENT = rb_define_class_under(rb_mErrno,"ENOENT",rb_eException);
 	#endif
-	rb_mOgreError = rb_define_module_under(rb_mOgre,"Error");
-	rb_define_method(rb_mOgreError,"to_s",RUBY_METHOD_FUNC(OgreException_getDescription),0);
-	rb_define_method(rb_mOgreError,"fulldescription",RUBY_METHOD_FUNC(OgreException_getFullDescription),0);
+	using namespace RubyOgre::Exception;
 
-	rb_define_method(rb_mOgreError,"to_i",RUBY_METHOD_FUNC(OgreException_getNumber),0);
-	rb_define_method(rb_mOgreError,"source",RUBY_METHOD_FUNC(OgreException_getSource),0);
-	rb_define_method(rb_mOgreError,"file",RUBY_METHOD_FUNC(OgreException_getFile),0);
-	rb_define_method(rb_mOgreError,"line",RUBY_METHOD_FUNC(OgreException_getLine),0);
+	rb_mOgreError = rb_define_module_under(rb_mOgre,"Error");
+	rb_define_method(rb_mOgreError,"to_s",RUBY_METHOD_FUNC(_getDescription),0);
+	rb_define_method(rb_mOgreError,"fulldescription",RUBY_METHOD_FUNC(_getFullDescription),0);
+
+	rb_define_method(rb_mOgreError,"to_i",RUBY_METHOD_FUNC(_getNumber),0);
+	rb_define_method(rb_mOgreError,"source",RUBY_METHOD_FUNC(_getSource),0);
+	rb_define_method(rb_mOgreError,"file",RUBY_METHOD_FUNC(_getFile),0);
+	rb_define_method(rb_mOgreError,"line",RUBY_METHOD_FUNC(_getLine),0);
 	
 	rb_eErrnoENT = rb_const_get(rb_mErrno,rb_intern("ENOENT"));
 	rb_eOgreIOError = rb_define_class_under(rb_mOgreError,"IOError",rb_eIOError);

@@ -3,14 +3,29 @@
 #define _self wrap<Ogre::Radian*>(self)
 VALUE rb_cOgreRadian;
 
+template <>
+VALUE wrap< Ogre::Radian >(Ogre::Radian *radian )
+{
+	return Data_Wrap_Struct(rb_cOgreRadian, NULL, free, radian);
+}
+
+template <>
+Ogre::Radian wrap< Ogre::Radian >(const VALUE &vradian)
+{
+	if (!rb_obj_is_kind_of(vradian, rb_cOgreRadian))
+	{
+		if(rb_obj_is_kind_of(vradian,rb_cOgreDegree))
+			return new Ogre::Radian(wrap<Ogre::Degree>(vradian));
+		else if(rb_obj_is_kind_of(vradian,rb_cNumeric))
+			return new Ogre::Radian(NUM2DBL(vradian));
+	}else{
+		return unwrapPtr<Ogre::Radian>(vradian, rb_cOgreRadian);
+	}
+}
+
 VALUE OgreRadian_alloc(VALUE self)
 {
 	return wrap(new Ogre::Radian);
-}
-
-Ogre::Radian* rb_to_radian(const VALUE &vradian)
-{
-	return wrap<Ogre::Radian*>(vradian);
 }
 
 /*

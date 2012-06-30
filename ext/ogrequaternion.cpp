@@ -1,35 +1,56 @@
 #include "ogrequaternion.hpp"
 #include "ogrevector3.hpp"
 #include "ogreradian.hpp"
+#include "ogreexception.hpp"
 #define _self wrap<Ogre::Quaternion*>(self)
 VALUE rb_cOgreQuaternion;
 
-VALUE OgreQuaternion_alloc(VALUE self)
+template <>
+VALUE wrap< Ogre::Quaternion >(Ogre::Quaternion *quaternion )
+{
+	return Data_Wrap_Struct(rb_cOgreQuaternion, NULL, free, quaternion);
+}
+
+template <>
+Ogre::Quaternion* wrap< Ogre::Quaternion* >(const VALUE &vquaternion)
+{
+	return unwrapPtr<Ogre::Quaternion>(vquaternion, rb_cOgreQuaternion);
+}
+template <>
+Ogre::Quaternion wrap< Ogre::Quaternion >(const VALUE &vquaternion)
+{
+	return *wrap< Ogre::Quaternion* >(vquaternion);
+}
+
+
+namespace RubyOgre {
+namespace Quaternion {
+
+VALUE _alloc(VALUE self)
 {
 	return wrap(new Ogre::Quaternion);
 }
 
-
-macro_attr_prop_with_func(Quaternion,x,DBL2NUM,NUM2DBL)
-macro_attr_prop_with_func(Quaternion,y,DBL2NUM,NUM2DBL)
-macro_attr_prop_with_func(Quaternion,z,DBL2NUM,NUM2DBL)
-macro_attr_prop_with_func(Quaternion,w,DBL2NUM,NUM2DBL)
+macro_attr_prop(x,double)
+macro_attr_prop(y,double)
+macro_attr_prop(z,double)
+macro_attr_prop(w,double)
 
 /*
 */
-VALUE OgreQuaternion_initialize(int argc,VALUE* argv,VALUE self)
+VALUE _initialize(int argc,VALUE* argv,VALUE self)
 {
 	return self;
 }
 /*
 */
-VALUE OgreQuaternion_initialize_copy(VALUE self, VALUE other)
+VALUE _initialize_copy(VALUE self, VALUE other)
 {
 	VALUE result = rb_call_super(1,&other);
-	OgreQuaternion_set_w(self,OgreQuaternion_get_w(other));
-	OgreQuaternion_set_x(self,OgreQuaternion_get_x(other));
-	OgreQuaternion_set_y(self,OgreQuaternion_get_y(other));
-	OgreQuaternion_set_z(self,OgreQuaternion_get_z(other));
+	_set_w(self,_get_w(other));
+	_set_x(self,_get_x(other));
+	_set_y(self,_get_y(other));
+	_set_z(self,_get_z(other));
 	return result;
 }
 /*
@@ -40,77 +61,68 @@ VALUE OgreQuaternion_initialize_copy(VALUE self, VALUE other)
  * ===Return value
  * String
 */
-VALUE OgreQuaternion_inspect(VALUE self)
+VALUE _inspect(VALUE self)
 {
 	VALUE array[6];
 	array[0]=rb_str_new2("#<%s:(%f, %f, %f, %f)>");
 	array[1]=rb_class_of(self);
-	array[2]=OgreQuaternion_get_w(self);
-	array[3]=OgreQuaternion_get_x(self);
-	array[4]=OgreQuaternion_get_y(self);
-	array[5]=OgreQuaternion_get_z(self);
+	array[2]=_get_w(self);
+	array[3]=_get_x(self);
+	array[4]=_get_y(self);
+	array[5]=_get_z(self);
 	return rb_f_sprintf(6,array);
 }
 /*
 */
-VALUE OgreQuaternion_minusself(VALUE self)
+VALUE _minusself(VALUE self)
 {
 	return wrap(- *_self);
 }
 /*
 */
-VALUE OgreQuaternion_xAxis(VALUE self)
+VALUE _xAxis(VALUE self)
 {
 	return wrap(_self->xAxis());
 }
 /*
 */
-VALUE OgreQuaternion_yAxis(VALUE self)
+VALUE _yAxis(VALUE self)
 {
 	return wrap(_self->yAxis());
 }
 /*
 */
-VALUE OgreQuaternion_zAxis(VALUE self)
+VALUE _zAxis(VALUE self)
 {
 	return wrap(_self->zAxis());
 }
 /*
 */
-VALUE OgreQuaternion_swap(VALUE self,VALUE other)
+VALUE _swap(VALUE self,VALUE other)
 {
-	if(rb_obj_is_kind_of(other,rb_cOgreQuaternion)){
-		_self->swap(*wrap<Ogre::Quaternion*>(other));
-	}else
-		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreQuaternion),rb_obj_classname(other));
+	_self->swap(*wrap<Ogre::Quaternion*>(other));
 	return self;
 }
 /*
 */
-VALUE OgreQuaternion_plus(VALUE self,VALUE other)
+VALUE _plus(VALUE self,VALUE other)
 {
-	if(rb_obj_is_kind_of(other,rb_cOgreQuaternion))
-		return wrap(*_self + *wrap<Ogre::Quaternion*>(other));
-	else
-		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreQuaternion),rb_obj_classname(other));
+	return wrap(*_self + wrap<Ogre::Quaternion>(other));
 }
 /*
 */
-VALUE OgreQuaternion_minus(VALUE self,VALUE other)
+VALUE _minus(VALUE self,VALUE other)
 {
-	if(rb_obj_is_kind_of(other,rb_cOgreQuaternion))
-		return wrap(*_self - *wrap<Ogre::Quaternion*>(other));
-	else
-		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreQuaternion),rb_obj_classname(other));
+	return wrap(*_self - wrap<Ogre::Quaternion>(other));
 }
 /*
 */
-VALUE OgreQuaternion_mal(VALUE self,VALUE other)
+VALUE _mal(VALUE self,VALUE other)
 {
 	if(rb_obj_is_kind_of(other,rb_cOgreQuaternion))
-		return wrap(*_self * *wrap<Ogre::Quaternion*>(other));
+		return wrap(*_self * wrap<Ogre::Quaternion>(other));
 	else if(rb_obj_is_kind_of(other,rb_cOgreVector3))
-		return wrap(*_self * *wrap<Ogre::Vector3*>(other));
+		return wrap(*_self * wrap<Ogre::Vector3>(other));
 	else
 		return wrap(*_self * NUM2DBL(other));
 }
@@ -122,13 +134,13 @@ VALUE OgreQuaternion_mal(VALUE self,VALUE other)
  * ===Return value
  * Integer
 */
-VALUE OgreQuaternion_hash(VALUE self)
+VALUE _hash(VALUE self)
 {
 	VALUE result = rb_ary_new();
-	rb_ary_push(result,OgreQuaternion_get_w(self));
-	rb_ary_push(result,OgreQuaternion_get_x(self));
-	rb_ary_push(result,OgreQuaternion_get_y(self));
-	rb_ary_push(result,OgreQuaternion_get_z(self));
+	rb_ary_push(result,_get_w(self));
+	rb_ary_push(result,_get_x(self));
+	rb_ary_push(result,_get_y(self));
+	rb_ary_push(result,_get_z(self));
 	return rb_funcall(result,rb_intern("hash"),0);
 }
 /*
@@ -137,14 +149,14 @@ VALUE OgreQuaternion_hash(VALUE self)
  * 
  * packs a Quaternion into an string.
 */
-VALUE OgreQuaternion_marshal_dump(VALUE self)
+VALUE _marshal_dump(VALUE self)
 {
 	VALUE result = rb_ary_new();
-	rb_ary_push(result,OgreQuaternion_get_w(self));
-	rb_ary_push(result,OgreQuaternion_get_x(self));
-	rb_ary_push(result,OgreQuaternion_get_y(self));
-	rb_ary_push(result,OgreQuaternion_get_z(self));
-	return rb_funcall(result,rb_intern("pack"),1,rb_str_new2("dddd"));
+	rb_ary_push(result,_get_w(self));
+	rb_ary_push(result,_get_x(self));
+	rb_ary_push(result,_get_y(self));
+	rb_ary_push(result,_get_z(self));
+	return rb_funcall(result,rb_intern("pack"),1,rb_str_new2("d*"));
 }
 /*
  * call-seq:
@@ -152,15 +164,17 @@ VALUE OgreQuaternion_marshal_dump(VALUE self)
  * 
  * loads a string into an Quaternion.
 */
-VALUE OgreQuaternion_marshal_load(VALUE self,VALUE load)
+VALUE _marshal_load(VALUE self,VALUE load)
 {
-	VALUE result = rb_funcall(load,rb_intern("unpack"),1,rb_str_new2("dddd"));
-	OgreQuaternion_set_z(self,rb_ary_pop(result));
-	OgreQuaternion_set_y(self,rb_ary_pop(result));
-	OgreQuaternion_set_x(self,rb_ary_pop(result));
-	OgreQuaternion_set_w(self,rb_ary_pop(result));
+	VALUE result = rb_funcall(load,rb_intern("unpack"),1,rb_str_new2("d*"));
+	_set_z(self,rb_ary_pop(result));
+	_set_y(self,rb_ary_pop(result));
+	_set_x(self,rb_ary_pop(result));
+	_set_w(self,rb_ary_pop(result));
 	return self;
 }
+
+}}
 
 /*
  * Document-class: Ogre::Quaternion
@@ -179,34 +193,36 @@ void Init_OgreQuaternion(VALUE rb_mOgre)
 	rb_define_attr(rb_cOgreQuaternion,"y",1,1);
 	rb_define_attr(rb_cOgreQuaternion,"z",1,1);
 #endif
-	rb_cOgreQuaternion = rb_define_class_under(rb_mOgre,"Quaternion",rb_cObject);
-	rb_define_alloc_func(rb_cOgreQuaternion,OgreQuaternion_alloc);
-	rb_define_method(rb_cOgreQuaternion,"initialize",RUBY_METHOD_FUNC(OgreQuaternion_initialize),-1);
-	rb_define_private_method(rb_cOgreQuaternion,"initialize_copy",RUBY_METHOD_FUNC(OgreQuaternion_initialize_copy),1);
+	using namespace RubyOgre::Quaternion;
 
-	rb_define_attr_method(rb_cOgreQuaternion,"w",OgreQuaternion_get_w,OgreQuaternion_set_w);
-	rb_define_attr_method(rb_cOgreQuaternion,"x",OgreQuaternion_get_x,OgreQuaternion_set_x);
-	rb_define_attr_method(rb_cOgreQuaternion,"y",OgreQuaternion_get_y,OgreQuaternion_set_y);
-	rb_define_attr_method(rb_cOgreQuaternion,"z",OgreQuaternion_get_z,OgreQuaternion_set_z);
+	rb_cOgreQuaternion = rb_define_class_under(rb_mOgre,"Quaternion",rb_cObject);
+	rb_define_alloc_func(rb_cOgreQuaternion,_alloc);
+	rb_define_method(rb_cOgreQuaternion,"initialize",RUBY_METHOD_FUNC(_initialize),-1);
+	rb_define_private_method(rb_cOgreQuaternion,"initialize_copy",RUBY_METHOD_FUNC(_initialize_copy),1);
+
+	rb_define_attr_method(rb_cOgreQuaternion,"w",_get_w,_set_w);
+	rb_define_attr_method(rb_cOgreQuaternion,"x",_get_x,_set_x);
+	rb_define_attr_method(rb_cOgreQuaternion,"y",_get_y,_set_y);
+	rb_define_attr_method(rb_cOgreQuaternion,"z",_get_z,_set_z);
 
 	
-	rb_define_method(rb_cOgreQuaternion,"inspect",RUBY_METHOD_FUNC(OgreQuaternion_inspect),0);
-	rb_define_method(rb_cOgreQuaternion,"-@",RUBY_METHOD_FUNC(OgreQuaternion_minusself),0);
+	rb_define_method(rb_cOgreQuaternion,"inspect",RUBY_METHOD_FUNC(_inspect),0);
+	rb_define_method(rb_cOgreQuaternion,"-@",RUBY_METHOD_FUNC(_minusself),0);
 	rb_define_alias(rb_cOgreQuaternion,"eql?","==");
 
-	rb_define_method(rb_cOgreQuaternion,"+",RUBY_METHOD_FUNC(OgreQuaternion_plus),1);
-	rb_define_method(rb_cOgreQuaternion,"-",RUBY_METHOD_FUNC(OgreQuaternion_minus),1);
-	rb_define_method(rb_cOgreQuaternion,"*",RUBY_METHOD_FUNC(OgreQuaternion_mal),1);
+	rb_define_method(rb_cOgreQuaternion,"+",RUBY_METHOD_FUNC(_plus),1);
+	rb_define_method(rb_cOgreQuaternion,"-",RUBY_METHOD_FUNC(_minus),1);
+	rb_define_method(rb_cOgreQuaternion,"*",RUBY_METHOD_FUNC(_mal),1);
 
-	rb_define_method(rb_cOgreQuaternion,"xAxis",RUBY_METHOD_FUNC(OgreQuaternion_xAxis),0);
-	rb_define_method(rb_cOgreQuaternion,"yAxis",RUBY_METHOD_FUNC(OgreQuaternion_yAxis),0);
-	rb_define_method(rb_cOgreQuaternion,"zAxis",RUBY_METHOD_FUNC(OgreQuaternion_zAxis),0);
+	rb_define_method(rb_cOgreQuaternion,"xAxis",RUBY_METHOD_FUNC(_xAxis),0);
+	rb_define_method(rb_cOgreQuaternion,"yAxis",RUBY_METHOD_FUNC(_yAxis),0);
+	rb_define_method(rb_cOgreQuaternion,"zAxis",RUBY_METHOD_FUNC(_zAxis),0);
 
-	rb_define_method(rb_cOgreQuaternion,"hash",RUBY_METHOD_FUNC(OgreQuaternion_hash),0);
-	rb_define_method(rb_cOgreQuaternion,"swap",RUBY_METHOD_FUNC(OgreQuaternion_swap),1);
+	rb_define_method(rb_cOgreQuaternion,"hash",RUBY_METHOD_FUNC(_hash),0);
+	rb_define_method(rb_cOgreQuaternion,"swap",RUBY_METHOD_FUNC(_swap),1);
 
-	rb_define_method(rb_cOgreQuaternion,"marshal_dump",RUBY_METHOD_FUNC(OgreQuaternion_marshal_dump),0);
-	rb_define_method(rb_cOgreQuaternion,"marshal_load",RUBY_METHOD_FUNC(OgreQuaternion_marshal_load),1);
+	rb_define_method(rb_cOgreQuaternion,"marshal_dump",RUBY_METHOD_FUNC(_marshal_dump),0);
+	rb_define_method(rb_cOgreQuaternion,"marshal_load",RUBY_METHOD_FUNC(_marshal_load),1);
 
 	rb_define_const(rb_cOgreQuaternion,"Zero",wrap(Ogre::Quaternion::ZERO));
 }

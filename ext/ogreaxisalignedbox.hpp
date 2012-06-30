@@ -15,10 +15,13 @@ inline VALUE wrap< Ogre::AxisAlignedBox >(Ogre::AxisAlignedBox *box )
 template <>
 inline Ogre::AxisAlignedBox* wrap< Ogre::AxisAlignedBox* >(const VALUE &vbox)
 {
-	if ( ! rb_obj_is_kind_of(vbox, rb_cOgreAxisAlignedBox) )
-		return NULL;
-	Ogre::AxisAlignedBox *box;
-  Data_Get_Struct( vbox, Ogre::AxisAlignedBox, box);
-	return box;
+	return unwrapPtr<Ogre::AxisAlignedBox>(vbox, rb_cOgreAxisAlignedBox);
 }
+
+template <>
+inline Ogre::AxisAlignedBox wrap< Ogre::AxisAlignedBox >(const VALUE &vbox)
+{
+	return *wrap< Ogre::AxisAlignedBox* >(vbox);
+}
+
 #endif /* __RubyOgreAxisAlignedBox_H__ */

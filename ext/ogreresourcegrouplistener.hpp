@@ -3,10 +3,12 @@
 
 #include "main.hpp"
 void Init_OgreResourceGroupListener(VALUE rb_mOgre);
-extern VALUE rb_cOgreResourceGroupListener;
+extern VALUE rb_mOgreResourceGroupListener;
 
 class RubyResourceGroupListener : public Ogre::ResourceGroupListener {
 	public:
+	RubyResourceGroupListener(VALUE val);
+
 	VALUE mRuby;
 
 	void resourceGroupScriptingStarted (const Ogre::String &groupName, size_t scriptCount);
@@ -31,8 +33,6 @@ class RubyResourceGroupListener : public Ogre::ResourceGroupListener {
 template <>
 inline VALUE wrap< RubyResourceGroupListener >(RubyResourceGroupListener *obj )
 {
-	if(obj->mRuby==Qnil)
-		obj->mRuby = Data_Wrap_Struct(rb_cOgreResourceGroupListener, NULL, NULL, obj);
 	return obj->mRuby;
 }
 template <>
@@ -44,7 +44,7 @@ inline VALUE wrap< Ogre::ResourceGroupListener >(Ogre::ResourceGroupListener *ob
 template <>
 inline Ogre::ResourceGroupListener* wrap< Ogre::ResourceGroupListener* >(const VALUE &vmovable)
 {
-	if ( ! rb_obj_is_kind_of(vmovable, rb_cOgreResourceGroupListener) )
+	if ( ! rb_obj_is_kind_of(vmovable, rb_mOgreResourceGroupListener) )
 		return NULL;
 	Ogre::ResourceGroupListener *movable;
   Data_Get_Struct( vmovable, Ogre::ResourceGroupListener, movable);

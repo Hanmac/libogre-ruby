@@ -1,53 +1,63 @@
 #include "ogreresource.hpp"
 #include "ogretexture.hpp"
+
+#include "ogreexception.hpp"
+
+
+template <>
+VALUE wrap< Ogre::TexturePtr >(Ogre::TexturePtr *texture )
+{
+	return Data_Wrap_Struct(rb_cOgreTexture, NULL, free, texture);
+}
+
+template <>
+Ogre::Texture* wrap< Ogre::Texture* >(const VALUE &vtexture)
+{
+	return unwrapPtr<Ogre::TexturePtr>(vtexture, rb_cOgreTexture)->get();
+}
+
+
 #define _self wrap<Ogre::Texture*>(self)
 VALUE rb_cOgreTexture;
 
-VALUE OgreTexture_getHeight(VALUE self)
+macro_attr_enum(TextureType,Ogre::TextureType)
+
+macro_attr(Gamma,float)
+
+macro_attr(Height,size_t)
+macro_attr(Width,size_t)
+macro_attr(Depth,size_t)
+macro_attr(NumMipmaps,size_t)
+
+macro_attr(Usage,int)
+
+macro_attr_bool(HardwareGammaEnabled)
+
+macro_attr_enum(Format,Ogre::PixelFormat)
+
+macro_attr(DesiredIntegerBitDepth,ushort)
+macro_attr(DesiredFloatBitDepth,ushort)
+
+macro_attr(TreatLuminanceAsAlpha,bool)
+
+
+singlefunc(createInternalResources)
+singlefunc(freeInternalResources)
+
+
+VALUE _getSrcHeight(VALUE self)
 {
-	return ULONG2NUM(_self->getHeight());
+	return ULONG2NUM(_self->getSrcHeight());
+}
+VALUE _getSrcWidth(VALUE self)
+{
+	return ULONG2NUM(_self->getSrcWidth());
+}
+VALUE _getSrcDepth(VALUE self)
+{
+	return ULONG2NUM(_self->getSrcDepth());
 }
 
-VALUE OgreTexture_getWidth(VALUE self)
-{
-	return ULONG2NUM(_self->getWidth());
-}
-
-VALUE OgreTexture_getDepth(VALUE self)
-{
-	return ULONG2NUM(_self->getDepth());
-}
-
-VALUE OgreTexture_getUsage(VALUE self)
-{
-	return INT2NUM(_self->getUsage());
-}
-
-
-
-VALUE OgreTexture_setHeight(VALUE self,VALUE val)
-{
-	_self->setHeight(NUM2ULONG(val));
-	return val;
-}
-
-VALUE OgreTexture_setWidth(VALUE self,VALUE val)
-{
-	_self->setWidth(NUM2ULONG(val));
-	return val;
-}
-
-VALUE OgreTexture_setDepth(VALUE self,VALUE val)
-{
-	_self->setDepth(NUM2ULONG(val));
-	return val;
-}
-
-VALUE OgreTexture_setUsage(VALUE self,VALUE val)
-{
-	_self->setUsage(NUM2INT(val));
-	return val;
-}
 
 /*
 virtual size_t 	getHeight (void) const
@@ -77,6 +87,9 @@ void Init_OgreTexture(VALUE rb_mOgre)
 #if 0
 	rb_mOgre = rb_define_module("Ogre");
 	rb_cOgreResource = rb_define_class_under(rb_mOgre,"Resource",rb_cObject);
+
+	rb_define_attr(rb_cOgreTexture,"gamma",1,1);
+
 	rb_define_attr(rb_cOgreTexture,"height",1,1);
 	rb_define_attr(rb_cOgreTexture,"width",1,1);
 	rb_define_attr(rb_cOgreTexture,"depth",1,1);
@@ -85,8 +98,17 @@ void Init_OgreTexture(VALUE rb_mOgre)
 #endif
 	rb_cOgreTexture = rb_define_class_under(rb_mOgre,"Texture",rb_cOgreResource);
 
-	rb_define_attr_method(rb_cOgreTexture,"height",OgreTexture_getHeight,OgreTexture_setHeight);
-	rb_define_attr_method(rb_cOgreTexture,"width",OgreTexture_getWidth,OgreTexture_setWidth);
-	rb_define_attr_method(rb_cOgreTexture,"depth",OgreTexture_getDepth,OgreTexture_setDepth);
-	rb_define_attr_method(rb_cOgreTexture,"usage",OgreTexture_getUsage,OgreTexture_setUsage);
+	rb_define_attr_method(rb_cOgreTexture,"gamma",_getGamma,_setGamma);
+
+	rb_define_attr_method(rb_cOgreTexture,"height",_getHeight,_setHeight);
+	rb_define_attr_method(rb_cOgreTexture,"width",_getWidth,_setWidth);
+	rb_define_attr_method(rb_cOgreTexture,"depth",_getDepth,_setDepth);
+	rb_define_attr_method(rb_cOgreTexture,"usage",_getUsage,_setUsage);
+
+	rb_define_method(rb_cOgreTexture,"src_height",RUBY_METHOD_FUNC(_getSrcHeight),0);
+	rb_define_method(rb_cOgreTexture,"src_width",RUBY_METHOD_FUNC(_getSrcWidth),0);
+	rb_define_method(rb_cOgreTexture,"src_depth",RUBY_METHOD_FUNC(_getSrcDepth),0);
+
+
+	registerklass<Ogre::Texture>(rb_cOgreTexture);
 }

@@ -19,7 +19,7 @@ VALUE OgreResourceGroup_initialize(int argc, VALUE *argv,VALUE self)
 	rb_scan_args(argc, argv, "11",&name,&inGlobalPool);
 	if(NIL_P(inGlobalPool))
 		inGlobalPool = Qtrue;
-	selfname = rb_string_value_cstr(&name);
+	selfname = wrap<Ogre::String>(name);
 	if(!manager->resourceGroupExists(selfname))
 		manager->createResourceGroup(selfname,RTEST(inGlobalPool));
 	return self;
@@ -41,7 +41,7 @@ VALUE OgreResourceGroup_addResourceLocation(int argc,VALUE *argv,VALUE self)
 	rb_scan_args(argc, argv, "21",&path,&type,&recursive);
 	Ogre::String result;
 	try{
-		manager->addResourceLocation(rb_string_value_cstr(&path),rb_string_value_cstr(&type),selfname,RTEST(recursive));
+		manager->addResourceLocation(wrap<Ogre::String>(path),wrap<Ogre::String>(type),selfname,RTEST(recursive));
 	}catch(Ogre::Exception& e){
 		rb_raise(wrap(e));
 	}
@@ -52,7 +52,7 @@ VALUE OgreResourceGroup_addResourceLocation(int argc,VALUE *argv,VALUE self)
 VALUE OgreResourceGroup_removeResourceLocation(VALUE self,VALUE name)
 {
 	try{
-		manager->removeResourceLocation(rb_string_value_cstr(&name),selfname);
+		manager->removeResourceLocation(wrap<Ogre::String>(name),selfname);
 	}catch(Ogre::Exception& e){
 		rb_raise(wrap(e));
 	}
@@ -62,7 +62,7 @@ VALUE OgreResourceGroup_removeResourceLocation(VALUE self,VALUE name)
 */
 VALUE OgreResourceGroup_resourceLocationExists(VALUE self,VALUE name)
 {
-	return manager->resourceLocationExists(rb_string_value_cstr(&name),selfname) ? Qtrue : Qfalse;
+	return manager->resourceLocationExists(wrap<Ogre::String>(name),selfname) ? Qtrue : Qfalse;
 }
 /*
 */
@@ -92,7 +92,7 @@ VALUE OgreResourceGroup_listResourceFileInfo(int argc,VALUE *argv,VALUE self)
 */
 VALUE OgreResourceGroup_findResourceLocation(VALUE self,VALUE pattern)
 {
-	return wrap<Ogre::String>(manager->findResourceLocation(selfname,rb_string_value_cstr(&pattern)));
+	return wrap<Ogre::String>(manager->findResourceLocation(selfname,wrap<Ogre::String>(pattern)));
 }
 /*
 */
@@ -102,7 +102,7 @@ VALUE OgreResourceGroup_findResourceFileInfo(int argc,VALUE *argv,VALUE self)
 	rb_scan_args(argc, argv, "11",&pattern,&dirs);
 	if(NIL_P(dirs))
 		dirs = Qfalse;
-	return wrap<Ogre::FileInfo>(manager->findResourceFileInfo(selfname,rb_string_value_cstr(&pattern),RTEST(dirs)));
+	return wrap<Ogre::FileInfo>(manager->findResourceFileInfo(selfname,wrap<Ogre::String>(pattern),RTEST(dirs)));
 }
 /*
 */
@@ -146,7 +146,7 @@ VALUE OgreResourceGroup_inGlobalPool(VALUE self)
 */
 VALUE OgreResourceGroup_undeclareResource(VALUE self,VALUE name)
 {
-	manager->undeclareResource(selfname,rb_string_value_cstr(&name));
+	manager->undeclareResource(selfname,wrap<Ogre::String>(name));
 	return self;
 }
 /*
@@ -170,7 +170,7 @@ VALUE OgreResourceGroup_openResource(int argc,VALUE *argv,VALUE self)
 	if(NIL_P(notfound))
 		notfound = Qtrue;
 	Ogre::Resource *res=NULL;
-	Ogre::DataStreamPtr ptr = manager->openResource(rb_string_value_cstr(&file),selfname,RTEST(notfound),res);
+	Ogre::DataStreamPtr ptr = manager->openResource(wrap<Ogre::String>(file),selfname,RTEST(notfound),res);
 	VALUE result = rb_ary_new();
 	rb_ary_push(result,wrap(ptr));
 	rb_ary_push(result,wrap(res));
@@ -180,7 +180,7 @@ VALUE OgreResourceGroup_openResource(int argc,VALUE *argv,VALUE self)
 */
 VALUE OgreResourceGroup_openResources(VALUE self,VALUE file)
 {
-	return wrap<Ogre::DataStreamPtr>(manager->openResources(rb_string_value_cstr(&file),selfname));
+	return wrap<Ogre::DataStreamPtr>(manager->openResources(wrap<Ogre::String>(file),selfname));
 }
 /*
 */
@@ -197,9 +197,9 @@ VALUE OgreResourceGroup_createResource(int argc,VALUE *argv,VALUE self)
 	if(!rb_obj_is_kind_of(hash,rb_cHash) || NIL_P(temp=rb_hash_aref(hash,ID2SYM(rb_intern("pattern")))))
 		locationPattern = Ogre::StringUtil::BLANK;
 	else
-		locationPattern = rb_string_value_cstr(&temp);
+		locationPattern = wrap<Ogre::String>(temp);
 	try{
-		return wrap(manager->createResource(rb_string_value_cstr(&file),selfname,overwrite,locationPattern));
+		return wrap(manager->createResource(wrap<Ogre::String>(file),selfname,overwrite,locationPattern));
 	}catch(Ogre::Exception& e){
 		rb_raise(wrap(e));
 	}
@@ -236,7 +236,7 @@ VALUE OgreResourceGroup_singleton_listResourceNames(int argc,VALUE *argv,VALUE s
 		groupname = Qnil;
 	}
 	if(!NIL_P(groupname))
-		result = rb_string_value_cstr(&groupname);
+		result = wrap<Ogre::String>(groupname);
 	if(NIL_P(dirs))
 		dirs = Qfalse;
 	return wrap<Ogre::String>(manager->listResourceNames(result,RTEST(dirs)));
@@ -249,9 +249,9 @@ VALUE OgreResourceGroup_singleton_addResourceLocation(int argc,VALUE *argv,VALUE
 	rb_scan_args(argc, argv, "22",&path,&type,&resGroup,&recursive);
 	Ogre::String result = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
 	if(NIL_P(resGroup))
-		result = rb_string_value_cstr(&resGroup);
+		result = wrap<Ogre::String>(resGroup);
 	try{
-		manager->addResourceLocation(rb_string_value_cstr(&path),rb_string_value_cstr(&type),result,RTEST(recursive));
+		manager->addResourceLocation(wrap<Ogre::String>(path),wrap<Ogre::String>(type),result,RTEST(recursive));
 	}catch(Ogre::Exception& e){
 		rb_raise(wrap(e));
 	}
@@ -265,8 +265,8 @@ VALUE OgreResourceGroup_singleton_removeResourceLocation(int argc,VALUE *argv,VA
 	rb_scan_args(argc, argv, "11",&name,&resGroup);
 	Ogre::String result = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
 	if(!NIL_P(resGroup))
-		result = rb_string_value_cstr(&resGroup);
-	manager->removeResourceLocation(rb_string_value_cstr(&name),result);
+		result = wrap<Ogre::String>(resGroup);
+	manager->removeResourceLocation(wrap<Ogre::String>(name),result);
 	return self;
 }
 /*
@@ -277,7 +277,7 @@ VALUE OgreResourceGroup_singleton_listResourceLocations(int argc,VALUE *argv,VAL
 	rb_scan_args(argc, argv, "01",&groupname);
 	Ogre::String result = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
 	if(!NIL_P(groupname))
-		result = rb_string_value_cstr(&groupname);
+		result = wrap<Ogre::String>(groupname);
 	return wrap<Ogre::String>(manager->listResourceLocations(result));
 }
 /*
@@ -288,8 +288,8 @@ VALUE OgreResourceGroup_singleton_findResourceLocation(int argc,VALUE *argv,VALU
 	rb_scan_args(argc, argv, "11",&pattern,&groupname);
 	Ogre::String result = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
 	if(!NIL_P(groupname))
-		result = rb_string_value_cstr(&groupname);
-	return wrap<Ogre::String>(manager->findResourceLocation(result,rb_string_value_cstr(&pattern)));
+		result = wrap<Ogre::String>(groupname);
+	return wrap<Ogre::String>(manager->findResourceLocation(result,wrap<Ogre::String>(pattern)));
 }
 /*
 */
@@ -303,10 +303,10 @@ VALUE OgreResourceGroup_singleton_findResourceFileInfo(int argc,VALUE *argv,VALU
 		groupname = Qnil;
 	}
 	if(!NIL_P(groupname))
-		result = rb_string_value_cstr(&groupname);
+		result = wrap<Ogre::String>(groupname);
 	if(NIL_P(dirs))
 		dirs = Qfalse;
-	return wrap<Ogre::FileInfo>(manager->findResourceFileInfo(result,rb_string_value_cstr(&pattern),RTEST(dirs)));
+	return wrap<Ogre::FileInfo>(manager->findResourceFileInfo(result,wrap<Ogre::String>(pattern),RTEST(dirs)));
 }
 /*
 */
@@ -320,7 +320,7 @@ VALUE OgreResourceGroup_singleton_listResourceFileInfo(int argc,VALUE *argv,VALU
 		groupname = Qnil;
 	}
 	if(!NIL_P(groupname))
-		result = rb_string_value_cstr(&groupname);
+		result = wrap<Ogre::String>(groupname);
 	if(NIL_P(dirs))
 		dirs = Qfalse;
 	return wrap<Ogre::FileInfo>(manager->listResourceFileInfo(result,RTEST(dirs)));
@@ -334,8 +334,8 @@ VALUE OgreResourceGroup_singleton_resourceLocationExists(int argc,VALUE *argv,VA
 	rb_scan_args(argc, argv, "11",&name,&resGroup);
 	Ogre::String result = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
 	if(!NIL_P(resGroup))
-		result = rb_string_value_cstr(&resGroup);
-	return manager->resourceLocationExists(rb_string_value_cstr(&name),result) ? Qtrue : Qfalse;
+		result = wrap<Ogre::String>(resGroup);
+	return manager->resourceLocationExists(wrap<Ogre::String>(name),result) ? Qtrue : Qfalse;
 }
 /*
 */
@@ -347,7 +347,7 @@ VALUE OgreResourceGroup_singleton_initialiseGroup(int argc,VALUE *argv,VALUE sel
 		if(NIL_P(name))
 			manager->initialiseAllResourceGroups();
 		else
-			manager->initialiseResourceGroup(rb_string_value_cstr(&name));
+			manager->initialiseResourceGroup(wrap<Ogre::String>(name));
 	}catch(Ogre::Exception& e){
 		rb_raise(wrap(e));
 	}	
@@ -358,19 +358,19 @@ VALUE OgreResourceGroup_singleton_initialiseGroup(int argc,VALUE *argv,VALUE sel
 */
 VALUE OgreResourceGroup_singleton_isResourceGroupInitialised(VALUE self,VALUE name)
 {
-	return manager->isResourceGroupInitialised(rb_string_value_cstr(&name)) ? Qtrue : Qfalse;
+	return manager->isResourceGroupInitialised(wrap<Ogre::String>(name)) ? Qtrue : Qfalse;
 }
 /*
 */
 VALUE OgreResourceGroup_singleton_isResourceGroupLoaded(VALUE self,VALUE name)
 {
-	return manager->isResourceGroupLoaded(rb_string_value_cstr(&name)) ? Qtrue : Qfalse;
+	return manager->isResourceGroupLoaded(wrap<Ogre::String>(name)) ? Qtrue : Qfalse;
 }
 /*
 */
 VALUE OgreResourceGroup_singleton_ResourceGroupExists(VALUE self,VALUE name)
 {
-	return manager->resourceGroupExists(rb_string_value_cstr(&name)) ? Qtrue : Qfalse;
+	return manager->resourceGroupExists(wrap<Ogre::String>(name)) ? Qtrue : Qfalse;
 }
 
 /*
@@ -383,21 +383,21 @@ VALUE OgreResourceGroup_singleton_getResourceGroups(VALUE self)
 */
 VALUE OgreResourceGroup_singleton_clearResourceGroup(VALUE self,VALUE name)
 {
-	manager->clearResourceGroup(rb_string_value_cstr(&name));
+	manager->clearResourceGroup(wrap<Ogre::String>(name));
 	return self;
 }
 /*
 */
 VALUE OgreResourceGroup_singleton_destroyResourceGroup(VALUE self,VALUE name)
 {
-	manager->destroyResourceGroup(rb_string_value_cstr(&name));
+	manager->destroyResourceGroup(wrap<Ogre::String>(name));
 	return self;
 }
 /*
 */
 VALUE OgreResourceGroup_singleton_isResourceGroupInGlobalPool(VALUE self,VALUE name)
 {
-	return manager->isResourceGroupInGlobalPool(rb_string_value_cstr(&name)) ? Qtrue : Qfalse;
+	return manager->isResourceGroupInGlobalPool(wrap<Ogre::String>(name)) ? Qtrue : Qfalse;
 }
 
 /*
@@ -408,11 +408,11 @@ VALUE OgreResourceGroup_singleton_openResource(int argc,VALUE *argv,VALUE self)
 	rb_scan_args(argc, argv, "12",&file,&groupname,&notfound);
 	Ogre::String cgroupname = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;;
 	if(!NIL_P(groupname))
-		cgroupname = rb_string_value_cstr(&groupname);
+		cgroupname = wrap<Ogre::String>(groupname);
 	if(NIL_P(notfound))
 		notfound = Qtrue;
 	Ogre::Resource *res=NULL;
-	Ogre::DataStreamPtr ptr = manager->openResource(rb_string_value_cstr(&file),cgroupname,RTEST(notfound),res);
+	Ogre::DataStreamPtr ptr = manager->openResource(wrap<Ogre::String>(file),cgroupname,RTEST(notfound),res);
 	VALUE result = rb_ary_new();
 	rb_ary_push(result,wrap(ptr));
 	rb_ary_push(result,wrap(res));
@@ -429,8 +429,8 @@ VALUE OgreResourceGroup_singleton_openResources(int argc,VALUE *argv,VALUE self)
 	if(NIL_P(groupname))
 		result = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
 	else
-		result = rb_string_value_cstr(&groupname);
-	return wrap<Ogre::DataStreamPtr>(manager->openResources(rb_string_value_cstr(&file),result));
+		result = wrap<Ogre::String>(groupname);
+	return wrap<Ogre::DataStreamPtr>(manager->openResources(wrap<Ogre::String>(file),result));
 }
 /*
 */
@@ -442,13 +442,13 @@ VALUE OgreResourceGroup_singleton_createResource(int argc,VALUE *argv,VALUE self
 	Ogre::String result = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
 	Ogre::String locationPattern =  Ogre::StringUtil::BLANK;
 	if(rb_obj_is_kind_of(hash,rb_cHash) && !NIL_P(temp=rb_hash_aref(hash,ID2SYM(rb_intern("group_name")))))
-		result = rb_string_value_cstr(&temp);
+		result = wrap<Ogre::String>(temp);
 	if(rb_obj_is_kind_of(hash,rb_cHash) && !NIL_P(temp=rb_hash_aref(hash,ID2SYM(rb_intern("overwrite")))))
 		overwrite = RTEST(temp);
 	if(rb_obj_is_kind_of(hash,rb_cHash) && !NIL_P(temp=rb_hash_aref(hash,ID2SYM(rb_intern("pattern")))))
-		locationPattern = rb_string_value_cstr(&temp);
+		locationPattern = wrap<Ogre::String>(temp);
 	try{
-		return wrap(manager->createResource(rb_string_value_cstr(&file),result,overwrite,locationPattern));
+		return wrap(manager->createResource(wrap<Ogre::String>(file),result,overwrite,locationPattern));
 	}catch(Ogre::Exception& e){
 		rb_raise(wrap(e));
 	}
@@ -462,7 +462,7 @@ VALUE OgreResourceGroup_singleton_unloadResourceGroup(int argc,VALUE *argv,VALUE
 	rb_scan_args(argc, argv, "11",&groupname,&reloadableOnly);
 	if(NIL_P(reloadableOnly))
 		reloadableOnly = Qfalse;
-	manager->unloadResourceGroup(rb_string_value_cstr(&groupname),RTEST(reloadableOnly));
+	manager->unloadResourceGroup(wrap<Ogre::String>(groupname),RTEST(reloadableOnly));
 	return self;
 }
 /*
@@ -473,8 +473,8 @@ VALUE OgreResourceGroup_singleton_undeclareResource(int argc,VALUE *argv,VALUE s
 	rb_scan_args(argc, argv, "11",&file,&groupname);
 	Ogre::String result = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
 	if(!NIL_P(groupname))
-		result = rb_string_value_cstr(&groupname);
-	manager->undeclareResource(result,rb_string_value_cstr(&file));
+		result = wrap<Ogre::String>(groupname);
+	manager->undeclareResource(result,wrap<Ogre::String>(file));
 	return self;
 }
 

@@ -1,43 +1,97 @@
 #include "ogrecolor.hpp"
-
+#include "ogreexception.hpp"
 #define _self wrap<Ogre::ColourValue*>(self)
 VALUE rb_cOgreColor;
 
-VALUE OgreColor_alloc(VALUE self)
+template <>
+VALUE wrap< Ogre::ColourValue >(Ogre::ColourValue *color )
+{
+	return Data_Wrap_Struct(rb_cOgreColor, NULL, free, color);
+}
+
+template <>
+Ogre::ColourValue* wrap< Ogre::ColourValue* >(const VALUE &vcolor)
+{
+	return unwrapPtr<Ogre::ColourValue>(vcolor, rb_cOgreColor);
+}
+template <>
+Ogre::ColourValue wrap< Ogre::ColourValue >(const VALUE &vcolor)
+{
+	if (!rb_obj_is_kind_of(vcolor, rb_cOgreColor) &&
+		rb_respond_to(vcolor,rb_intern("red")) &&
+		rb_respond_to(vcolor,rb_intern("blue")) &&
+		rb_respond_to(vcolor,rb_intern("green")) &&
+		rb_respond_to(vcolor,rb_intern("alpha"))){
+			 double temp;
+			 Ogre::ColourValue color;
+			 temp = NUM2DBL(rb_funcall(vcolor,rb_intern("red"),0));
+			 if(temp > 1.0)
+			 	temp /=256;
+			 color.r = temp;
+			 temp = NUM2DBL(rb_funcall(vcolor,rb_intern("blue"),0));
+			 if(temp > 1.0)
+			 	temp /=256;
+			 color.b = temp;
+
+			 temp = NUM2DBL(rb_funcall(vcolor,rb_intern("green"),0));
+			 if(temp > 1.0)
+			 	temp /=256;
+			 color.g = temp;
+
+			 temp = NUM2DBL(rb_funcall(vcolor,rb_intern("alpha"),0));
+			 if(temp > 1.0)
+			 	temp /=256;
+			 color.a = temp;
+			 return color;
+	}else{
+		return *wrap< Ogre::ColourValue* >(vcolor);
+	}
+}
+
+namespace RubyOgre {
+namespace Color {
+
+VALUE _alloc(VALUE self)
 {
 	return wrap(new Ogre::ColourValue);
 }
 
-macro_attr_prop_with_func(Color,r,DBL2NUM,NUM2DBL)
-macro_attr_prop_with_func(Color,g,DBL2NUM,NUM2DBL)
-macro_attr_prop_with_func(Color,b,DBL2NUM,NUM2DBL)
-macro_attr_prop_with_func(Color,a,DBL2NUM,NUM2DBL)
+macro_attr_prop(r,double)
+macro_attr_prop(g,double)
+macro_attr_prop(b,double)
+macro_attr_prop(a,double)
+
+macro_attr(AsRGBA,ulong)
+macro_attr(AsARGB,ulong)
+macro_attr(AsBGRA,ulong)
+macro_attr(AsABGR,ulong)
+
 /*
  * call-seq:
  *   Color.new(red,green,blue[,alpha])
  * 
  * creates a new Color Object. 
 */
-VALUE OgreColor_initialize(int argc,VALUE *argv,VALUE self)
+VALUE _initialize(int argc,VALUE *argv,VALUE self)
 {
 	VALUE red,green,blue,alpha;
 	rb_scan_args(argc, argv, "31",&red,&green,&blue,&alpha);
-	OgreColor_set_r(self,red);
-	OgreColor_set_g(self,green);
-	OgreColor_set_b(self,blue);
+	_set_r(self,red);
+	_set_g(self,green);
+	_set_b(self,blue);
 	if(!NIL_P(alpha))
-		OgreColor_set_a(self,alpha);
+		_set_a(self,alpha);
 	return self;
 }
 /*
 */
-VALUE OgreColor_initialize_copy(VALUE self, VALUE other)
+VALUE _initialize_copy(VALUE self, VALUE other)
 {
 	VALUE result = rb_call_super(1,&other);
-	OgreColor_set_r(self,OgreColor_get_r(other));
-	OgreColor_set_g(self,OgreColor_get_g(other));
-	OgreColor_set_b(self,OgreColor_get_b(other));
-	OgreColor_set_a(self,OgreColor_get_a(other));
+	_set_r(self,_get_r(other));
+	_set_g(self,_get_g(other));
+	_set_b(self,_get_b(other));
+	_set_a(self,_get_a(other));
 	return result;
 }
 /*
@@ -48,7 +102,7 @@ VALUE OgreColor_initialize_copy(VALUE self, VALUE other)
  * ===Return value
  * Color
 */
-VALUE OgreColor_plus(VALUE self,VALUE val)
+VALUE _plus(VALUE self,VALUE val)
 {
 	Ogre::ColourValue temp = *_self + *wrap<Ogre::ColourValue*>(val);
 	temp.saturate();
@@ -62,7 +116,7 @@ VALUE OgreColor_plus(VALUE self,VALUE val)
  * ===Return value
  * Color
 */
-VALUE OgreColor_minus(VALUE self,VALUE val)
+VALUE _minus(VALUE self,VALUE val)
 {
 	Ogre::ColourValue temp = *_self - *wrap<Ogre::ColourValue*>(val);
 	temp.saturate();
@@ -77,7 +131,7 @@ VALUE OgreColor_minus(VALUE self,VALUE val)
  * ===Return value
  * Color
 */
-VALUE OgreColor_mal(VALUE self,VALUE val)
+VALUE _mal(VALUE self,VALUE val)
 {
 	if(rb_obj_is_kind_of(val,rb_cNumeric))
 		return wrap(*_self * NUM2DBL(val));
@@ -93,32 +147,32 @@ VALUE OgreColor_mal(VALUE self,VALUE val)
  * ===Return value
  * Color
 */
-VALUE OgreColor_durch(VALUE self,VALUE val)
+VALUE _durch(VALUE self,VALUE val)
 {
 	if(rb_obj_is_kind_of(val,rb_cNumeric))
 		return wrap(*_self / NUM2DBL(val));
 	else
 		return wrap(*_self / *wrap<Ogre::ColourValue*>(val));
 }
-VALUE OgreColor_get_hue(VALUE self)
+VALUE _get_hue(VALUE self)
 {
 	Ogre::Real hue,saturation,brightness;
 	_self->getHSB(&hue, &saturation, &brightness);
 	return DBL2NUM(hue);
 }
-VALUE OgreColor_get_saturation(VALUE self)
+VALUE _get_saturation(VALUE self)
 {
 	Ogre::Real hue,saturation,brightness;
 	_self->getHSB(&hue, &saturation, &brightness);
 	return DBL2NUM(saturation);
 }
-VALUE OgreColor_get_brightness(VALUE self)
+VALUE _get_brightness(VALUE self)
 {
 	Ogre::Real hue,saturation,brightness;
 	_self->getHSB(&hue, &saturation, &brightness);
 	return DBL2NUM(brightness);
 }
-VALUE OgreColor_set_hue(VALUE self,VALUE val)
+VALUE _set_hue(VALUE self,VALUE val)
 {
 	Ogre::Real hue,saturation,brightness;
 	_self->getHSB(&hue, &saturation, &brightness);
@@ -126,7 +180,7 @@ VALUE OgreColor_set_hue(VALUE self,VALUE val)
 	_self->saturate();
 	return val;
 }
-VALUE OgreColor_set_saturation(VALUE self,VALUE val)
+VALUE _set_saturation(VALUE self,VALUE val)
 {
 	Ogre::Real hue,saturation,brightness;
 	_self->getHSB(&hue, &saturation, &brightness);
@@ -134,7 +188,7 @@ VALUE OgreColor_set_saturation(VALUE self,VALUE val)
 	_self->saturate();
 	return val;
 }
-VALUE OgreColor_set_brightness(VALUE self,VALUE val)
+VALUE _set_brightness(VALUE self,VALUE val)
 {
 	Ogre::Real hue,saturation,brightness;
 	_self->getHSB(&hue, &saturation, &brightness);
@@ -142,7 +196,7 @@ VALUE OgreColor_set_brightness(VALUE self,VALUE val)
 	_self->saturate();
 	return val;
 }
-VALUE OgreColor_get_hsb(VALUE self)
+VALUE _get_hsb(VALUE self)
 {
 	Ogre::Real hue,saturation,brightness;
 	_self->getHSB(&hue, &saturation, &brightness);
@@ -152,7 +206,7 @@ VALUE OgreColor_get_hsb(VALUE self)
 	rb_ary_push(result,DBL2NUM(brightness));
 	return result;
 }
-VALUE OgreColor_set_hsb(VALUE self,VALUE val)
+VALUE _set_hsb(VALUE self,VALUE val)
 {
 	if(rb_obj_is_kind_of(val,rb_cArray))
 		if(RARRAY_LEN(val) == 3){
@@ -164,42 +218,6 @@ VALUE OgreColor_set_hsb(VALUE self,VALUE val)
 		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cArray),rb_obj_classname(val));
 	return val;
 }
-VALUE OgreColor_get_rgba(VALUE self)
-{
-	return ULONG2NUM(_self->getAsRGBA());
-}
-VALUE OgreColor_get_argb(VALUE self)
-{
-	return ULONG2NUM(_self->getAsARGB());
-}
-VALUE OgreColor_get_bgra(VALUE self)
-{
-	return ULONG2NUM(_self->getAsBGRA());
-}
-VALUE OgreColor_get_abgr(VALUE self)
-{
-	return ULONG2NUM(_self->getAsABGR());
-}
-VALUE OgreColor_set_rgba(VALUE self,VALUE val)
-{
-	_self->setAsRGBA(NUM2ULONG(val));
-	return val;
-}
-VALUE OgreColor_set_argb(VALUE self,VALUE val)
-{
-	_self->setAsARGB(NUM2ULONG(val));
-	return val;
-}
-VALUE OgreColor_set_bgra(VALUE self,VALUE val)
-{
-	_self->setAsBGRA(NUM2ULONG(val));
-	return val;
-}
-VALUE OgreColor_set_abgr(VALUE self,VALUE val)
-{
-	_self->setAsABGR(NUM2ULONG(val));
-	return val;
-}
 /*
  * call-seq:
  *   color.inspect -> String
@@ -208,15 +226,15 @@ VALUE OgreColor_set_abgr(VALUE self,VALUE val)
  * ===Return value
  * String
 */
-VALUE OgreColor_inspect(VALUE self)
+VALUE _inspect(VALUE self)
 {
 	VALUE array[6];
 	array[0]=rb_str_new2("#<%s:(%f, %f, %f, %f)>");
 	array[1]=rb_class_of(self);
-	array[2]=OgreColor_get_r(self);
-	array[3]=OgreColor_get_g(self);
-	array[4]=OgreColor_get_b(self);
-	array[5]=OgreColor_get_a(self);
+	array[2]=_get_r(self);
+	array[3]=_get_g(self);
+	array[4]=_get_b(self);
+	array[5]=_get_a(self);
 	return rb_f_sprintf(6,array);
 }
 /*
@@ -227,7 +245,7 @@ VALUE OgreColor_inspect(VALUE self)
  * ===Return value
  * boolean
 */
-VALUE OgreColor_equal(VALUE self,VALUE other)
+VALUE _equal(VALUE self,VALUE other)
 {
 	if(rb_obj_is_kind_of(other,rb_cOgreColor))
 		return *_self == *wrap<Ogre::ColourValue*>(other) ? Qtrue : Qfalse;
@@ -242,7 +260,7 @@ VALUE OgreColor_equal(VALUE self,VALUE other)
  * ===Return value
  * boolean
 */
-VALUE OgreColor_nequal(VALUE self,VALUE other)
+VALUE _nequal(VALUE self,VALUE other)
 {
 	if(rb_obj_is_kind_of(other,rb_cOgreColor))
 		return *_self != *wrap<Ogre::ColourValue*>(other) ? Qtrue : Qfalse;
@@ -257,13 +275,13 @@ VALUE OgreColor_nequal(VALUE self,VALUE other)
  * ===Return value
  * Integer
 */
-VALUE OgreColor_hash(VALUE self)
+VALUE _hash(VALUE self)
 {
 	VALUE result = rb_ary_new();
-	rb_ary_push(result,OgreColor_get_r(self));
-	rb_ary_push(result,OgreColor_get_g(self));
-	rb_ary_push(result,OgreColor_get_b(self));
-	rb_ary_push(result,OgreColor_get_a(self));
+	rb_ary_push(result,_get_r(self));
+	rb_ary_push(result,_get_g(self));
+	rb_ary_push(result,_get_b(self));
+	rb_ary_push(result,_get_a(self));
 	return rb_funcall(result,rb_intern("hash"),0);
 }
 /*
@@ -272,14 +290,14 @@ VALUE OgreColor_hash(VALUE self)
  * 
  * packs a Color into an string.
 */
-VALUE OgreColor_marshal_dump(VALUE self)
+VALUE _marshal_dump(VALUE self)
 {
 	VALUE result = rb_ary_new();
-	rb_ary_push(result,OgreColor_get_r(self));
-	rb_ary_push(result,OgreColor_get_g(self));
-	rb_ary_push(result,OgreColor_get_b(self));
-	rb_ary_push(result,OgreColor_get_a(self));
-	return rb_funcall(result,rb_intern("pack"),1,rb_str_new2("dddd"));
+	rb_ary_push(result,_get_r(self));
+	rb_ary_push(result,_get_g(self));
+	rb_ary_push(result,_get_b(self));
+	rb_ary_push(result,_get_a(self));
+	return rb_funcall(result,rb_intern("pack"),1,rb_str_new2("d*"));
 }
 /*
  * call-seq:
@@ -287,23 +305,17 @@ VALUE OgreColor_marshal_dump(VALUE self)
  * 
  * loads a string into an Color.
 */
-VALUE OgreColor_marshal_load(VALUE self,VALUE load)
+VALUE _marshal_load(VALUE self,VALUE load)
 {
-	VALUE result = rb_funcall(load,rb_intern("unpack"),1,rb_str_new2("dddd"));
-	OgreColor_set_a(self,rb_ary_pop(result));
-	OgreColor_set_b(self,rb_ary_pop(result));
-	OgreColor_set_g(self,rb_ary_pop(result));
-	OgreColor_set_r(self,rb_ary_pop(result));
+	VALUE result = rb_funcall(load,rb_intern("unpack"),1,rb_str_new2("d*"));
+	_set_a(self,rb_ary_pop(result));
+	_set_b(self,rb_ary_pop(result));
+	_set_g(self,rb_ary_pop(result));
+	_set_r(self,rb_ary_pop(result));
 	return self;
 }
-/*
-*/
-VALUE Numeric_mal_OgreColor(VALUE self,VALUE val)
-{
-	if(rb_obj_is_kind_of(val,rb_cOgreColor))
-		return wrap(NUM2DBL(self) * *wrap<Ogre::ColourValue*>(val));
-	else
-		return rb_funcall(self,rb_intern("malOgreColor"),1,val);
+
+}
 }
 /*
  * Document-class: Ogre::Color
@@ -371,39 +383,41 @@ void Init_OgreColor(VALUE rb_mOgre)
 	rb_define_attr(rb_cOgreColor,"argb",1,1);
 
 #endif
+	using namespace RubyOgre::Color;
+
 	rb_cOgreColor = rb_define_class_under(rb_mOgre,"Color",rb_cObject);
-	rb_define_alloc_func(rb_cOgreColor,OgreColor_alloc);
+	rb_define_alloc_func(rb_cOgreColor,_alloc);
 	
-	rb_define_method(rb_cOgreColor,"initialize",RUBY_METHOD_FUNC(OgreColor_initialize),-1);
-	rb_define_private_method(rb_cOgreColor,"initialize_copy",RUBY_METHOD_FUNC(OgreColor_initialize_copy),1);
+	rb_define_method(rb_cOgreColor,"initialize",RUBY_METHOD_FUNC(_initialize),-1);
+	rb_define_private_method(rb_cOgreColor,"initialize_copy",RUBY_METHOD_FUNC(_initialize_copy),1);
 	
-	rb_define_attr_method(rb_cOgreColor,"red",OgreColor_get_r,OgreColor_set_r);
-	rb_define_attr_method(rb_cOgreColor,"blue",OgreColor_get_b,OgreColor_set_b);
-	rb_define_attr_method(rb_cOgreColor,"green",OgreColor_get_g,OgreColor_set_g);
-	rb_define_attr_method(rb_cOgreColor,"alpha",OgreColor_get_a,OgreColor_set_a);
+	rb_define_attr_method(rb_cOgreColor,"red",_get_r,_set_r);
+	rb_define_attr_method(rb_cOgreColor,"blue",_get_b,_set_b);
+	rb_define_attr_method(rb_cOgreColor,"green",_get_g,_set_g);
+	rb_define_attr_method(rb_cOgreColor,"alpha",_get_a,_set_a);
 	
-	rb_define_attr_method(rb_cOgreColor,"hue",OgreColor_get_hue,OgreColor_set_hue);
-	rb_define_attr_method(rb_cOgreColor,"saturation",OgreColor_get_saturation,OgreColor_set_saturation);
-	rb_define_attr_method(rb_cOgreColor,"brightness",OgreColor_get_brightness,OgreColor_set_brightness);
+	rb_define_attr_method(rb_cOgreColor,"hue",_get_hue,_set_hue);
+	rb_define_attr_method(rb_cOgreColor,"saturation",_get_saturation,_set_saturation);
+	rb_define_attr_method(rb_cOgreColor,"brightness",_get_brightness,_set_brightness);
 
 
-	rb_define_attr_method(rb_cOgreColor,"hsb",OgreColor_get_hsb,OgreColor_set_hsb);
+	rb_define_attr_method(rb_cOgreColor,"hsb",_get_hsb,_set_hsb);
 
-	rb_define_attr_method(rb_cOgreColor,"rgba",OgreColor_get_rgba,OgreColor_set_rgba);
-	rb_define_attr_method(rb_cOgreColor,"argb",OgreColor_get_argb,OgreColor_set_argb);
-	rb_define_attr_method(rb_cOgreColor,"bgra",OgreColor_get_bgra,OgreColor_set_bgra);
-	rb_define_attr_method(rb_cOgreColor,"abgr",OgreColor_get_abgr,OgreColor_set_abgr);
+	rb_define_attr_method(rb_cOgreColor,"rgba",_getAsRGBA,_setAsRGBA);
+	rb_define_attr_method(rb_cOgreColor,"argb",_getAsARGB,_setAsARGB);
+	rb_define_attr_method(rb_cOgreColor,"bgra",_getAsBGRA,_setAsBGRA);
+	rb_define_attr_method(rb_cOgreColor,"abgr",_getAsABGR,_setAsABGR);
 
 
-	rb_define_method(rb_cOgreColor,"inspect",RUBY_METHOD_FUNC(OgreColor_inspect),0);
+	rb_define_method(rb_cOgreColor,"inspect",RUBY_METHOD_FUNC(_inspect),0);
 
-	rb_define_method(rb_cOgreColor,"==",RUBY_METHOD_FUNC(OgreColor_equal),1);
-	rb_define_method(rb_cOgreColor,"!=",RUBY_METHOD_FUNC(OgreColor_nequal),1);
+	rb_define_method(rb_cOgreColor,"==",RUBY_METHOD_FUNC(_equal),1);
+	rb_define_method(rb_cOgreColor,"!=",RUBY_METHOD_FUNC(_nequal),1);
 	
-	rb_define_method(rb_cOgreColor,"+",RUBY_METHOD_FUNC(OgreColor_plus),1);
-	rb_define_method(rb_cOgreColor,"-",RUBY_METHOD_FUNC(OgreColor_minus),1);
-	rb_define_method(rb_cOgreColor,"*",RUBY_METHOD_FUNC(OgreColor_mal),1);
-	rb_define_method(rb_cOgreColor,"/",RUBY_METHOD_FUNC(OgreColor_durch),1);
+	rb_define_method(rb_cOgreColor,"+",RUBY_METHOD_FUNC(_plus),1);
+	rb_define_method(rb_cOgreColor,"-",RUBY_METHOD_FUNC(_minus),1);
+	rb_define_method(rb_cOgreColor,"*",RUBY_METHOD_FUNC(_mal),1);
+	rb_define_method(rb_cOgreColor,"/",RUBY_METHOD_FUNC(_durch),1);
 	
 	rb_define_const(rb_cOgreColor,"Zero",wrap(Ogre::ColourValue::ZERO));
 	rb_define_const(rb_cOgreColor,"Black",wrap(Ogre::ColourValue::Black));
@@ -413,14 +427,8 @@ void Init_OgreColor(VALUE rb_mOgre)
 	rb_define_const(rb_cOgreColor,"Blue",wrap(Ogre::ColourValue::Blue));
 	
 	rb_define_alias(rb_cOgreColor,"eql?","==");
-	rb_define_method(rb_cOgreColor,"hash",RUBY_METHOD_FUNC(OgreColor_hash),0);
-/*	
-//	rb_define_alias(rb_cFloat,"malOgreColor","*");
-//	rb_define_method(rb_cFloat,"*",RUBY_METHOD_FUNC(Numeric_mal_OgreColor),1);
-//	rb_define_alias(rb_cInteger,"malOgreColor","*");
-//	rb_define_method(rb_cInteger,"*",RUBY_METHOD_FUNC(Numeric_mal_OgreColor),1);
-*/
+	rb_define_method(rb_cOgreColor,"hash",RUBY_METHOD_FUNC(_hash),0);
 
-	rb_define_method(rb_cOgreColor,"marshal_dump",RUBY_METHOD_FUNC(OgreColor_marshal_dump),0);	
-	rb_define_method(rb_cOgreColor,"marshal_load",RUBY_METHOD_FUNC(OgreColor_marshal_load),1);
+	rb_define_method(rb_cOgreColor,"marshal_dump",RUBY_METHOD_FUNC(_marshal_dump),0);
+	rb_define_method(rb_cOgreColor,"marshal_load",RUBY_METHOD_FUNC(_marshal_load),1);
 }

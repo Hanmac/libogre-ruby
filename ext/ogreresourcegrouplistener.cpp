@@ -2,15 +2,7 @@
 #include "ogreresourcegroup.hpp"
 #include "ogreresource.hpp"
 
-VALUE rb_cOgreResourceGroupListener;
-
-VALUE OgreResourceGroupListener_alloc(VALUE self)
-{
-	RubyResourceGroupListener *temp = new RubyResourceGroupListener;
-	temp->mRuby=Qnil;
-	return wrap(temp);
-}
-
+VALUE rb_mOgreResourceGroupListener;
 
 void RubyResourceGroupListener::resourceGroupScriptingStarted(const Ogre::String &groupName, size_t scriptCount)
 {
@@ -89,24 +81,25 @@ void Init_OgreResourceGroupListener(VALUE rb_mOgre)
 	rb_mOgre = rb_define_module("Ogre");
 	rb_cOgreResourceGroup = rb_define_class_under(rb_mOgre,"ResourceGroup",rb_cObject);
 #endif
-	rb_cOgreResourceGroupListener = rb_define_class_under(rb_cOgreResourceGroup,"Listener",rb_cObject);
-	rb_define_alloc_func(rb_cOgreResourceGroupListener,OgreResourceGroupListener_alloc);
 
-	rb_define_method(rb_cOgreResourceGroupListener,"resourceGroupScriptingStarted",RUBY_METHOD_FUNC(Ogre_dummy2),2);// in ogre.y
-	rb_define_method(rb_cOgreResourceGroupListener,"scriptParseStarted",RUBY_METHOD_FUNC(scriptParseStarted_dummy),1);
-	rb_define_method(rb_cOgreResourceGroupListener,"scriptParseEnded",RUBY_METHOD_FUNC(Ogre_dummy2),2);// in ogre.y
-	rb_define_method(rb_cOgreResourceGroupListener,"resourceGroupScriptingEnded",RUBY_METHOD_FUNC(Ogre_dummy1),1);// in ogre.y
-	rb_define_method(rb_cOgreResourceGroupListener,"resourceGroupPrepareStarted",RUBY_METHOD_FUNC(Ogre_dummy2),2);// in ogre.y
-	rb_define_method(rb_cOgreResourceGroupListener,"resourcePrepareStarted",RUBY_METHOD_FUNC(Ogre_dummy1),1);// in ogre.y
-	rb_define_method(rb_cOgreResourceGroupListener,"resourcePrepareEnded",RUBY_METHOD_FUNC(Ogre_dummy0),0);// in ogre.y
-	rb_define_method(rb_cOgreResourceGroupListener,"worldGeometryPrepareStageStarted",RUBY_METHOD_FUNC(Ogre_dummy1),1);// in ogre.y
-	rb_define_method(rb_cOgreResourceGroupListener,"resourcePrepareEnded",RUBY_METHOD_FUNC(Ogre_dummy0),0);// in ogre.y
-	rb_define_method(rb_cOgreResourceGroupListener,"resourceGroupPrepareEnded",RUBY_METHOD_FUNC(Ogre_dummy1),1);// in ogre.y
-	rb_define_method(rb_cOgreResourceGroupListener,"resourceGroupLoadStarted",RUBY_METHOD_FUNC(Ogre_dummy2),2);// in ogre.y
-	rb_define_method(rb_cOgreResourceGroupListener,"resourceLoadStarted",RUBY_METHOD_FUNC(Ogre_dummy1),1);// in ogre.y
-	rb_define_method(rb_cOgreResourceGroupListener,"resourceLoadEnded",RUBY_METHOD_FUNC(Ogre_dummy0),0);// in ogre.y
-	rb_define_method(rb_cOgreResourceGroupListener,"worldGeometryStageStarted",RUBY_METHOD_FUNC(Ogre_dummy1),1);// in ogre.y
-	rb_define_method(rb_cOgreResourceGroupListener,"worldGeometryStageEnded",RUBY_METHOD_FUNC(Ogre_dummy0),0);// in ogre.y
-	rb_define_method(rb_cOgreResourceGroupListener,"resourceGroupLoadEnded",RUBY_METHOD_FUNC(Ogre_dummy1),1);// in ogre.y
+
+	rb_mOgreResourceGroupListener = rb_define_module_under(rb_cOgreResourceGroup,"Listener");
+
+	rb_define_method(rb_mOgreResourceGroupListener,"resourceGroupScriptingStarted",RUBY_METHOD_FUNC(Ogre_dummy2),2);// in ogre.y
+	rb_define_method(rb_mOgreResourceGroupListener,"scriptParseStarted",RUBY_METHOD_FUNC(scriptParseStarted_dummy),1);
+	rb_define_method(rb_mOgreResourceGroupListener,"scriptParseEnded",RUBY_METHOD_FUNC(Ogre_dummy2),2);// in ogre.y
+	rb_define_method(rb_mOgreResourceGroupListener,"resourceGroupScriptingEnded",RUBY_METHOD_FUNC(Ogre_dummy1),1);// in ogre.y
+	rb_define_method(rb_mOgreResourceGroupListener,"resourceGroupPrepareStarted",RUBY_METHOD_FUNC(Ogre_dummy2),2);// in ogre.y
+	rb_define_method(rb_mOgreResourceGroupListener,"resourcePrepareStarted",RUBY_METHOD_FUNC(Ogre_dummy1),1);// in ogre.y
+	rb_define_method(rb_mOgreResourceGroupListener,"resourcePrepareEnded",RUBY_METHOD_FUNC(Ogre_dummy0),0);// in ogre.y
+	rb_define_method(rb_mOgreResourceGroupListener,"worldGeometryPrepareStageStarted",RUBY_METHOD_FUNC(Ogre_dummy1),1);// in ogre.y
+	rb_define_method(rb_mOgreResourceGroupListener,"resourcePrepareEnded",RUBY_METHOD_FUNC(Ogre_dummy0),0);// in ogre.y
+	rb_define_method(rb_mOgreResourceGroupListener,"resourceGroupPrepareEnded",RUBY_METHOD_FUNC(Ogre_dummy1),1);// in ogre.y
+	rb_define_method(rb_mOgreResourceGroupListener,"resourceGroupLoadStarted",RUBY_METHOD_FUNC(Ogre_dummy2),2);// in ogre.y
+	rb_define_method(rb_mOgreResourceGroupListener,"resourceLoadStarted",RUBY_METHOD_FUNC(Ogre_dummy1),1);// in ogre.y
+	rb_define_method(rb_mOgreResourceGroupListener,"resourceLoadEnded",RUBY_METHOD_FUNC(Ogre_dummy0),0);// in ogre.y
+	rb_define_method(rb_mOgreResourceGroupListener,"worldGeometryStageStarted",RUBY_METHOD_FUNC(Ogre_dummy1),1);// in ogre.y
+	rb_define_method(rb_mOgreResourceGroupListener,"worldGeometryStageEnded",RUBY_METHOD_FUNC(Ogre_dummy0),0);// in ogre.y
+	rb_define_method(rb_mOgreResourceGroupListener,"resourceGroupLoadEnded",RUBY_METHOD_FUNC(Ogre_dummy1),1);// in ogre.y
 
 }

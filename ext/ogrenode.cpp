@@ -1,32 +1,38 @@
 #include "ogrenode.hpp"
 #include "ogrevector3.hpp"
-
+#include "ogreexception.hpp"
 #include "ogrequaternion.hpp"
 //#include "ogrenodelistener.hpp"
 #define _self wrap<Ogre::Node*>(self)
 
 VALUE rb_cOgreNode;
 
-macro_attr(Node,Position,Ogre::Vector3)
-macro_attr(Node,Scale,Ogre::Vector3)
-/*
-*/
-VALUE OgreNode_getName(VALUE self)
+void wrap(Ogre::Node::ChildNodeIterator it )
 {
-	return wrap(_self->getName());
+	wrap_each2(it.begin(),it.end());
 }
 
+namespace RubyOgre
+{
+namespace Node
+{
+
+macro_attr(Position,Ogre::Vector3)
+macro_attr(Scale,Ogre::Vector3)
+macro_attr(Orientation,Ogre::Quaternion);
+
+singlereturn(getName)
 
 /*
 */
-VALUE OgreNode_numChildren(VALUE self)
+VALUE _numChildren(VALUE self)
 {
 	return UINT2NUM(_self->numChildren());
 }
 
 /*
 */
-VALUE OgreNode_addChild(VALUE self,VALUE val)
+VALUE _addChild(VALUE self,VALUE val)
 {
 	_self->addChild(wrap<Ogre::Node*>(self));
 	return self;
@@ -40,7 +46,7 @@ VALUE OgreNode_addChild(VALUE self,VALUE val)
  * ===Return value
  * String
 */
-VALUE OgreNode_inspect(VALUE self)
+VALUE _inspect(VALUE self)
 {
 	VALUE array[3];
 	array[0]=rb_str_new2("#<%s:%s>");
@@ -48,27 +54,27 @@ VALUE OgreNode_inspect(VALUE self)
 	if(_self==NULL)
 		array[2]=rb_str_new2("(destroyed)");
 	else
-		array[2]=OgreNode_getName(self);
+		array[2]=_getName(self);
 	return rb_f_sprintf(3,array);
 }
 
 /*
 */
-VALUE OgreNode_getListener(VALUE self)
+VALUE _getListener(VALUE self)
 {
 	Ogre::Node::Listener *temp = _self->getListener();
 	return temp ? wrap(temp) : Qnil;
 }
 /*
 */
-VALUE OgreNode_setListener(VALUE self,VALUE val)
+VALUE _setListener(VALUE self,VALUE val)
 {
 	_self->setListener(wrap<Ogre::Node::Listener*>(val));
 	return val;
 }
 /*
 */
-VALUE OgreNode_each(VALUE self)
+VALUE _each(VALUE self)
 {
 	RETURN_ENUMERATOR(self,0,NULL);
 	wrap(_self->getChildIterator());
@@ -77,11 +83,11 @@ VALUE OgreNode_each(VALUE self)
 
 /*
 */
-VALUE OgreNode_getChild(VALUE self,VALUE name)
+VALUE _getChild(VALUE self,VALUE name)
 {
 	Ogre::Node *node = NULL;
 	if(rb_obj_is_kind_of(name,rb_cString))
-		node = _self->getChild(rb_string_value_cstr(&name));
+		node = _self->getChild(wrap<Ogre::String>(name));
 	if(rb_obj_is_kind_of(name,rb_cNumeric))
 		node = _self->getChild(NUM2ULONG(name));
 	
@@ -90,10 +96,10 @@ VALUE OgreNode_getChild(VALUE self,VALUE name)
 
 /*
 */
-VALUE OgreNode_removeChild(VALUE self,VALUE name)
+VALUE _removeChild(VALUE self,VALUE name)
 {
 	if(rb_obj_is_kind_of(name,rb_cString))
-		_self->removeChild(rb_string_value_cstr(&name));
+		_self->removeChild(wrap<Ogre::String>(name));
 	else if(rb_obj_is_kind_of(name,rb_cNumeric))
 		_self->removeChild(NUM2ULONG(name));
 	else
@@ -103,7 +109,7 @@ VALUE OgreNode_removeChild(VALUE self,VALUE name)
 
 /*
 */
-VALUE OgreNode_createChild(int argc,VALUE *argv,VALUE self)
+VALUE _createChild(int argc,VALUE *argv,VALUE self)
 {
 	VALUE name,arg1,arg2;
 	Ogre::Vector3 vec;
@@ -125,7 +131,7 @@ VALUE OgreNode_createChild(int argc,VALUE *argv,VALUE self)
 			rotate = wrap<Ogre::Quaternion>(arg2);
 		else
 			rotate=Ogre::Quaternion::IDENTITY;
-		return wrap(_self->createChild(rb_string_value_cstr(&name),vec,rotate));
+		return wrap(_self->createChild(wrap<Ogre::String>(name),vec,rotate));
 	}else{
 		rb_scan_args(argc, argv, "02",&arg1,&arg2);
 		if(rb_obj_is_kind_of(arg1,rb_cOgreQuaternion))
@@ -146,6 +152,8 @@ VALUE OgreNode_createChild(int argc,VALUE *argv,VALUE self)
 	}
 }
 
+}
+}
 void Init_OgreNode(VALUE rb_mOgre)
 {
 #if 0
@@ -155,26 +163,30 @@ void Init_OgreNode(VALUE rb_mOgre)
 	rb_define_attr(rb_cOgreNode,"position",1,1);
 	rb_define_attr(rb_cOgreNode,"scale",1,1);
 #endif
+	using namespace RubyOgre::Node;
+
 	rb_cOgreNode = rb_define_class_under(rb_mOgre,"Node",rb_cObject);
 	rb_undef_alloc_func(rb_cOgreNode);
 	
-	rb_define_method(rb_cOgreNode,"name",RUBY_METHOD_FUNC(OgreNode_getName),0);
-	rb_define_method(rb_cOgreNode,"numChildren",RUBY_METHOD_FUNC(OgreNode_numChildren),0);
+	rb_define_method(rb_cOgreNode,"name",RUBY_METHOD_FUNC(_getName),0);
+	rb_define_method(rb_cOgreNode,"size",RUBY_METHOD_FUNC(_numChildren),0);
 	
-	rb_define_method(rb_cOgreNode,"addChild",RUBY_METHOD_FUNC(OgreNode_addChild),1);
-	rb_define_method(rb_cOgreNode,"removeChild",RUBY_METHOD_FUNC(OgreNode_removeChild),1);
+	rb_define_method(rb_cOgreNode,"addChild",RUBY_METHOD_FUNC(_addChild),1);
+	rb_define_method(rb_cOgreNode,"removeChild",RUBY_METHOD_FUNC(_removeChild),1);
 
-	rb_define_method(rb_cOgreNode,"createChild",RUBY_METHOD_FUNC(OgreNode_createChild),-1);
+	rb_define_method(rb_cOgreNode,"createChild",RUBY_METHOD_FUNC(_createChild),-1);
 
-	rb_define_method(rb_cOgreNode,"inspect",RUBY_METHOD_FUNC(OgreNode_inspect),0);
+	rb_define_method(rb_cOgreNode,"inspect",RUBY_METHOD_FUNC(_inspect),0);
 
-	rb_define_attr_method(rb_cOgreNode,"listener",OgreNode_getListener,OgreNode_setListener);
+	rb_define_attr_method(rb_cOgreNode,"listener",_getListener,_setListener);
 	
-	rb_define_attr_method(rb_cOgreNode,"position",OgreNode_getPosition,OgreNode_setPosition);
-	rb_define_attr_method(rb_cOgreNode,"scale",OgreNode_getScale,OgreNode_setScale);
+	rb_define_attr_method(rb_cOgreNode,"position",_getPosition,_setPosition);
+	rb_define_attr_method(rb_cOgreNode,"scale",_getScale,_setScale);
 	
 
-	rb_define_method(rb_cOgreNode,"each",RUBY_METHOD_FUNC(OgreNode_each),0);
+	rb_define_method(rb_cOgreNode,"each",RUBY_METHOD_FUNC(_each),0);
 	rb_include_module(rb_cOgreNode,rb_mEnumerable);
-	rb_define_method(rb_cOgreNode,"[]",RUBY_METHOD_FUNC(OgreNode_getChild),1);
+	rb_define_method(rb_cOgreNode,"[]",RUBY_METHOD_FUNC(_getChild),1);
+
+	registerklass<Ogre::Node>(rb_cOgreNode);
 }

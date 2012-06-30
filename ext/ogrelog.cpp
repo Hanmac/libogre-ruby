@@ -3,29 +3,65 @@
 #define _self wrap<Ogre::Log*>(self)
 #define _singleton wrap<Ogre::LogManager*>(self)
 VALUE rb_cOgreLog;
+
+
+struct RubyLog{
+	Ogre::String name;
+};
+
+template <>
+VALUE wrap< Ogre::Log >(Ogre::Log *log )
+{
+	if(log == NULL)
+		return Qnil;
+	RubyLog *temp = new RubyLog;
+	temp->name = log->getName();
+	return Data_Wrap_Struct(rb_cOgreLog, NULL, NULL, log);
+}
+
+template <>
+Ogre::Log* wrap< Ogre::Log* >(const VALUE &vlog)
+{
+	if ( ! rb_obj_is_kind_of(vlog, rb_cOgreLog) )
+		return NULL;
+	try{
+		RubyLog *log;
+		Data_Get_Struct( vlog, RubyLog, log);
+		return Ogre::LogManager::getSingletonPtr()->getLog(log->name);
+	}catch(Ogre::Exception& e){
+		rb_raise(wrap(e));
+		return NULL;
+	}
+}
+template <>
+Ogre::LogManager* wrap< Ogre::LogManager* >(const VALUE &vlog)
+{
+	Ogre::LogManager *temp = Ogre::LogManager::getSingletonPtr();
+	return temp != NULL ? temp : new Ogre::LogManager;
+}
+
+namespace RubyOgre
+{
+namespace Log
+{
 /*
 */
-VALUE OgreLog_getName(VALUE self)
+VALUE _getName(VALUE self)
 {
 	return wrap(_self->getName());
 }
 
 /*
 */
-VALUE OgreLog_log(int argc,VALUE *argv,VALUE self)
+VALUE _log(int argc,VALUE *argv,VALUE self)
 {
 	VALUE message,level,mask;
 	rb_scan_args(argc, argv, "13",&message,&level,&mask);
-	Ogre::LogMessageLevel olevel;
-	if(NIL_P(level))	
-		olevel = Ogre::LML_NORMAL;
-	else
-		olevel = wrap<Ogre::LogMessageLevel>(level);
+	Ogre::LogMessageLevel olevel = wrapenum<Ogre::LogMessageLevel>(level);
 	if(NIL_P(mask))
 		mask = Qfalse;
 	try{
-		message = rb_funcall(message,rb_intern("to_s"),0);
-		_self->logMessage(rb_string_value_cstr(&message), olevel, RTEST(mask));
+		_self->logMessage(wrap<Ogre::String>(message), olevel, RTEST(mask));
 	}catch(Ogre::Exception& e){
 		rb_raise(wrap(e));
 	}
@@ -33,69 +69,38 @@ VALUE OgreLog_log(int argc,VALUE *argv,VALUE self)
 }
 /*
 */
-VALUE OgreLog_logshift(VALUE self,VALUE message)
+VALUE _logshift(VALUE self,VALUE message)
 {
 	try{
-		message = rb_funcall(message,rb_intern("to_s"),0);
-		_self->logMessage(rb_string_value_cstr(&message), Ogre::LML_NORMAL, false);
+		_self->logMessage(wrap<Ogre::String>(message), Ogre::LML_NORMAL, false);
 	}catch(Ogre::Exception& e){
 		rb_raise(wrap(e));
 	}
 	return self;
 }
+
+macro_attr_enum(LogDetail,Ogre::LoggingLevel)
+macro_attr_bool(TimeStampEnabled)
+
 /*
 */
-VALUE OgreLog_getLogDetail(VALUE self)
-{
-	return wrap(_self->getLogDetail());
-}
-/*
-*/
-VALUE OgreLog_setLogDetail(VALUE self,VALUE val)
-{
-	_self->setLogDetail(wrap<Ogre::LoggingLevel>(val));
-	return val;
-}
-/*
-*/
-VALUE OgreLog_isTimeStampEnabled(VALUE self)
-{
-	return _self->isTimeStampEnabled() ? Qtrue : Qfalse;
-}
-/*
-*/
-VALUE OgreLog_setTimeStampEnabled(VALUE self,VALUE val)
-{
-	_self->setTimeStampEnabled(RTEST(val));
-	return val;
-}
-/*
-*/
-VALUE OgreLog_destroy(VALUE self)
+VALUE _destroy(VALUE self)
 {
 	Ogre::LogManager::getSingletonPtr()->destroyLog(_self);
 	return Qnil;
 }
 /*
 */
-VALUE OgreLog_addListener(VALUE self,VALUE val)
+VALUE _addListener(VALUE self,VALUE val)
 {
-	Ogre::LogListener *listener = wrap<Ogre::LogListener*>(val);
-	if(listener)
-		_self->addListener(listener);
-	else
-		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreLogListener),rb_obj_classname(val));
+	_self->addListener(wrap<Ogre::LogListener*>(val));
 	return self;
 }
 /*
 */
-VALUE OgreLog_removeListener(VALUE self,VALUE val)
+VALUE _removeListener(VALUE self,VALUE val)
 {
-	Ogre::LogListener *listener = wrap<Ogre::LogListener*>(val);
-	if(listener)
-		_self->removeListener(listener);
-	else
-		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreLogListener),rb_obj_classname(val));
+	_self->removeListener(wrap<Ogre::LogListener*>(val));
 	return self;
 }
 
@@ -103,7 +108,7 @@ VALUE OgreLog_removeListener(VALUE self,VALUE val)
 
 /*
 */
-VALUE OgreLog_singleton_createLog(int argc,VALUE *argv,VALUE self)
+VALUE _singleton_createLog(int argc,VALUE *argv,VALUE self)
 {
 	VALUE name,defaultlog,debuggeroutput,suppressFileOutput;
 	rb_scan_args(argc, argv, "13",&name,&defaultlog,&debuggeroutput,&suppressFileOutput);
@@ -114,28 +119,23 @@ VALUE OgreLog_singleton_createLog(int argc,VALUE *argv,VALUE self)
 	if(NIL_P(suppressFileOutput))
 		suppressFileOutput = Qfalse;
 	try{
-		return wrap(_singleton->createLog(rb_string_value_cstr(&name),RTEST(defaultlog),RTEST(debuggeroutput),RTEST(suppressFileOutput)));
+		return wrap(_singleton->createLog(wrap<Ogre::String>(name),RTEST(defaultlog),RTEST(debuggeroutput),RTEST(suppressFileOutput)));
 	}catch(Ogre::Exception& e){
 		rb_raise(wrap(e));
-		return Qnil;
 	}
+	return Qnil;
 }
 /*
 */
-VALUE OgreLog_singleton_log(int argc,VALUE *argv,VALUE self)
+VALUE _singleton_log(int argc,VALUE *argv,VALUE self)
 {
 	VALUE message,level,mask;
 	rb_scan_args(argc, argv, "13",&message,&level,&mask);
-	Ogre::LogMessageLevel olevel;
-	if(NIL_P(level))	
-		olevel = Ogre::LML_NORMAL;
-	else
-		olevel = wrap<Ogre::LogMessageLevel>(level);
+	Ogre::LogMessageLevel olevel = wrapenum<Ogre::LogMessageLevel>(level);
 	if(NIL_P(mask))
 		mask = Qfalse;
 	try{
-		message = rb_funcall(message,rb_intern("to_s"),0);
-		_singleton->logMessage(rb_string_value_cstr(&message), olevel, RTEST(mask));
+		_singleton->logMessage(wrap<Ogre::String>(message), olevel, RTEST(mask));
 	}catch(Ogre::Exception& e){
 		rb_raise(wrap(e));
 	}
@@ -143,11 +143,10 @@ VALUE OgreLog_singleton_log(int argc,VALUE *argv,VALUE self)
 }
 /*
 */
-VALUE OgreLog_singleton_logshift(VALUE self,VALUE message)
+VALUE _singleton_logshift(VALUE self,VALUE message)
 {
 	try{
-		message = rb_funcall(message,rb_intern("to_s"),0);
-		_singleton->logMessage(rb_string_value_cstr(&message), Ogre::LML_NORMAL, false);
+		_singleton->logMessage(wrap<Ogre::String>(message), Ogre::LML_NORMAL, false);
 	}catch(Ogre::Exception& e){
 		rb_raise(wrap(e));
 	}
@@ -162,61 +161,71 @@ VALUE OgreLog_singleton_logshift(VALUE self,VALUE message)
  * ===Return value
  * Ogre::Log or nil
 */
-VALUE OgreLog_singleton_getLog(VALUE self,VALUE name)
+VALUE _singleton_getLog(VALUE self,VALUE name)
 {
 	try{
-		return wrap(_singleton->getLog(rb_string_value_cstr(&name)));
+		return wrap(_singleton->getLog(wrap<Ogre::String>(name)));
 	}catch(Ogre::Exception& e){
 		rb_raise(wrap(e));
-		return Qnil;
 	}
+	return Qnil;
 }
 /*
 */
-VALUE OgreLog_singleton_getdefaultLog(VALUE self)
+VALUE _singleton_getdefaultLog(VALUE self)
 {
 	Ogre::Log *temp = _singleton->getDefaultLog();
 	return temp ? wrap(temp) : Qnil;
 }
 /*
 */
-VALUE OgreLog_singleton_setdefaultLog(VALUE self,VALUE log)
+VALUE _singleton_setdefaultLog(VALUE self,VALUE log)
 {
-	if (rb_obj_is_kind_of(log, rb_cOgreLog))
-		_singleton->setDefaultLog(wrap<Ogre::Log*>(log));
-	else
-		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreLog),rb_obj_classname(log));
+	_singleton->setDefaultLog(wrap<Ogre::Log*>(log));
 	return log;
 }
 
+}
+}
 
 void Init_OgreLog(VALUE rb_mOgre)
 {
 	#if 0
 	rb_mOgre = rb_define_module("Ogre");
+
+	rb_define_attr(rb_cOgreLog,"detail",1,1);
+	rb_define_attr(rb_cOgreLog,"timestamp",1,1);
+
 	#endif
+	using namespace RubyOgre::Log;
 	rb_cOgreLog = rb_define_class_under(rb_mOgre,"Log",rb_cObject);
 	rb_undef_alloc_func(rb_cOgreLog);
 	
-	rb_define_method(rb_cOgreLog,"name",RUBY_METHOD_FUNC(OgreLog_getName),0);
-	rb_define_method(rb_cOgreLog,"log",RUBY_METHOD_FUNC(OgreLog_log),-1);
-	rb_define_method(rb_cOgreLog,"<<",RUBY_METHOD_FUNC(OgreLog_logshift),1);
+	rb_define_method(rb_cOgreLog,"name",RUBY_METHOD_FUNC(_getName),0);
+	rb_define_method(rb_cOgreLog,"log",RUBY_METHOD_FUNC(_log),-1);
+	rb_define_method(rb_cOgreLog,"<<",RUBY_METHOD_FUNC(_logshift),1);
 	
-	rb_define_method(rb_cOgreLog,"detail",RUBY_METHOD_FUNC(OgreLog_getLogDetail),0);
-	rb_define_method(rb_cOgreLog,"detail=",RUBY_METHOD_FUNC(OgreLog_setLogDetail),1);
+	rb_define_attr_method(rb_cOgreLog,"detail",_getLogDetail,_setLogDetail);
+	rb_define_attr_method(rb_cOgreLog,"timestamp",_getTimeStampEnabled,_setTimeStampEnabled);
 
-	rb_define_method(rb_cOgreLog,"timestamp",RUBY_METHOD_FUNC(OgreLog_isTimeStampEnabled),0);
-	rb_define_method(rb_cOgreLog,"timestamp=",RUBY_METHOD_FUNC(OgreLog_setTimeStampEnabled),1);
+	rb_define_method(rb_cOgreLog,"addListener",RUBY_METHOD_FUNC(_addListener),1);
+	rb_define_method(rb_cOgreLog,"removeListener",RUBY_METHOD_FUNC(_removeListener),1);
 
-	rb_define_method(rb_cOgreLog,"addListener",RUBY_METHOD_FUNC(OgreLog_addListener),1);
-	rb_define_method(rb_cOgreLog,"removeListener",RUBY_METHOD_FUNC(OgreLog_removeListener),1);
-
-	rb_define_method(rb_cOgreLog,"destroy",RUBY_METHOD_FUNC(OgreLog_destroy),0);
+	rb_define_method(rb_cOgreLog,"destroy",RUBY_METHOD_FUNC(_destroy),0);
 	
-	rb_define_singleton_method(rb_cOgreLog,"createLog",RUBY_METHOD_FUNC(OgreLog_singleton_createLog),-1);
-	rb_define_singleton_method(rb_cOgreLog,"log",RUBY_METHOD_FUNC(OgreLog_singleton_log),-1);
-	rb_define_singleton_method(rb_cOgreLog,"<<",RUBY_METHOD_FUNC(OgreLog_singleton_logshift),1);
-	rb_define_singleton_method(rb_cOgreLog,"[]",RUBY_METHOD_FUNC(OgreLog_singleton_getLog),1);
-	rb_define_singleton_method(rb_cOgreLog,"defaultLog",RUBY_METHOD_FUNC(OgreLog_singleton_getdefaultLog),0);
-	rb_define_singleton_method(rb_cOgreLog,"defaultLog=",RUBY_METHOD_FUNC(OgreLog_singleton_setdefaultLog),1);
+	rb_define_singleton_method(rb_cOgreLog,"createLog",RUBY_METHOD_FUNC(_singleton_createLog),-1);
+	rb_define_singleton_method(rb_cOgreLog,"log",RUBY_METHOD_FUNC(_singleton_log),-1);
+	rb_define_singleton_method(rb_cOgreLog,"<<",RUBY_METHOD_FUNC(_singleton_logshift),1);
+	rb_define_singleton_method(rb_cOgreLog,"[]",RUBY_METHOD_FUNC(_singleton_getLog),1);
+	rb_define_singleton_method(rb_cOgreLog,"defaultLog",RUBY_METHOD_FUNC(_singleton_getdefaultLog),0);
+	rb_define_singleton_method(rb_cOgreLog,"defaultLog=",RUBY_METHOD_FUNC(_singleton_setdefaultLog),1);
+
+	registerenum<Ogre::LoggingLevel>("Ogre::LoggingLevel")
+		.add(Ogre::LL_LOW,"low")
+		.add(Ogre::LL_NORMAL,"normal")
+		.add(Ogre::LL_BOREME,"boreme");
+	registerenum<Ogre::LogMessageLevel>("Ogre::LogMessageLevel",Ogre::LML_NORMAL)
+		.add(Ogre::LML_TRIVIAL,"trivial")
+		.add(Ogre::LML_NORMAL,"normal")
+		.add(Ogre::LML_CRITICAL,"critical");
 }

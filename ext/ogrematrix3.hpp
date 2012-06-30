@@ -15,10 +15,12 @@ inline VALUE wrap< Ogre::Matrix3 >(Ogre::Matrix3 *matrix )
 template <>
 inline Ogre::Matrix3* wrap< Ogre::Matrix3* >(const VALUE &vmatrix)
 {
-	if ( ! rb_obj_is_kind_of(vmatrix, rb_cOgreMatrix3) )
-		return NULL;
-	Ogre::Matrix3 *matrix;
-  Data_Get_Struct( vmatrix, Ogre::Matrix3, matrix);
-	return matrix;
+	return unwrapPtr<Ogre::Matrix3>(vmatrix, rb_cOgreMatrix3);
+}
+
+template <>
+inline Ogre::Matrix3 wrap< Ogre::Matrix3 >(const VALUE &vmatrix)
+{
+	return *wrap< Ogre::Matrix3* >(vmatrix);
 }
 #endif /* __RubyOgreMatrix3_H__ */

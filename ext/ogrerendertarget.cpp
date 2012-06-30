@@ -1,13 +1,23 @@
 #include "ogrerendertarget.hpp"
 #include "ogreviewport.hpp"
 #include "ogrecamera.hpp"
+#include "ogreexception.hpp"
 #define _self wrap<Ogre::RenderTarget*>(self)
 VALUE rb_cOgreRenderTarget;
 
-macro_attr_with_func(RenderTarget,Priority,UINT2NUM,NUM2UINT)
+namespace RubyOgre {
+namespace RenderTarget {
+
+macro_attr(Priority,Ogre::uchar)
+macro_attr_bool(Active)
+macro_attr_bool(AutoUpdated)
+
+singlereturn(getName)
+singlereturn(isPrimary)
+
 /*
 */
-VALUE OgreRenderTarget_each(VALUE self)
+VALUE _each(VALUE self)
 {
 	RETURN_ENUMERATOR(self,0,NULL);
 	for (unsigned int i = 0; i < _self->getNumViewports(); ++i)
@@ -17,13 +27,7 @@ VALUE OgreRenderTarget_each(VALUE self)
 
 /*
 */
-VALUE OgreRenderTarget_getName(VALUE self)
-{
-	return wrap(_self->getName());
-}
-/*
-*/
-VALUE OgreRenderTarget_addViewport(int argc,VALUE *argv,VALUE self)
+VALUE _addViewport(int argc,VALUE *argv,VALUE self)
 {
 	VALUE cam,ZOrder,left,top,width,height;
 	rb_scan_args(argc, argv, "15",&cam,&ZOrder,&left,&top,&width,&height);
@@ -48,89 +52,73 @@ return wrap(_self->addViewport(wrap<Ogre::Camera*>(cam), NUM2INT(ZOrder), NUM2DB
  * ===Return value
  * String
 */
-VALUE OgreRenderTarget_inspect(VALUE self)
+VALUE _inspect(VALUE self)
 {
 	VALUE array[3];
 	array[0]=rb_str_new2("#<%s:%s>");
 	array[1]=rb_class_of(self);
-	array[2]=OgreRenderTarget_getName(self);
+	array[2]=_getName(self);
 	return rb_f_sprintf(3,array);
 }
 
-VALUE OgreRenderTarget_getActive(VALUE self)
-{
-	return _self->isActive() ? Qtrue : Qfalse;
-}
-VALUE OgreRenderTarget_setActive(VALUE self,VALUE val)
-{
-	_self->setActive(RTEST(val));
-	return val;
-}
-VALUE OgreRenderTarget_getAutoUpdated(VALUE self)
-{
-	return _self->isAutoUpdated() ? Qtrue : Qfalse;
-}
-VALUE OgreRenderTarget_setAutoUpdated(VALUE self,VALUE val)
-{
-	_self->setAutoUpdated(RTEST(val));
-	return val;
-}
+
 /*
 */
-VALUE OgreRenderTarget_getWidth(VALUE self)
+VALUE _getWidth(VALUE self)
 {
 	return UINT2NUM(_self->getWidth());
 }
 /*
 */
-VALUE OgreRenderTarget_getHeight(VALUE self)
+VALUE _getHeight(VALUE self)
 {
 	return UINT2NUM(_self->getHeight());
 }
 /*
 */
-VALUE OgreRenderTarget_getColorDepth(VALUE self)
+VALUE _getColorDepth(VALUE self)
 {
 	return UINT2NUM(_self->getColourDepth());
 }
 
 /*
 */
-VALUE OgreRenderTarget_getLastFPS(VALUE self)
+VALUE _getLastFPS(VALUE self)
 {
 	return DBL2NUM(_self->getLastFPS());
 }
 /*
 */
-VALUE OgreRenderTarget_getAverageFPS(VALUE self)
+VALUE _getAverageFPS(VALUE self)
 {
 return DBL2NUM(_self->getAverageFPS());
 }
 /*
 */
-VALUE OgreRenderTarget_getBestFPS(VALUE self)
+VALUE _getBestFPS(VALUE self)
 {
 return DBL2NUM(_self->getBestFPS());
 }
 /*
 */
-VALUE OgreRenderTarget_getWorstFPS(VALUE self)
+VALUE _getWorstFPS(VALUE self)
 {
 return DBL2NUM(_self->getWorstFPS());
 }
 /*
 */
-VALUE OgreRenderTarget_getBestFrameTime(VALUE self)
+VALUE _getBestFrameTime(VALUE self)
 {
 return DBL2NUM(_self->getBestFrameTime());
 }
 /*
 */
-VALUE OgreRenderTarget_getWorstFrameTime(VALUE self)
+VALUE _getWorstFrameTime(VALUE self)
 {
 return DBL2NUM(_self->getWorstFrameTime());
 }
 
+}}
 /*
 */
 void Init_OgreRenderTarget(VALUE rb_mOgre)
@@ -142,22 +130,28 @@ void Init_OgreRenderTarget(VALUE rb_mOgre)
 	rb_define_attr(rb_cOgreRenderTarget,"autoUpdated",1,1);
 	rb_define_attr(rb_cOgreRenderTarget,"priority",1,1);
 #endif
+	using namespace RubyOgre::RenderTarget;
+
 	rb_cOgreRenderTarget = rb_define_class_under(rb_mOgre,"RenderTarget",rb_cObject);
 	rb_undef_alloc_func(rb_cOgreRenderTarget);
 
-	rb_define_method(rb_cOgreRenderTarget,"name",RUBY_METHOD_FUNC(OgreRenderTarget_getName),0);
-	rb_define_method(rb_cOgreRenderTarget,"inspect",RUBY_METHOD_FUNC(OgreRenderTarget_inspect),0);
+	rb_define_method(rb_cOgreRenderTarget,"name",RUBY_METHOD_FUNC(_getName),0);
+	rb_define_method(rb_cOgreRenderTarget,"inspect",RUBY_METHOD_FUNC(_inspect),0);
 	
-	rb_define_method(rb_cOgreRenderTarget,"each",RUBY_METHOD_FUNC(OgreRenderTarget_each),0);
+	rb_define_method(rb_cOgreRenderTarget,"each",RUBY_METHOD_FUNC(_each),0);
 	rb_include_module(rb_cOgreRenderTarget,rb_mEnumerable);
 
-	rb_define_method(rb_cOgreRenderTarget,"addViewport",RUBY_METHOD_FUNC(OgreRenderTarget_addViewport),-1);
+	rb_define_method(rb_cOgreRenderTarget,"addViewport",RUBY_METHOD_FUNC(_addViewport),-1);
 
-	rb_define_method(rb_cOgreRenderTarget,"width",RUBY_METHOD_FUNC(OgreRenderTarget_getWidth),0);
-	rb_define_method(rb_cOgreRenderTarget,"height",RUBY_METHOD_FUNC(OgreRenderTarget_getHeight),0);
-	rb_define_method(rb_cOgreRenderTarget,"colordepth",RUBY_METHOD_FUNC(OgreRenderTarget_getColorDepth),0);
+	rb_define_method(rb_cOgreRenderTarget,"primary?",RUBY_METHOD_FUNC(_isPrimary),0);
 
-	rb_define_attr_method(rb_cOgreRenderTarget,"active",OgreRenderTarget_getActive,OgreRenderTarget_setActive);
-	rb_define_attr_method(rb_cOgreRenderTarget,"autoUpdated",OgreRenderTarget_getAutoUpdated,OgreRenderTarget_setAutoUpdated);
-	rb_define_attr_method(rb_cOgreRenderTarget,"priority",OgreRenderTarget_getPriority,OgreRenderTarget_setPriority);
+	rb_define_method(rb_cOgreRenderTarget,"width",RUBY_METHOD_FUNC(_getWidth),0);
+	rb_define_method(rb_cOgreRenderTarget,"height",RUBY_METHOD_FUNC(_getHeight),0);
+	rb_define_method(rb_cOgreRenderTarget,"colordepth",RUBY_METHOD_FUNC(_getColorDepth),0);
+
+	rb_define_attr_method(rb_cOgreRenderTarget,"active",_getActive,_setActive);
+	rb_define_attr_method(rb_cOgreRenderTarget,"autoUpdated",_getAutoUpdated,_setAutoUpdated);
+	rb_define_attr_method(rb_cOgreRenderTarget,"priority",_getPriority,_setPriority);
+
+	registerklass<Ogre::RenderTarget>(rb_cOgreRenderTarget);
 }

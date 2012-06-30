@@ -5,17 +5,156 @@
 #include <Ogre.h>
 #include <typeinfo>
 
+#include <string>
+#include <map>
+
+
+template< class T > struct remove_pointer                    {typedef T type;};
+template< class T > struct remove_pointer<T*>                {typedef T type;};
+template< class T > struct remove_pointer<T* const>          {typedef T type;};
+template< class T > struct remove_pointer<T* volatile>       {typedef T type;};
+template< class T > struct remove_pointer<T* const volatile> {typedef T type;};
+
+
+typedef std::map<std::string,VALUE > klassregistertype;
+
+struct enumtype
+{
+	std::string name;
+	typedef std::map<int,ID> value_type;
+	value_type values;
+
+	int defaults;
+
+	enumtype& add(int enumo,const char* sym)
+	{
+		values.insert(std::make_pair(enumo,rb_intern(sym)));
+		return *this;
+	}
+};
+//typedef std::map<int,ID > enumtype;
+typedef std::map<std::string,enumtype > enumregistertype;
+extern klassregistertype klassregister;
+extern enumregistertype enumregister;
+
+template <typename T>
+void registerklass(VALUE klass)
+{
+	klassregister.insert(std::make_pair(std::string(typeid(T).name()),klass));
+}
+
+template <typename T>
+enumtype& registerenum(const char* name,int def = 0)
+{
+	enumtype &type = enumregister[std::string(typeid(T).name())];
+	type.name = std::string(name);
+	type.defaults = def;
+	return type;
+}
+
+VALUE wrap(void *obj,VALUE klass);
+VALUE wrap(Ogre::MovableObject *obj,VALUE klass);
+VALUE wrap(Ogre::Renderable *obj,VALUE klass);
+VALUE wrap(Ogre::Node *obj,VALUE klass);
+VALUE wrap(Ogre::Frustum *obj,VALUE klass);
+VALUE wrap(Ogre::BillboardChain *obj,VALUE klass);
+VALUE wrap(Ogre::BillboardSet *obj,VALUE klass);
+
+
 template <typename T>
 VALUE wrap(T *arg){
-	rb_warn("unknown convertion from %s to VALUE. return nil instat.",typeid(T).name());
+	if(!arg)
+		return Qnil;
+	std::map<std::string,VALUE >::iterator it = klassregister.find(typeid(*arg).name());
+	if(it != klassregister.end())
+		return wrap(arg,it->second);
+	it = klassregister.find(typeid(T).name());
+	if(it != klassregister.end())
+		return wrap(arg,it->second);
+
+	rb_warn("unknown convertion from %s to VALUE. return nil instat.",typeid(*arg).name());
 	return Qnil;
 };
 
+
+template <typename T>
+T* unwrapPtr(const VALUE &obj,const VALUE &klass)
+{
+	if (rb_obj_is_kind_of(obj, klass)){
+		T *temp;
+		Data_Get_Struct( obj, T, temp);
+		return temp;
+	}else{
+		rb_raise(rb_eTypeError,
+				"Expected %s got %s!",
+				rb_class2name(klass),
+				rb_obj_classname(obj)
+		);
+		return NULL;
+	}
+
+}
+
+template <typename T>
+struct WrapReturn
+{
+	WrapReturn(T *val) : mValue(val) {};
+	WrapReturn(T &val) : mValue(&val) {};
+
+	T *mValue;
+
+	operator T*() {return mValue;};
+	operator T() {return *mValue;};
+
+};
+
+
 template <typename T>
 T wrap(const VALUE &arg){
+	if(NIL_P(arg))
+		return (T)NULL;
+	typedef typename remove_pointer<T>::type rtype;
+	klassregistertype::iterator it = klassregister.find(typeid(rtype).name());
+	if(it != klassregister.end())
+		return WrapReturn<rtype>(unwrapPtr<rtype>(arg,it->second));
+
 	rb_warn("unknown convertion from VALUE to %s. return %s() instat.",typeid(T).name(),typeid(T).name());
-	return T();
+	return (T)NULL;
 };
+
+template <typename T>
+VALUE wrapenum(const T &arg){
+	enumtype::value_type &enummap = enumregister[std::string(typeid(T).name())].values;
+	enumtype::value_type::iterator it = enummap.find((int)arg);
+	if(it != enummap.end())
+		return ID2SYM(it->second);
+	return Qnil;
+}
+
+template <typename T>
+T wrapenum(const VALUE &arg){
+	enumregistertype::iterator it = enumregister.find(typeid(T).name());
+	if(it != enumregister.end())
+	{
+		if(NIL_P(arg))
+			return (T)it->second.defaults;
+		else if(SYMBOL_P(arg))
+		{
+			ID id = SYM2ID(arg);
+			for(enumtype::value_type::iterator it2 = it->second.values.begin();
+					it2 != it->second.values.end();
+					++it2)
+			{
+				if(it2->second == id)
+					return (T)it2->first;
+			}
+			rb_raise(rb_eTypeError,"%s is not a %s-Enum.",rb_id2name(id),it->second.name.c_str());
+		}else
+			return (T)NUM2INT(arg);
+	}
+	return (T)0;
+}
+
 
 template <typename T,typename Y,typename P,typename A>
 VALUE wrap(Ogre::multimap<T,Y,P,A> arg){
@@ -30,20 +169,9 @@ VALUE wrap(Ogre::multimap<T,Y,P,A> arg){
 	return result;
 };
 
-//*template <>
-template <typename T>
-VALUE wrap(const Ogre::Singleton<T> &s){
-	return wrap<T*>(s);
-}
-
 template <typename T>
 VALUE wrap(const T &arg){
 	return wrap(new T(arg));
-};
-//*
-template <typename T>
-VALUE wrap(Ogre::SharedPtr<T> &ptr){
-	return wrap<T>(ptr.get());
 };
 //*/
 
@@ -105,8 +233,40 @@ inline VALUE wrap< Ogre::String >(const Ogre::String &st )
 template <>
 inline Ogre::String wrap< Ogre::String >(const VALUE &val )
 {
-	return rb_string_value_cstr((volatile VALUE*)(&val));
+	if(NIL_P(val))
+		return "";
+	else if (rb_obj_is_kind_of(val, rb_cString))
+		return rb_string_value_cstr((volatile VALUE*)(&val));
+	else
+		return wrap< Ogre::String >(rb_funcall(val,rb_intern("to_s"),0));
 }
+
+template <>
+VALUE wrap< bool >(const bool &st );
+
+template <>
+bool wrap< bool >(const VALUE &val );
+
+template <>
+VALUE wrap< double >(const double &st );
+
+template <>
+double wrap< double >(const VALUE &val );
+
+
+template <>
+VALUE wrap< float >(const float &st );
+
+template <>
+float wrap< float >(const VALUE &val );
+
+
+template <>
+VALUE wrap< unsigned short >(const unsigned short &st );
+
+template <>
+unsigned short wrap< unsigned short >(const VALUE &val );
+
 
 /*
 template <>
@@ -171,6 +331,10 @@ void wrap(Ogre::MapIterator<typename Ogre::map<T,V>::type > it)
 {
 	wrap_each2(it.begin(),it.end());
 }
+
+template <typename T>
+bool wrapable(const VALUE &obj);
+
 /*
 */
 VALUE Ogre_dummy0(VALUE self);
@@ -179,60 +343,73 @@ VALUE Ogre_dummy2(VALUE self,VALUE obj1,VALUE obj2);
 VALUE Ogre_dummy3(VALUE self,VALUE obj1,VALUE obj2,VALUE obj3);
 VALUE Ogre_dummy4(VALUE self,VALUE obj1,VALUE obj2,VALUE obj3,VALUE obj4);
 
-extern VALUE rb_cOgreRadian;
-extern VALUE rb_cOgreDegree;
-Ogre::Degree* rb_to_degree(const VALUE &vdegree);
-Ogre::Radian* rb_to_radian(const VALUE &vradian);
 
+void rb_define_attr_method(VALUE klass,std::string name,VALUE(get)(VALUE),VALUE(set)(VALUE,VALUE));
 
-inline void rb_define_attr_method(VALUE klass,std::string name,VALUE(get)(VALUE),VALUE(set)(VALUE,VALUE))
-{
-	rb_define_method(klass,name.c_str(),RUBY_METHOD_FUNC(get),0);
-	rb_define_method(klass,(name + "=").c_str(),RUBY_METHOD_FUNC(set),1);
-}
-
-#define macro_attr(klass,attr,type) \
-VALUE Ogre##klass##_get##attr(VALUE self)\
-{return wrap(_self->get##attr());}\
+#define macro_attr_func(attr,funcget,funcset,wrapget,wrapset) \
+VALUE _get##attr(VALUE self)\
+{ \
+	try { return wrapget(_self->funcget); }catch(Ogre::Exception& e){\
+		rb_raise(wrap(e));\
+	}\
+	return Qnil;\
+}\
 \
-VALUE Ogre##klass##_set##attr(VALUE self,VALUE other)\
+VALUE _set##attr(VALUE self,VALUE other)\
 {\
-	_self->set##attr(wrap<type>(other));\
+	try {	_self->funcset(wrapset(other));	}catch(Ogre::Exception& e){\
+		rb_raise(wrap(e));\
+	}\
 	return other;\
 }
 
-#define macro_attr_with_func(klass,attr,getfunc,setfunc) \
-VALUE Ogre##klass##_get##attr(VALUE self)\
-{return getfunc(_self->get##attr() );}\
-\
-VALUE Ogre##klass##_set##attr(VALUE self,VALUE other)\
-{\
-	_self->set##attr( setfunc(other) );\
-	return other;\
-}
+
+
+
+#define macro_attr(attr,type) macro_attr_func(attr,get##attr(),set##attr,wrap,wrap<type>)
+#define macro_attr_enum(attr,type) macro_attr_func(attr,get##attr(),set##attr,wrapenum<type>,wrapenum<type>)
+#define macro_attr_with_func(attr,getf,setf) macro_attr_func(attr,get##attr(),set##attr,getf,setf)
 
 //*/
-#define macro_attr_prop(klass,attr,type) \
-VALUE Ogre##klass##_get_##attr(VALUE self)\
-{return wrap(_self->attr);}\
-\
-VALUE Ogre##klass##_set_##attr(VALUE self,VALUE other)\
-{\
-	_self->attr = wrap<type>(other);\
-	return other;\
-}
+#define macro_attr_prop(attr,type) macro_attr_func(_##attr,attr,attr = ,wrap,wrap<type>)
+#define macro_attr_prop_enum(attr,type) macro_attr_func(_##attr,attr,attr = ,wrapenum<type>,wrapenum<type>)
+#define macro_attr_prop_with_func(attr,getf,setf) macro_attr_func(_##attr,attr,attr = ,getf,setf)
 
-#define macro_attr_prop_with_func(klass,attr,getfunc,setfunc) \
-VALUE Ogre##klass##_get_##attr(VALUE self)\
-{return getfunc(_self->attr);}\
-\
-VALUE Ogre##klass##_set_##attr(VALUE self,VALUE other)\
-{\
-	_self->attr = setfunc(other);\
-	return other;\
-}
+/*
+//#define macro_attr_prop(attr,type) \
+//VALUE _get_##attr(VALUE self)\
+//{return wrap(_self->attr);}\
+//\
+//VALUE _set_##attr(VALUE self,VALUE other)\
+//{\
+//	_self->attr = wrap<type>(other);\
+//	return other;\
+//}
+//*/
 
-#define RBOOL(val) (val) ? Qtrue : Qfalse
+#define macro_attr_bool(attr) macro_attr_func(attr,is##attr(),set##attr,wrap,RTEST)
+
+/*
+//#define macro_attr_bool(attr) \
+//VALUE _get##attr(VALUE self)\
+//{return wrap(_self->is##attr());}\
+//\
+//VALUE _set##attr(VALUE self,VALUE other)\
+//{\
+//	_self->set##attr(RTEST(other));\
+//	return other;\
+//}
+//*/
+
+#define singlefunc(func) \
+VALUE _##func(VALUE self)\
+{_self->func();return self;}
+
+
+
+#define singlereturn(func) \
+VALUE _##func(VALUE self)\
+{return wrap(_self->func());}
 
 #endif /* __RubyOgreMain_H__ */
 

@@ -7,18 +7,9 @@ extern VALUE rb_cOgreMesh;
 
 
 template <>
-inline VALUE wrap< Ogre::Mesh >(Ogre::Mesh *mesh )
-{
-	return Data_Wrap_Struct(rb_cOgreMesh, NULL, NULL, mesh);
-}
+VALUE wrap< Ogre::MeshPtr >(Ogre::MeshPtr *mesh );
 
 template <>
-inline Ogre::Mesh* wrap< Ogre::Mesh* >(const VALUE &vmesh)
-{
-	if ( ! rb_obj_is_kind_of(vmesh, rb_cOgreMesh) )
-		return NULL;
-	Ogre::Mesh *mesh;
-  Data_Get_Struct( vmesh, Ogre::Mesh, mesh);
-	return mesh;
-}
+Ogre::Mesh* wrap< Ogre::Mesh* >(const VALUE &vmesh);
+
 #endif /* __RubyOgreMesh_H__ */

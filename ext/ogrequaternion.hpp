@@ -7,18 +7,12 @@ extern VALUE rb_cOgreQuaternion;
 
 
 template <>
-inline VALUE wrap< Ogre::Quaternion >(Ogre::Quaternion *matrix )
-{
-	return Data_Wrap_Struct(rb_cOgreQuaternion, NULL, free, matrix);
-}
+VALUE wrap< Ogre::Quaternion >(Ogre::Quaternion *quaternion );
 
 template <>
-inline Ogre::Quaternion* wrap< Ogre::Quaternion* >(const VALUE &vmatrix)
-{
-	if ( ! rb_obj_is_kind_of(vmatrix, rb_cOgreQuaternion) )
-		return NULL;
-	Ogre::Quaternion *matrix;
-  Data_Get_Struct( vmatrix, Ogre::Quaternion, matrix);
-	return matrix;
-}
+Ogre::Quaternion* wrap< Ogre::Quaternion* >(const VALUE &vquaternion);
+
+template <>
+Ogre::Quaternion wrap< Ogre::Quaternion >(const VALUE &vquaternion);
+
 #endif /* __RubyOgreQuaternion_H__ */

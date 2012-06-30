@@ -6,59 +6,62 @@
 #include "ogremovableobject.hpp"
 #define _self wrap<Ogre::Light*>(self)
 VALUE rb_cOgreLight;
+namespace RubyOgre
+{
+namespace Light
+{
+macro_attr(DiffuseColour,Ogre::ColourValue)
+macro_attr(SpecularColour,Ogre::ColourValue)
 
-macro_attr(Light,DiffuseColour,Ogre::ColourValue)
-macro_attr(Light,SpecularColour,Ogre::ColourValue)
+macro_attr(Position,Ogre::Vector3)
+macro_attr(Direction,Ogre::Vector3)
 
-macro_attr(Light,Position,Ogre::Vector3)
-macro_attr(Light,Direction,Ogre::Vector3)
+macro_attr(SpotlightInnerAngle,Ogre::Radian)
+macro_attr(SpotlightOuterAngle,Ogre::Radian)
 
-macro_attr(Light,SpotlightInnerAngle,Ogre::Radian)
-macro_attr(Light,SpotlightOuterAngle,Ogre::Radian)
-
-macro_attr_with_func(Light,SpotlightFalloff,INT2NUM,NUM2INT)
-macro_attr_with_func(Light,PowerScale,INT2NUM,NUM2INT)
+macro_attr(SpotlightFalloff,Ogre::Real)
+macro_attr(PowerScale,Ogre::Real)
 
 
-macro_attr_with_func(Light,ShadowFarDistance,DBL2NUM,NUM2DBL)
+macro_attr(ShadowFarDistance,double)
 
-macro_attr_with_func(Light,ShadowNearClipDistance,DBL2NUM,NUM2DBL)
-macro_attr_with_func(Light,ShadowFarClipDistance,DBL2NUM,NUM2DBL)
+macro_attr(ShadowNearClipDistance,double)
+macro_attr(ShadowFarClipDistance,double)
 
-VALUE OgreLight_getAttenuationRange(VALUE self)
+VALUE _getAttenuationRange(VALUE self)
 {
 	return DBL2NUM(_self->getAttenuationRange());
 }
-VALUE OgreLight_getAttenuationConstant(VALUE self)
+VALUE _getAttenuationConstant(VALUE self)
 {
 	return DBL2NUM(_self->getAttenuationConstant());
 }
-VALUE OgreLight_getAttenuationLinear(VALUE self)
+VALUE _getAttenuationLinear(VALUE self)
 {
 	return DBL2NUM(_self->getAttenuationLinear());
 }
-VALUE OgreLight_getAttenuationQuadric(VALUE self)
+VALUE _getAttenuationQuadric(VALUE self)
 {
 	return DBL2NUM(_self->getAttenuationQuadric());
 }
 
-VALUE OgreLight_setAttenuationRange(VALUE self,VALUE val)
+VALUE _setAttenuationRange(VALUE self,VALUE val)
 {
 	_self->setAttenuation(NUM2DBL(val),_self->getAttenuationConstant(),_self->getAttenuationLinear(),_self->getAttenuationQuadric());
 	return val;
 }
 
-VALUE OgreLight_setAttenuationConstant(VALUE self,VALUE val)
+VALUE _setAttenuationConstant(VALUE self,VALUE val)
 {
 	_self->setAttenuation(_self->getAttenuationRange(),NUM2DBL(val),_self->getAttenuationLinear(),_self->getAttenuationQuadric());
 	return val;
 }
-VALUE OgreLight_setAttenuationLinear(VALUE self,VALUE val)
+VALUE _setAttenuationLinear(VALUE self,VALUE val)
 {
 	_self->setAttenuation(_self->getAttenuationRange(),_self->getAttenuationConstant(),NUM2DBL(val),_self->getAttenuationQuadric());
 	return val;
 }
-VALUE OgreLight_setAttenuationQuadric(VALUE self,VALUE val)
+VALUE _setAttenuationQuadric(VALUE self,VALUE val)
 {
 	_self->setAttenuation(_self->getAttenuationRange(),_self->getAttenuationConstant(),_self->getAttenuationLinear(),NUM2DBL(val));
 	return val;
@@ -66,17 +69,20 @@ VALUE OgreLight_setAttenuationQuadric(VALUE self,VALUE val)
 
 /*
 */
-VALUE OgreLight_getCustomParameter(VALUE self,VALUE index)
+VALUE _getCustomParameter(VALUE self,VALUE index)
 {
 	return wrap(_self->getCustomParameter(NUM2UINT(index)));
 }
 /*
 */
-VALUE OgreLight_setCustomParameter(VALUE self,VALUE index,VALUE value)
+VALUE _setCustomParameter(VALUE self,VALUE index,VALUE value)
 {
 	_self->setCustomParameter(NUM2UINT(index),wrap<Ogre::Vector4>(value));
 	return self;
 }
+
+}}
+
 /*
  * Document-class: Ogre::Light
  * 
@@ -120,32 +126,35 @@ void Init_OgreLight(VALUE rb_mOgre)
 
 
 #endif
+	using namespace RubyOgre::Light;
+
 	rb_cOgreLight = rb_define_class_under(rb_mOgre,"Light",rb_cObject);
 	rb_undef_alloc_func(rb_cOgreLight);
 	rb_include_module(rb_cOgreLight,rb_mOgreMovableObject);
 	
-	rb_define_attr_method(rb_cOgreLight,"diffuseColor",OgreLight_getDiffuseColour,OgreLight_setDiffuseColour);
-	rb_define_attr_method(rb_cOgreLight,"specularColor",OgreLight_getSpecularColour,OgreLight_setSpecularColour);
-	rb_define_attr_method(rb_cOgreLight,"position",OgreLight_getPosition,OgreLight_setPosition);
-	rb_define_attr_method(rb_cOgreLight,"direction",OgreLight_getDirection,OgreLight_setDirection);
+	rb_define_attr_method(rb_cOgreLight,"diffuseColor",_getDiffuseColour,_setDiffuseColour);
+	rb_define_attr_method(rb_cOgreLight,"specularColor",_getSpecularColour,_setSpecularColour);
+	rb_define_attr_method(rb_cOgreLight,"position",_getPosition,_setPosition);
+	rb_define_attr_method(rb_cOgreLight,"direction",_getDirection,_setDirection);
 
-	rb_define_attr_method(rb_cOgreLight,"spotlightInnerAngle",OgreLight_getSpotlightInnerAngle,OgreLight_setSpotlightInnerAngle);
-	rb_define_attr_method(rb_cOgreLight,"spotlightOuterAngle",OgreLight_getSpotlightOuterAngle,OgreLight_setSpotlightOuterAngle);
+	rb_define_attr_method(rb_cOgreLight,"spotlightInnerAngle",_getSpotlightInnerAngle,_setSpotlightInnerAngle);
+	rb_define_attr_method(rb_cOgreLight,"spotlightOuterAngle",_getSpotlightOuterAngle,_setSpotlightOuterAngle);
 	
-	rb_define_attr_method(rb_cOgreLight,"spotlightFalloff",OgreLight_getSpotlightFalloff,OgreLight_setSpotlightFalloff);
+	rb_define_attr_method(rb_cOgreLight,"spotlightFalloff",_getSpotlightFalloff,_setSpotlightFalloff);
 	
-	rb_define_attr_method(rb_cOgreLight,"powerScale",OgreLight_getPowerScale,OgreLight_setPowerScale);
+	rb_define_attr_method(rb_cOgreLight,"powerScale",_getPowerScale,_setPowerScale);
 	
-	rb_define_method(rb_cOgreLight,"getCustomParameter",RUBY_METHOD_FUNC(OgreLight_getCustomParameter),1);
-	rb_define_method(rb_cOgreLight,"setCustomParameter",RUBY_METHOD_FUNC(OgreLight_setCustomParameter),2);
+	rb_define_method(rb_cOgreLight,"getCustomParameter",RUBY_METHOD_FUNC(_getCustomParameter),1);
+	rb_define_method(rb_cOgreLight,"setCustomParameter",RUBY_METHOD_FUNC(_setCustomParameter),2);
 	
-	rb_define_attr_method(rb_cOgreLight,"attenuationRange",OgreLight_getAttenuationRange,OgreLight_setAttenuationRange);
-	rb_define_attr_method(rb_cOgreLight,"attenuationConstant",OgreLight_getAttenuationConstant,OgreLight_setAttenuationConstant);
-	rb_define_attr_method(rb_cOgreLight,"attenuationLinear",OgreLight_getAttenuationLinear,OgreLight_setAttenuationLinear);
-	rb_define_attr_method(rb_cOgreLight,"attenuationQuadric",OgreLight_getAttenuationQuadric,OgreLight_setAttenuationQuadric);
+	rb_define_attr_method(rb_cOgreLight,"attenuationRange",_getAttenuationRange,_setAttenuationRange);
+	rb_define_attr_method(rb_cOgreLight,"attenuationConstant",_getAttenuationConstant,_setAttenuationConstant);
+	rb_define_attr_method(rb_cOgreLight,"attenuationLinear",_getAttenuationLinear,_setAttenuationLinear);
+	rb_define_attr_method(rb_cOgreLight,"attenuationQuadric",_getAttenuationQuadric,_setAttenuationQuadric);
 
-	rb_define_attr_method(rb_cOgreLight,"shadowFarDistance",OgreLight_getShadowFarDistance,OgreLight_setShadowFarDistance);
-	rb_define_attr_method(rb_cOgreLight,"shadowFarClipDistance",OgreLight_getShadowFarClipDistance,OgreLight_setShadowFarClipDistance);
-	rb_define_attr_method(rb_cOgreLight,"shadowNearClipDistance",OgreLight_getShadowNearClipDistance,OgreLight_setShadowNearClipDistance);
+	rb_define_attr_method(rb_cOgreLight,"shadowFarDistance",_getShadowFarDistance,_setShadowFarDistance);
+	rb_define_attr_method(rb_cOgreLight,"shadowFarClipDistance",_getShadowFarClipDistance,_setShadowFarClipDistance);
+	rb_define_attr_method(rb_cOgreLight,"shadowNearClipDistance",_getShadowNearClipDistance,_setShadowNearClipDistance);
 
+	registerklass<Ogre::Light>(rb_cOgreLight);
 }

@@ -1,27 +1,35 @@
 #include "ogreresource.hpp"
 #include "ogrefont.hpp"
+#include "ogrematerial.hpp"
+#include "ogreexception.hpp"
 #define _self wrap<Ogre::Font*>(self)
 VALUE rb_cOgreFont;
 
-VALUE OgreFont_getSource(VALUE self)
+template <>
+VALUE wrap< Ogre::FontPtr >(Ogre::FontPtr *font )
 {
-	return wrap(_self->getSource());
-}
-VALUE OgreFont_setSource(VALUE self,VALUE val)
-{
-	_self->setSource(rb_string_value_cstr(&val));
-	return val;
+	return Data_Wrap_Struct(rb_cOgreFont, NULL, free, font);
 }
 
-
-
-/*
-*/
-VALUE OgreFont_getMaterial(VALUE self)
+template <>
+Ogre::Font* wrap< Ogre::Font* >(const VALUE &vfont)
 {
-	return wrap(_self->getMaterial().get());
+	return unwrapPtr<Ogre::FontPtr>(vfont, rb_cOgreFont)->get();
 }
 
+
+namespace RubyOgre
+{
+namespace Font
+{
+
+macro_attr(Source,Ogre::String)
+macro_attr(AntialiasColour,bool)
+
+singlereturn(getMaterial)
+
+}
+}
 /*
 setSource (const String &source)
  	Sets the source of the font.
@@ -48,8 +56,9 @@ void Init_OgreFont(VALUE rb_mOgre)
 	rb_define_attr(rb_cOgreFont,"trueTypeSize",1,1);
 	rb_define_attr(rb_cOgreFont,"antialiasColour",1,1);
 #endif
+	using namespace RubyOgre::Font;
 	rb_cOgreFont = rb_define_class_under(rb_mOgre,"Font",rb_cOgreResource);
-	rb_define_attr_method(rb_cOgreFont,"source",OgreFont_getSource,OgreFont_setSource);
+	rb_define_attr_method(rb_cOgreFont,"source",_getSource,_setSource);
 	
-	rb_define_method(rb_cOgreFont,"material",RUBY_METHOD_FUNC(OgreFont_getMaterial),0);
+	rb_define_method(rb_cOgreFont,"material",RUBY_METHOD_FUNC(_getMaterial),0);
 }

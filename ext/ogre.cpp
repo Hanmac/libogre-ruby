@@ -25,6 +25,8 @@
 #include "ogremovableobjectlistener.hpp"
 #include "ogrelight.hpp"
 #include "ogrenode.hpp"
+#include "ogrescenenode.hpp"
+#include "ogrebone.hpp"
 #include "ogreray.hpp"
 #include "ogrelog.hpp"
 #include "ogreloglistener.hpp"
@@ -56,7 +58,17 @@
 #include "ogreparticleemitter.hpp"
 
 #include "ogrestringinterface.hpp"
+
+#include "ogresimplespline.hpp"
+#include "ogrerotationalspline.hpp"
+
+#include <OgreAny.h>
+
+klassregistertype klassregister;
+enumregistertype enumregister;
+
 VALUE rb_mOgre;
+VALUE globalholder;
 
 VALUE Ogre_dummy0(VALUE self)
 {
@@ -77,6 +89,118 @@ VALUE Ogre_dummy3(VALUE self,VALUE obj1,VALUE obj2,VALUE obj3)
 VALUE Ogre_dummy4(VALUE self,VALUE obj1,VALUE obj2,VALUE obj3,VALUE obj4)
 {
 	return Qnil;
+}
+
+
+template <>
+VALUE wrap< bool >(const bool &st )
+{
+	return st ? Qtrue : Qfalse;
+}
+
+template <>
+bool wrap< bool >(const VALUE &val )
+{
+	return RTEST(val);
+}
+
+template <>
+VALUE wrap< double >(const double &st )
+{
+	return DBL2NUM(st);
+}
+
+template <>
+double wrap< double >(const VALUE &val )
+{
+	return NUM2DBL(val);
+}
+
+
+template <>
+VALUE wrap< float >(const float &st )
+{
+	return DBL2NUM(st);
+}
+
+template <>
+float wrap< float >(const VALUE &val )
+{
+	return NUM2DBL(val);
+}
+
+
+template <>
+VALUE wrap< unsigned short >(const unsigned short &st )
+{
+	return UINT2NUM(st);
+}
+
+template <>
+unsigned short wrap< unsigned short >(const VALUE &val )
+{
+	return NUM2UINT(val);
+}
+
+class RubyAny
+{
+public:
+
+	RubyAny(VALUE obj)
+	: value(obj)
+	{
+		rb_hash_aset(globalholder,INT2NUM(obj),obj);
+
+	}
+
+	~RubyAny() {
+		rb_hash_delete(globalholder,INT2NUM(value));
+	}
+	VALUE get() const {return value;};
+
+	inline friend std::ostream& operator << ( std::ostream& o, const Ogre::SharedPtr<RubyAny>& v )
+	{
+		o << wrap<Ogre::String>(v->get());
+		return o;
+	}
+
+private:
+	VALUE value;
+};
+
+VALUE wrap(void *obj,VALUE klass)
+{
+	return Data_Wrap_Struct(klass, NULL, NULL, obj);
+}
+
+#define macro_wrap2(T,V) \
+VALUE wrap(T *obj,VALUE klass)\
+{\
+	VALUE result;\
+	Ogre::UserObjectBindings &bind = static_cast<V*>(obj)->getUserObjectBindings(); \
+	if(bind.getUserAny().isEmpty())\
+	{\
+		result = wrap((void*)obj,klass);\
+		bind.setUserAny(Ogre::Any(Ogre::SharedPtr<RubyAny>(new RubyAny(result))));\
+	}else\
+		result = Ogre::any_cast<Ogre::SharedPtr<RubyAny> >(bind.getUserAny())->get();\
+	return result;\
+}
+
+
+#define macro_wrap(T) macro_wrap2(T,T)
+
+macro_wrap(Ogre::Node)
+macro_wrap(Ogre::MovableObject)
+macro_wrap(Ogre::Renderable)
+macro_wrap2(Ogre::Frustum,Ogre::MovableObject)
+macro_wrap2(Ogre::BillboardChain,Ogre::MovableObject)
+macro_wrap2(Ogre::BillboardSet,Ogre::MovableObject)
+
+void rb_define_attr_method(VALUE klass,std::string name,VALUE(get)(VALUE),VALUE(set)(VALUE,VALUE))
+{
+	rb_define_method(klass,name.c_str(),RUBY_METHOD_FUNC(get),0);
+	rb_define_method(klass,(name + "=").c_str(),RUBY_METHOD_FUNC(set),1);
 }
 
 extern "C" void Init_ogre(void)
@@ -163,6 +287,8 @@ extern "C" void Init_ogre(void)
 	Init_OgreParticle(rb_mOgre);
 	Init_OgreParticleEmitter(rb_mOgre);
 	
+	Init_OgreSimpleSpline(rb_mOgre);
+	Init_OgreRotationalSpline(rb_mOgre);
 	
 	VALUE array[4];
 	array[0]=rb_str_new2("%d.%d.%d");
@@ -171,4 +297,25 @@ extern "C" void Init_ogre(void)
 	array[3]=INT2NUM(OGRE_VERSION_PATCH);
 	rb_const_set(rb_mOgre,rb_intern("Version"),rb_f_sprintf(4,array));
 	rb_const_set(rb_mOgre,rb_intern("VersionName"),rb_str_new2(OGRE_VERSION_NAME));
+
+	globalholder = rb_hash_new();
+	rb_global_variable(&globalholder);
+//
+//	rb_warn("%lu klasses",klassregister.size());
+//	for(klassregistertype::iterator it = klassregister.begin();
+//			it != klassregister.end();
+//			++it)
+//		rb_warn("%s => %s",it->first.c_str(),rb_class2name(it->second));
+//	rb_warn("%lu enums",enumregister.size());
+//	for(enumregistertype::iterator it = enumregister.begin();
+//				it != enumregister.end();
+//				++it)
+//	{
+//		rb_warn("%s:",it->first.c_str());
+//		for(enumregistertype::mapped_type::iterator it2 = it->second.begin();
+//						it2 != it->second.end();
+//						++it2)
+//			rb_warn("%d => %s",it2->first,rb_id2name(it2->second));
+//	}
+//
 }

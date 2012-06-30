@@ -13,24 +13,23 @@ VALUE OgreConfigFile_alloc(VALUE self)
 VALUE OgreConfigFile_initialize(int argc,VALUE* argv,VALUE self)
 {
 	VALUE file,hash,temp;
-	bool trimWhitespace;
+	bool trimWhitespace = true;
 	rb_scan_args(argc, argv, "11",&file,&hash);
-	Ogre::String separators;
-	if(!rb_obj_is_kind_of(hash,rb_cHash) || NIL_P(temp=rb_hash_aref(hash,ID2SYM(rb_intern("trimWhitespace")))))
-		trimWhitespace = true;
-	else
-		trimWhitespace = RTEST(temp);
-	if(!rb_obj_is_kind_of(hash,rb_cHash) || NIL_P(temp=rb_hash_aref(hash,ID2SYM(rb_intern("separators")))))
-		separators = "\t:=";
-	else
-		separators = rb_string_value_cstr(&temp);
+	Ogre::String separators("\t:=");
+	if(rb_obj_is_kind_of(hash,rb_cHash))
+	{
+		if(!NIL_P(temp=rb_hash_aref(hash,ID2SYM(rb_intern("trimWhitespace")))))
+			trimWhitespace = RTEST(temp);
+		if(!NIL_P(temp=rb_hash_aref(hash,ID2SYM(rb_intern("separators")))))
+			separators = wrap<Ogre::String>(temp);
+	}
 	try{
 		if(rb_obj_is_kind_of(file,rb_cOgreDataStream))
 			_self->load(wrap<Ogre::DataStreamPtr>(file),separators,trimWhitespace);
 		else if(!rb_obj_is_kind_of(hash,rb_cHash) || NIL_P(temp=rb_hash_aref(hash,ID2SYM(rb_intern("group_name")))))
-			_self->load(rb_string_value_cstr(&file),separators,trimWhitespace);
+			_self->load(wrap<Ogre::String>(file),separators,trimWhitespace);
 		else
-			_self->load(rb_string_value_cstr(&file),rb_string_value_cstr(&temp),separators,trimWhitespace);
+			_self->load(wrap<Ogre::String>(file),wrap<Ogre::String>(temp),separators,trimWhitespace);
 	}catch(Ogre::Exception& e){
 		rb_raise(wrap(e));
 	}
@@ -50,13 +49,13 @@ VALUE OgreConfigFile_get(int argc,VALUE* argv,VALUE self)
 	if(NIL_P(section))
 		temp = Ogre::StringUtil::BLANK;
 	else
-		temp = rb_string_value_cstr(&section);
+		temp = wrap<Ogre::String>(section);
 	try{
-		return wrap(_self->getMultiSetting(rb_string_value_cstr(&key),temp));
+		return wrap(_self->getMultiSetting(wrap<Ogre::String>(key),temp));
 	}catch(Ogre::Exception& e){
 		rb_raise(wrap(e));
-		return Qnil;
 	}
+	return Qnil;
 }
 /*
  * call-seq:
@@ -96,4 +95,6 @@ void Init_OgreConfigFile(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreConfigFile,"each",RUBY_METHOD_FUNC(OgreConfigFile_each),0);
 
 	rb_include_module(rb_cOgreConfigFile,rb_mEnumerable);
+
+	registerklass<Ogre::ConfigFile>(rb_cOgreConfigFile);
 }

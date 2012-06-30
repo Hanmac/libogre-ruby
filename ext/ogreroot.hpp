@@ -7,15 +7,7 @@ void Init_OgreRoot(VALUE rb_mOgre);
 extern Ogre::Root *root;
 
 template <>
-inline VALUE wrap< Ogre::Plugin >(Ogre::Plugin *man )
-{
-	return wrap(man->getName());
-}
+VALUE wrap< Ogre::Plugin >(Ogre::Plugin *man );
 template <>
-inline Ogre::Root* wrap< Ogre::Root* >(const VALUE &vvector)
-{
-	if(root==NULL)
-		root = new Ogre::Root();
-	return Ogre::Root::getSingletonPtr();
-}
+Ogre::Root* wrap< Ogre::Root* >(const VALUE &vvector);
 #endif /* __RubyOgreVector3_H__ */

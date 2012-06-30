@@ -9,18 +9,9 @@ extern VALUE rb_cOgreFont;
 
 
 template <>
-inline VALUE wrap< Ogre::Font >(Ogre::Font *font )
-{
-	return Data_Wrap_Struct(rb_cOgreFont, NULL, NULL, font);
-}
+VALUE wrap< Ogre::FontPtr >(Ogre::FontPtr *font );
 
 template <>
-inline Ogre::Font* wrap< Ogre::Font* >(const VALUE &vfont)
-{
-	if ( ! rb_obj_is_kind_of(vfont, rb_cOgreFont) )
-		return NULL;
-	Ogre::Font *font;
-  Data_Get_Struct( vfont, Ogre::Font, font);
-	return font;
-}
+Ogre::Font* wrap< Ogre::Font* >(const VALUE &vfont);
+
 #endif /* __RubyOgreFont_H__ */

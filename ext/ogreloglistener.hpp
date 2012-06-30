@@ -8,15 +8,16 @@ extern VALUE rb_cOgreLogListener;
 class RubyLogListener : public Ogre::LogListener {
 	public:
 	VALUE mRuby;
-	void messageLogged(const Ogre::String &message, Ogre::LogMessageLevel lml, bool maskDebug, const Ogre::String &logName);
+	RubyLogListener(VALUE val);
+	void messageLogged(const Ogre::String &message, Ogre::LogMessageLevel lml, bool maskDebug, const Ogre::String &logName,bool &skipThisMessage);
 };
+
+extern std::map<VALUE,RubyLogListener*> loglistenerholder;
 
 //*
 template <>
 inline VALUE wrap< RubyLogListener >(RubyLogListener *obj )
 {
-	if(obj->mRuby==Qnil)
-		obj->mRuby = Data_Wrap_Struct(rb_cOgreLogListener, NULL, NULL, obj);
 	return obj->mRuby;
 }
 template <>
@@ -26,12 +27,11 @@ inline VALUE wrap< Ogre::LogListener >(Ogre::LogListener *obj )
 }
 //*/
 template <>
-inline Ogre::LogListener* wrap< Ogre::LogListener* >(const VALUE &vmovable)
+inline Ogre::LogListener* wrap< Ogre::LogListener* >(const VALUE &vlog)
 {
-	if ( ! rb_obj_is_kind_of(vmovable, rb_cOgreLogListener) )
-		return NULL;
-	Ogre::LogListener *movable;
-  Data_Get_Struct( vmovable, Ogre::LogListener, movable);
-	return movable;
+	std::map<VALUE,RubyLogListener*>::iterator it = loglistenerholder.find(vlog);
+	if(it != loglistenerholder.end())
+		return it->second;
+	return new RubyLogListener(vlog);
 }
 #endif /* __RubyOgreLog_H__ */

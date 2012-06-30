@@ -1,28 +1,35 @@
 #include "ogrevector2.hpp"
+#include "ogreexception.hpp"
+
 #define _self wrap<Ogre::Vector2*>(self)
 VALUE rb_cOgreVector2;
 
-VALUE OgreVector2_alloc(VALUE self)
+namespace RubyOgre
+{
+namespace Vector2
+{
+
+VALUE _alloc(VALUE self)
 {
 	return wrap(new Ogre::Vector2);
 }
-macro_attr_prop_with_func(Vector2,x,DBL2NUM,NUM2DBL)
-macro_attr_prop_with_func(Vector2,y,DBL2NUM,NUM2DBL)
+macro_attr_prop(x,double)
+macro_attr_prop(y,double)
 /*
 */
-VALUE OgreVector2_initialize(VALUE self,VALUE x,VALUE y)
+VALUE _initialize(VALUE self,VALUE x,VALUE y)
 {
-	OgreVector2_set_x(self,x);
-	OgreVector2_set_y(self,y);
+	_set_x(self,x);
+	_set_y(self,y);
 	return self;
 }
 /*
 */
-VALUE OgreVector2_initialize_copy(VALUE self, VALUE other)
+VALUE _initialize_copy(VALUE self, VALUE other)
 {
 	VALUE result = rb_call_super(1,&other);
-	OgreVector2_set_x(self,OgreVector2_get_x(other));
-	OgreVector2_set_y(self,OgreVector2_get_y(other));
+	_set_x(self,_get_x(other));
+	_set_y(self,_get_y(other));
 	return result;
 }
 /*
@@ -33,24 +40,24 @@ VALUE OgreVector2_initialize_copy(VALUE self, VALUE other)
  * ===Return value
  * String
 */
-VALUE OgreVector2_inspect(VALUE self)
+VALUE _inspect(VALUE self)
 {
 	VALUE array[4];
 	array[0]=rb_str_new2("#<%s:(%f, %f)>");
 	array[1]=rb_class_of(self);
-	array[2]=OgreVector2_get_x(self);
-	array[3]=OgreVector2_get_y(self);
+	array[2]=_get_x(self);
+	array[3]=_get_y(self);
 	return rb_f_sprintf(4,array);
 }
 /*
 */
-VALUE OgreVector2_minusself(VALUE self)
+VALUE _minusself(VALUE self)
 {
 	return wrap(- *_self);
 }
 /*
 */
-VALUE OgreVector2_compare(VALUE self,VALUE other)
+VALUE _compare(VALUE self,VALUE other)
 {
 	if(rb_obj_is_kind_of(other,rb_cOgreVector2)){
 		Ogre::Vector2 temp = *wrap<Ogre::Vector2*>(other);
@@ -60,17 +67,14 @@ VALUE OgreVector2_compare(VALUE self,VALUE other)
 }
 /*
 */
-VALUE OgreVector2_swap(VALUE self,VALUE other)
+VALUE _swap(VALUE self,VALUE other)
 {
-	if(rb_obj_is_kind_of(other,rb_cOgreVector2)){
-		_self->swap(*wrap<Ogre::Vector2*>(other));
-	}else
-		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreVector2),rb_obj_classname(other));
+	_self->swap(*wrap<Ogre::Vector2*>(other));
 	return self;
 }
 /*
 */
-VALUE OgreVector2_plus(VALUE self,VALUE other)
+VALUE _plus(VALUE self,VALUE other)
 {
 	if(rb_obj_is_kind_of(other,rb_cOgreVector2))
 		return wrap(*_self + *wrap<Ogre::Vector2*>(other));
@@ -79,7 +83,7 @@ VALUE OgreVector2_plus(VALUE self,VALUE other)
 }
 /*
 */
-VALUE OgreVector2_minus(VALUE self,VALUE other)
+VALUE _minus(VALUE self,VALUE other)
 {
 	if(rb_obj_is_kind_of(other,rb_cOgreVector2))
 		return wrap(*_self - *wrap<Ogre::Vector2*>(other));
@@ -88,7 +92,7 @@ VALUE OgreVector2_minus(VALUE self,VALUE other)
 }
 /*
 */
-VALUE OgreVector2_mal(VALUE self,VALUE other)
+VALUE _mal(VALUE self,VALUE other)
 {
 	if(rb_obj_is_kind_of(other,rb_cOgreVector2))
 		return wrap(*_self * *wrap<Ogre::Vector2*>(other));
@@ -97,7 +101,7 @@ VALUE OgreVector2_mal(VALUE self,VALUE other)
 }
 /*
 */
-VALUE OgreVector2_durch(VALUE self,VALUE other)
+VALUE _durch(VALUE self,VALUE other)
 {
 	if(rb_obj_is_kind_of(other,rb_cOgreVector2))
 		return wrap(*_self / *wrap<Ogre::Vector2*>(other));
@@ -106,61 +110,49 @@ VALUE OgreVector2_durch(VALUE self,VALUE other)
 }
 /*
 */
-VALUE OgreVector2_length(VALUE self)
+VALUE _length(VALUE self)
 {
 	return DBL2NUM(_self->length());
 }
 /*
 */
-VALUE OgreVector2_squaredlength(VALUE self)
+VALUE _squaredlength(VALUE self)
 {
 	return DBL2NUM(_self->squaredLength());
 }
 /*
 */
-VALUE OgreVector2_distance(VALUE self, VALUE other)
+VALUE _distance(VALUE self, VALUE other)
 {
-	if(rb_obj_is_kind_of(other,rb_cOgreVector2)){
-		return wrap(_self->distance(*wrap<Ogre::Vector2*>(other)));
-	}else
-		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreVector2),rb_obj_classname(other));
+	return wrap(_self->distance(*wrap<Ogre::Vector2*>(other)));
 }
 /*
 */
-VALUE OgreVector2_squaredDistance(VALUE self, VALUE other)
+VALUE _squaredDistance(VALUE self, VALUE other)
 {
-	if(rb_obj_is_kind_of(other,rb_cOgreVector2)){
-		return wrap(_self->squaredDistance(*wrap<Ogre::Vector2*>(other)));
-	}else
-		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreVector2),rb_obj_classname(other));
+	return wrap(_self->squaredDistance(*wrap<Ogre::Vector2*>(other)));
 }
 /*
 */
-VALUE OgreVector2_dotProduct(VALUE self, VALUE other)
+VALUE _dotProduct(VALUE self, VALUE other)
 {
-	if(rb_obj_is_kind_of(other,rb_cOgreVector2)){
-		return DBL2NUM(_self->dotProduct(*wrap<Ogre::Vector2*>(other)));
-	}else
-		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreVector2),rb_obj_classname(other));
+	return DBL2NUM(_self->dotProduct(*wrap<Ogre::Vector2*>(other)));
 }
 /*
 */
-VALUE OgreVector2_isZeroLength(VALUE self)
+VALUE _isZeroLength(VALUE self)
 {
 	return _self->isZeroLength() ? Qtrue : Qfalse;
 }
 /*
 */
-VALUE OgreVector2_crossProduct(VALUE self,VALUE other)
+VALUE _crossProduct(VALUE self,VALUE other)
 {
-	if(rb_obj_is_kind_of(other,rb_cOgreVector2))
-		return wrap(_self->crossProduct(*wrap<Ogre::Vector2*>(other)));
-	else
-		rb_raise(rb_eTypeError,"Exepted %s got %s!",rb_class2name(rb_cOgreVector2),rb_obj_classname(other));
+	return wrap(_self->crossProduct(*wrap<Ogre::Vector2*>(other)));
 }
 /*
 */
-VALUE OgreVector2_isNaN(VALUE self)
+VALUE _isNaN(VALUE self)
 {
 	return _self->isNaN() ? Qtrue : Qfalse;
 }
@@ -172,11 +164,11 @@ VALUE OgreVector2_isNaN(VALUE self)
  * ===Return value
  * Integer
 */
-VALUE OgreVector2_hash(VALUE self)
+VALUE _hash(VALUE self)
 {
 	VALUE result = rb_ary_new();
-	rb_ary_push(result,OgreVector2_get_x(self));
-	rb_ary_push(result,OgreVector2_get_y(self));
+	rb_ary_push(result,_get_x(self));
+	rb_ary_push(result,_get_y(self));
 	return rb_funcall(result,rb_intern("hash"),0);
 }
 /*
@@ -185,11 +177,11 @@ VALUE OgreVector2_hash(VALUE self)
  * 
  * packs a Vector2 into an string.
 */
-VALUE OgreVector2_marshal_dump(VALUE self)
+VALUE _marshal_dump(VALUE self)
 {
 	VALUE result = rb_ary_new();
-	rb_ary_push(result,OgreVector2_get_x(self));
-	rb_ary_push(result,OgreVector2_get_y(self));
+	rb_ary_push(result,_get_x(self));
+	rb_ary_push(result,_get_y(self));
 	return rb_funcall(result,rb_intern("pack"),1,rb_str_new2("dd"));
 }
 /*
@@ -198,12 +190,15 @@ VALUE OgreVector2_marshal_dump(VALUE self)
  * 
  * loads a string into an Vector2.
 */
-VALUE OgreVector2_marshal_load(VALUE self,VALUE load)
+VALUE _marshal_load(VALUE self,VALUE load)
 {
 	VALUE result = rb_funcall(load,rb_intern("unpack"),1,rb_str_new2("dd"));
-	OgreVector2_set_y(self,rb_ary_pop(result));
-	OgreVector2_set_x(self,rb_ary_pop(result));
+	_set_y(self,rb_ary_pop(result));
+	_set_x(self,rb_ary_pop(result));
 	return self;
+}
+
+}
 }
 
 /*
@@ -234,41 +229,43 @@ void Init_OgreVector2(VALUE rb_mOgre)
 	rb_define_attr(rb_cOgreVector2,"x",1,1);
 	rb_define_attr(rb_cOgreVector2,"y",1,1);
 #endif
-	rb_cOgreVector2 = rb_define_class_under(rb_mOgre,"Vector2",rb_cObject);
-	rb_define_alloc_func(rb_cOgreVector2,OgreVector2_alloc);
-	rb_define_method(rb_cOgreVector2,"initialize",RUBY_METHOD_FUNC(OgreVector2_initialize),2);
-	rb_define_private_method(rb_cOgreVector2,"initialize_copy",RUBY_METHOD_FUNC(OgreVector2_initialize_copy),1);
-	
-	rb_define_attr_method(rb_cOgreVector2,"x",OgreVector2_get_x,OgreVector2_set_x);
-	rb_define_attr_method(rb_cOgreVector2,"y",OgreVector2_get_y,OgreVector2_set_y);
+	using namespace RubyOgre::Vector2;
 
-	rb_define_method(rb_cOgreVector2,"inspect",RUBY_METHOD_FUNC(OgreVector2_inspect),0);
-	rb_define_method(rb_cOgreVector2,"-@",RUBY_METHOD_FUNC(OgreVector2_minusself),0);
-	rb_define_method(rb_cOgreVector2,"<=>",RUBY_METHOD_FUNC(OgreVector2_compare),1);
+	rb_cOgreVector2 = rb_define_class_under(rb_mOgre,"Vector2",rb_cObject);
+	rb_define_alloc_func(rb_cOgreVector2,_alloc);
+	rb_define_method(rb_cOgreVector2,"initialize",RUBY_METHOD_FUNC(_initialize),2);
+	rb_define_private_method(rb_cOgreVector2,"initialize_copy",RUBY_METHOD_FUNC(_initialize_copy),1);
+	
+	rb_define_attr_method(rb_cOgreVector2,"x",_get_x,_set_x);
+	rb_define_attr_method(rb_cOgreVector2,"y",_get_y,_set_y);
+
+	rb_define_method(rb_cOgreVector2,"inspect",RUBY_METHOD_FUNC(_inspect),0);
+	rb_define_method(rb_cOgreVector2,"-@",RUBY_METHOD_FUNC(_minusself),0);
+	rb_define_method(rb_cOgreVector2,"<=>",RUBY_METHOD_FUNC(_compare),1);
 	rb_include_module(rb_cOgreVector2,rb_mComparable);
 	rb_define_alias(rb_cOgreVector2,"eql?","==");
 
-	rb_define_method(rb_cOgreVector2,"+",RUBY_METHOD_FUNC(OgreVector2_plus),1);
-	rb_define_method(rb_cOgreVector2,"-",RUBY_METHOD_FUNC(OgreVector2_minus),1);
-	rb_define_method(rb_cOgreVector2,"*",RUBY_METHOD_FUNC(OgreVector2_mal),1);
-	rb_define_method(rb_cOgreVector2,"/",RUBY_METHOD_FUNC(OgreVector2_durch),1);
+	rb_define_method(rb_cOgreVector2,"+",RUBY_METHOD_FUNC(_plus),1);
+	rb_define_method(rb_cOgreVector2,"-",RUBY_METHOD_FUNC(_minus),1);
+	rb_define_method(rb_cOgreVector2,"*",RUBY_METHOD_FUNC(_mal),1);
+	rb_define_method(rb_cOgreVector2,"/",RUBY_METHOD_FUNC(_durch),1);
 
-	rb_define_method(rb_cOgreVector2,"length",RUBY_METHOD_FUNC(OgreVector2_length),0);
-	rb_define_method(rb_cOgreVector2,"squared_length",RUBY_METHOD_FUNC(OgreVector2_squaredlength),0);
+	rb_define_method(rb_cOgreVector2,"length",RUBY_METHOD_FUNC(_length),0);
+	rb_define_method(rb_cOgreVector2,"squared_length",RUBY_METHOD_FUNC(_squaredlength),0);
 	
-	rb_define_method(rb_cOgreVector2,"hash",RUBY_METHOD_FUNC(OgreVector2_hash),0);
+	rb_define_method(rb_cOgreVector2,"hash",RUBY_METHOD_FUNC(_hash),0);
 
-	rb_define_method(rb_cOgreVector2,"zerolength?",RUBY_METHOD_FUNC(OgreVector2_isZeroLength),0);	
-	rb_define_method(rb_cOgreVector2,"NaN?",RUBY_METHOD_FUNC(OgreVector2_isNaN),0);
-	rb_define_method(rb_cOgreVector2,"swap",RUBY_METHOD_FUNC(OgreVector2_swap),1);
+	rb_define_method(rb_cOgreVector2,"zerolength?",RUBY_METHOD_FUNC(_isZeroLength),0);
+	rb_define_method(rb_cOgreVector2,"NaN?",RUBY_METHOD_FUNC(_isNaN),0);
+	rb_define_method(rb_cOgreVector2,"swap",RUBY_METHOD_FUNC(_swap),1);
 
-	rb_define_method(rb_cOgreVector2,"marshal_dump",RUBY_METHOD_FUNC(OgreVector2_marshal_dump),0);
-	rb_define_method(rb_cOgreVector2,"marshal_load",RUBY_METHOD_FUNC(OgreVector2_marshal_load),1);
+	rb_define_method(rb_cOgreVector2,"marshal_dump",RUBY_METHOD_FUNC(_marshal_dump),0);
+	rb_define_method(rb_cOgreVector2,"marshal_load",RUBY_METHOD_FUNC(_marshal_load),1);
 
 	rb_define_const(rb_cOgreVector2,"Zero",wrap(Ogre::Vector2::ZERO));
 	rb_define_const(rb_cOgreVector2,"Unit_X",wrap(Ogre::Vector2::UNIT_X));
 	rb_define_const(rb_cOgreVector2,"Unit_Y",wrap(Ogre::Vector2::UNIT_Y));
 	rb_define_const(rb_cOgreVector2,"Negative_Unit_X",wrap(Ogre::Vector2::NEGATIVE_UNIT_X));
-  rb_define_const(rb_cOgreVector2,"Negative_Unit_Y",wrap(Ogre::Vector2::NEGATIVE_UNIT_Y));
-  rb_define_const(rb_cOgreVector2,"Unit_Scale",wrap(Ogre::Vector2::UNIT_SCALE));
+	rb_define_const(rb_cOgreVector2,"Negative_Unit_Y",wrap(Ogre::Vector2::NEGATIVE_UNIT_Y));
+	rb_define_const(rb_cOgreVector2,"Unit_Scale",wrap(Ogre::Vector2::UNIT_SCALE));
 }
