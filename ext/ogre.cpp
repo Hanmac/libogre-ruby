@@ -268,6 +268,7 @@ extern "C" void Init_ogre(void)
 	Init_OgreResource(rb_mOgre);
 	Init_OgreFont(rb_mOgre);
 	Init_OgreSkeleton(rb_mOgre);
+	Init_OgreGpuProgram(rb_mOgre);
 	
 	Init_OgreBillboard(rb_mOgre);
 	

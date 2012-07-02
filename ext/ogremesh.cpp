@@ -51,7 +51,7 @@ VALUE _each(VALUE self)
 VALUE _singleton_createPlane(int argc,VALUE *argv,VALUE self)
 {
 	VALUE name, groupName, plane, width, height, opt;
-	rb_scan_args(argc, argv, "03",&name,&groupName,&plane,&width,&height,&opt);
+	rb_scan_args(argc, argv, "51",&name,&groupName,&plane,&width,&height,&opt);
 
 	int xsegments = 1, ysegments = 1;
 	bool normals = true;

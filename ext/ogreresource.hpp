@@ -11,6 +11,7 @@ extern VALUE rb_cOgreResource;
 #include "ogrefont.hpp"
 #include "ogreskeleton.hpp"
 #include "ogrecompositor.hpp"
+#include "ogregpuprogram.hpp"
 
 
 template <>

@@ -25,6 +25,8 @@ VALUE wrap< Ogre::Resource >(Ogre::Resource *resource )
 		return wrap(new Ogre::SkeletonPtr(tmp));
 	if(Ogre::Compositor *tmp = dynamic_cast<Ogre::Compositor*>(resource))
 		return wrap(new Ogre::CompositorPtr(tmp));
+	if(Ogre::GpuProgram *tmp = dynamic_cast<Ogre::GpuProgram*>(resource))
+		return wrap(new Ogre::GpuProgramPtr(tmp));
 
 	return Qnil;
 }
@@ -47,6 +49,8 @@ VALUE wrap< Ogre::ResourcePtr >(const Ogre::ResourcePtr& resource )
 		return wrap(new Ogre::SkeletonPtr(resource));
 	if(dynamic_cast<Ogre::Compositor*>(resource.get()))
 		return wrap(new Ogre::CompositorPtr(resource));
+	if(dynamic_cast<Ogre::GpuProgram*>(resource.get()))
+		return wrap(new Ogre::GpuProgramPtr(resource));
 
 	return Qnil;
 }
@@ -66,6 +70,8 @@ Ogre::Resource* wrap< Ogre::Resource* >(const VALUE &vresource)
 		return unwrapPtr<Ogre::SkeletonPtr>(vresource, rb_cOgreSkeleton)->get();
 	if(rb_obj_is_kind_of(vresource, rb_cOgreCompositor))
 		return unwrapPtr<Ogre::CompositorPtr>(vresource, rb_cOgreCompositor)->get();
+	if(rb_obj_is_kind_of(vresource, rb_cOgreGpuProgram))
+		return unwrapPtr<Ogre::GpuProgramPtr>(vresource, rb_cOgreGpuProgram)->get();
 
 	rb_raise(rb_eTypeError,"Expected %s got %s!",rb_class2name(rb_cOgreResource),	rb_obj_classname(vresource));
 	return NULL;
@@ -87,6 +93,8 @@ Ogre::ResourceManager* wrap< Ogre::ResourceManager* >(const VALUE &vclass)
 		return Ogre::CompositorManager::getSingletonPtr();
 	if(vclass==rb_cOgreSkeleton)
 		return Ogre::SkeletonManager::getSingletonPtr();
+	if(vclass==rb_cOgreGpuProgram)
+		return Ogre::GpuProgramManager::getSingletonPtr();
 
 	rb_raise(rb_eTypeError,"%s is not a valid Ogre::ResourceManager!",rb_class2name(vclass));
 	return NULL;
