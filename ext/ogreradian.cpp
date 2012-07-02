@@ -15,12 +15,11 @@ Ogre::Radian wrap< Ogre::Radian >(const VALUE &vradian)
 	if (!rb_obj_is_kind_of(vradian, rb_cOgreRadian))
 	{
 		if(rb_obj_is_kind_of(vradian,rb_cOgreDegree))
-			return new Ogre::Radian(wrap<Ogre::Degree>(vradian));
+			return Ogre::Radian(wrap<Ogre::Degree>(vradian));
 		else if(rb_obj_is_kind_of(vradian,rb_cNumeric))
-			return new Ogre::Radian(NUM2DBL(vradian));
-	}else{
-		return unwrapPtr<Ogre::Radian>(vradian, rb_cOgreRadian);
+			return Ogre::Radian(NUM2DBL(vradian));
 	}
+	return *unwrapPtr<Ogre::Radian>(vradian, rb_cOgreRadian);
 }
 
 VALUE OgreRadian_alloc(VALUE self)
