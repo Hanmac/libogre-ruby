@@ -225,21 +225,10 @@ VALUE wrap(const Ogre::SharedPtr<typename Ogre::vector<T>::type> &vec){
 };
 
 template <>
-inline VALUE wrap< Ogre::String >(const Ogre::String &st )
-{
-	return rb_str_new2(st.c_str());
-}
+VALUE wrap< Ogre::String >(const Ogre::String &st );
 
 template <>
-inline Ogre::String wrap< Ogre::String >(const VALUE &val )
-{
-	if(NIL_P(val))
-		return "";
-	else if (rb_obj_is_kind_of(val, rb_cString))
-		return rb_string_value_cstr((volatile VALUE*)(&val));
-	else
-		return wrap< Ogre::String >(rb_funcall(val,rb_intern("to_s"),0));
-}
+Ogre::String wrap< Ogre::String >(const VALUE &val );
 
 template <>
 VALUE wrap< bool >(const bool &st );
@@ -277,14 +266,10 @@ inline VALUE wrap< Ogre::StringVector >(const Ogre::StringVector &vec )
 */
 
 template <>
-inline VALUE wrap< Ogre::NameValuePairList >(const Ogre::NameValuePairList &map )
-{
-	VALUE result = rb_hash_new();
-	Ogre::NameValuePairList::const_iterator it;
-	for ( it=map.begin() ; it != map.end(); it++ )
-		rb_hash_aset(result,wrap(it->first),wrap(it->second));
-	return result;
-}
+VALUE wrap< Ogre::NameValuePairList >(const Ogre::NameValuePairList &map );
+
+template <>
+Ogre::NameValuePairList* wrap< Ogre::NameValuePairList* >(const VALUE &map );
 
 template <typename T>
 void wrap_each1(T begin,T end)

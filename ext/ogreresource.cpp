@@ -1,6 +1,4 @@
 
-#include "ogrematerial.hpp"
-
 #include "ogreresource.hpp"
 #include "ogreexception.hpp"
 
@@ -9,6 +7,27 @@
 #define _self wrap<Ogre::Resource*>(self)
 #define _singleton wrap<Ogre::ResourceManager*>(self)
 VALUE rb_cOgreResource;
+
+template <>
+VALUE wrap< Ogre::Resource >(Ogre::Resource *resource )
+{
+	if(resource == NULL)
+		return Qnil;
+	if(Ogre::Material *tmp = dynamic_cast<Ogre::Material*>(resource))
+		return wrap(new Ogre::MaterialPtr(tmp));
+	if(Ogre::Mesh *tmp = dynamic_cast<Ogre::Mesh*>(resource))
+		return wrap(new Ogre::MeshPtr(tmp));
+	if(Ogre::Texture *tmp = dynamic_cast<Ogre::Texture*>(resource))
+		return wrap(new Ogre::TexturePtr(tmp));
+	if(Ogre::Font *tmp = dynamic_cast<Ogre::Font*>(resource))
+		return wrap(new Ogre::FontPtr(tmp));
+	if(Ogre::Skeleton *tmp = dynamic_cast<Ogre::Skeleton*>(resource))
+		return wrap(new Ogre::SkeletonPtr(tmp));
+	if(Ogre::Compositor *tmp = dynamic_cast<Ogre::Compositor*>(resource))
+		return wrap(new Ogre::CompositorPtr(tmp));
+
+	return Qnil;
+}
 
 
 template <>
@@ -73,35 +92,6 @@ Ogre::ResourceManager* wrap< Ogre::ResourceManager* >(const VALUE &vclass)
 	return NULL;
 }
 
-namespace RubyOgre {
-namespace Resource {
-
-macro_attr_bool(BackgroundLoaded)
-
-singlereturn(getGroup)
-singlereturn(getOrigin)
-singlereturn(getSize)
-singlereturn(getName)
-
-/*
-*/
-VALUE _isPrepared(VALUE self)
-{
-	return _self->isPrepared() ? Qtrue : Qfalse;
-}
-/*
-*/
-VALUE _isLoaded(VALUE self)
-{
-	return _self->isLoaded() ? Qtrue : Qfalse;
-}
-/*
-*/
-VALUE _isLoading(VALUE self)
-{
-	return _self->isLoading() ? Qtrue : Qfalse;
-}
-
 Ogre::String unwrapResourceGroup(VALUE obj,const Ogre::String &defaultgroup)
 {
 	if(NIL_P(obj))
@@ -120,6 +110,22 @@ Ogre::String unwrapResourceGroup(VALUE obj,const Ogre::String &defaultgroup)
 	}
 	return wrap<Ogre::String>(obj);
 }
+
+
+namespace RubyOgre {
+namespace Resource {
+
+macro_attr_bool(BackgroundLoaded)
+
+singlereturn(getGroup)
+singlereturn(getOrigin)
+singlereturn(getSize)
+singlereturn(getName)
+
+singlereturn(isPrepared)
+singlereturn(isLoaded)
+singlereturn(isLoading)
+singlereturn(isReloadable)
 
 /*
 */
@@ -300,7 +306,7 @@ VALUE _singleton_create(int argc,VALUE *argv,VALUE self)
 	try {
 		return wrap(_singleton->createOrRetrieve(wrap<Ogre::String>(path),
 				unwrapResourceGroup(groupname,Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME),
-				false,NULL,NULL).first);
+				false,NULL,wrap<Ogre::NameValuePairList*>(params)).first);
 	}catch(Ogre::Exception& e){
 		rb_raise(wrap(e));
 	}
@@ -324,7 +330,7 @@ VALUE _singleton_prepare(int argc,VALUE *argv,VALUE self)
 	try{
 		return wrap(_singleton->prepare(wrap<Ogre::String>(path),
 			unwrapResourceGroup(groupname,Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME),
-			false,NULL,NULL,RTEST(backgroundThread))
+			false,NULL,wrap<Ogre::NameValuePairList*>(params),RTEST(backgroundThread))
 		);
 	}catch(Ogre::Exception& e){
 		rb_raise(wrap(e));
@@ -340,7 +346,7 @@ VALUE _singleton_load(int argc,VALUE *argv,VALUE self)
 	try{
 		return wrap(_singleton->load(wrap<Ogre::String>(path),
 			unwrapResourceGroup(groupname,Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME),
-			false,NULL,NULL,RTEST(backgroundThread)).get()
+			false,NULL,NULL,RTEST(backgroundThread))
 		);
 	}catch(Ogre::Exception& e){
 		rb_raise(wrap(e));
@@ -392,6 +398,7 @@ void Init_OgreResource(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreResource,"prepared?",RUBY_METHOD_FUNC(_isPrepared),0);
 	rb_define_method(rb_cOgreResource,"loaded?",RUBY_METHOD_FUNC(_isLoaded),0);
 	rb_define_method(rb_cOgreResource,"loading?",RUBY_METHOD_FUNC(_isLoading),0);
+	rb_define_method(rb_cOgreResource,"reloadable?",RUBY_METHOD_FUNC(_isReloadable),0);
 	
 	
 

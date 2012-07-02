@@ -142,6 +142,51 @@ unsigned short wrap< unsigned short >(const VALUE &val )
 	return NUM2UINT(val);
 }
 
+template <>
+VALUE wrap< Ogre::String >(const Ogre::String &st )
+{
+	return rb_str_new2(st.c_str());
+}
+
+template <>
+Ogre::String wrap< Ogre::String >(const VALUE &val )
+{
+	if(NIL_P(val))
+		return "";
+	else if (rb_obj_is_kind_of(val, rb_cString))
+		return rb_string_value_cstr((volatile VALUE*)(&val));
+	else
+		return wrap< Ogre::String >(rb_funcall(val,rb_intern("to_s"),0));
+}
+
+template <>
+VALUE wrap< Ogre::NameValuePairList >(const Ogre::NameValuePairList &map )
+{
+	VALUE result = rb_hash_new();
+	Ogre::NameValuePairList::const_iterator it;
+	for ( it=map.begin() ; it != map.end(); it++ )
+		rb_hash_aset(result,wrap(it->first),wrap(it->second));
+	return result;
+}
+
+int foreach(VALUE key, VALUE value, VALUE arg)
+{
+	((Ogre::NameValuePairList*)(arg))->insert(std::make_pair(wrap<Ogre::String>(key),wrap<Ogre::String>(value)));
+	return ST_CONTINUE;
+}
+
+template <>
+Ogre::NameValuePairList* wrap< Ogre::NameValuePairList* >(const VALUE &map )
+{
+	Ogre::NameValuePairList *result = new Ogre::NameValuePairList;
+	if(!NIL_P(map))
+		rb_hash_foreach(map,(int (*)(ANYARGS))(foreach),(VALUE)result);
+	return result;
+}
+
+
+
+
 class RubyAny
 {
 public:
