@@ -702,4 +702,9 @@ void Init_OgreSceneManager(VALUE rb_mOgre)
 	rb_define_attr_method(rb_cOgreSceneManagerMetaData,"name",MetaData::_get_typeName,MetaData::_set_typeName);
 	rb_define_attr_method(rb_cOgreSceneManagerMetaData,"description",MetaData::_get_description,MetaData::_set_description);
 	rb_define_attr_method(rb_cOgreSceneManagerMetaData,"scenetype",MetaData::_get_sceneTypeMask,MetaData::_set_sceneTypeMask);
+
+	registerenum<Ogre::SceneManager::PrefabType>("Ogre::SceneManager::PrefabType")
+		.add(Ogre::SceneManager::PT_CUBE,"cube")
+		.add(Ogre::SceneManager::PT_PLANE,"plane")
+		.add(Ogre::SceneManager::PT_SPHERE,"sphere");
 }
