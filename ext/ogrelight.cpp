@@ -10,6 +10,9 @@ namespace RubyOgre
 {
 namespace Light
 {
+
+macro_attr_enum(Type,Ogre::Light::LightTypes)
+
 macro_attr(DiffuseColour,Ogre::ColourValue)
 macro_attr(SpecularColour,Ogre::ColourValue)
 
@@ -132,6 +135,7 @@ void Init_OgreLight(VALUE rb_mOgre)
 	rb_undef_alloc_func(rb_cOgreLight);
 	rb_include_module(rb_cOgreLight,rb_mOgreMovableObject);
 	
+	rb_define_attr_method(rb_cOgreLight,"type",_getType,_setType);
 	rb_define_attr_method(rb_cOgreLight,"diffuseColor",_getDiffuseColour,_setDiffuseColour);
 	rb_define_attr_method(rb_cOgreLight,"specularColor",_getSpecularColour,_setSpecularColour);
 	rb_define_attr_method(rb_cOgreLight,"position",_getPosition,_setPosition);
@@ -157,4 +161,10 @@ void Init_OgreLight(VALUE rb_mOgre)
 	rb_define_attr_method(rb_cOgreLight,"shadowNearClipDistance",_getShadowNearClipDistance,_setShadowNearClipDistance);
 
 	registerklass<Ogre::Light>(rb_cOgreLight);
+
+	registerenum<Ogre::Light::LightTypes>("Ogre::Light::LightTypes")
+		.add(Ogre::Light::LT_POINT,"point")
+		.add(Ogre::Light::LT_DIRECTIONAL,"directional")
+		.add(Ogre::Light::LT_SPOTLIGHT,"spotlight");
+
 }
