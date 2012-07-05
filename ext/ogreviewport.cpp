@@ -1,4 +1,5 @@
 #include "ogreviewport.hpp"
+#include "ogreviewportlistener.hpp"
 #include "ogreexception.hpp"
 #include "ogrerendertarget.hpp"
 #include "ogrecamera.hpp"
@@ -24,6 +25,12 @@ singlereturn(getTop)
 singlereturn(getWidth)
 singlereturn(getHeight)
 
+singlereturn(getActualLeft)
+singlereturn(getActualTop)
+singlereturn(getActualWidth)
+singlereturn(getActualHeight)
+
+
 singlefunc(update)
 
 //
@@ -48,7 +55,11 @@ VALUE _setHeight(VALUE self,VALUE val)
 	return val;
 }
 
-
+VALUE _addListener(VALUE self,VALUE obj)
+{
+	_self->addListener(wrap<Ogre::Viewport::Listener*>(obj));
+	return self;
+}
 
 
 }
@@ -90,8 +101,16 @@ void Init_OgreViewport(VALUE rb_mOgre)
 	
 	rb_define_attr_method(rb_cOgreViewport,"left",_getLeft,_setLeft);
 	rb_define_attr_method(rb_cOgreViewport,"top",_getTop,_setTop);
-	rb_define_attr_method(rb_cOgreViewport,"wight",_getWidth,_setWidth);
+	rb_define_attr_method(rb_cOgreViewport,"width",_getWidth,_setWidth);
 	rb_define_attr_method(rb_cOgreViewport,"height",_getHeight,_setHeight);
+
+
+	rb_define_method(rb_cOgreViewport,"actual_left",RUBY_METHOD_FUNC(_getActualLeft),0);
+	rb_define_method(rb_cOgreViewport,"actual_top",RUBY_METHOD_FUNC(_getActualTop),0);
+	rb_define_method(rb_cOgreViewport,"actual_width",RUBY_METHOD_FUNC(_getActualWidth),0);
+	rb_define_method(rb_cOgreViewport,"actual_height",RUBY_METHOD_FUNC(_getActualHeight),0);
+
+	rb_define_method(rb_cOgreViewport,"addListener",RUBY_METHOD_FUNC(_addListener),1);
 
 	registerklass<Ogre::Viewport>(rb_cOgreViewport);
 }
