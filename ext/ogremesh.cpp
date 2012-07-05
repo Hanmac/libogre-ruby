@@ -1,5 +1,6 @@
 #include "ogreresource.hpp"
 #include "ogremesh.hpp"
+#include "ogreexception.hpp"
 #include "ogreplane.hpp"
 #include "ogrevector3.hpp"
 #include "ogresubmesh.hpp"
@@ -61,32 +62,37 @@ VALUE _singleton_createPlane(int argc,VALUE *argv,VALUE self)
 	if(rb_obj_is_kind_of(opt, rb_cHash))
 	{
 		VALUE temp;
-		if(NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("xsegments")))))
+		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("xsegments")))))
 			xsegments = NUM2INT(temp);
-		if(NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("ysegments")))))
+		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("ysegments")))))
 			ysegments = NUM2INT(temp);
-		if(NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("normals")))))
+		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("normals")))))
 			normals = RTEST(temp);
-		if(NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("text_coords")))))
+		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("text_coords")))))
 			numTexCoordSets = NUM2UINT(temp);
-		if(NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("utile")))))
+		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("utile")))))
 			uTile = NUM2DBL(temp);
-		if(NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("vtile")))))
+		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("vtile")))))
 			vTile = NUM2DBL(temp);
-		if(NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("upVector")))))
+		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("upVector")))))
 			upVector = wrap<Ogre::Vector3>(temp);
     }
+	try {
+		return wrap(_manager->createPlane(wrap<Ogre::String>(name),
+			unwrapResourceGroup(groupName,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME),
+			wrap<Ogre::Plane>(plane),
+			NUM2DBL(width),NUM2DBL(height),
+			xsegments,ysegments,
+			normals,
+			numTexCoordSets,
+			uTile,vTile,
+			upVector
+			));
+	}catch(Ogre::Exception& e){
+		rb_raise(wrap(e));
+	}
+	return Qnil;
 
-	return wrap(_manager->createPlane(wrap<Ogre::String>(name),
-		unwrapResourceGroup(groupName,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME),
-		wrap<Ogre::Plane>(plane),
-		NUM2DBL(width),NUM2DBL(height),
-		xsegments,ysegments,
-		normals,
-		numTexCoordSets,
-		uTile,vTile,
-		upVector
-		));
 }
 
 }
@@ -104,5 +110,7 @@ void Init_OgreMesh(VALUE rb_mOgre)
 
 	rb_define_method(rb_cOgreMesh,"each",RUBY_METHOD_FUNC(_each),0);
 	rb_include_module(rb_cOgreMesh,rb_mEnumerable);
+
+	rb_define_singleton_method(rb_cOgreMesh,"createPlane",RUBY_METHOD_FUNC(_singleton_createPlane),-1);
 
 }
