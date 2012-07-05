@@ -5,6 +5,8 @@
 #include "ogrerenderwindow.hpp"
 #include "ogrerendersystem.hpp"
 #include "ogrescenemanager.hpp"
+#include "ogreframelistener.hpp"
+
 #define _self wrap<Ogre::Root*>(self)
 VALUE rb_mOgreRoot;
 
@@ -164,6 +166,16 @@ VALUE _loadPlugin(VALUE self,VALUE val)
 	return self;
 }
 /*
+ *
+ */
+
+VALUE _addFrameListener(VALUE self,VALUE obj)
+{
+	_self->addFrameListener(wrap<Ogre::FrameListener*>(obj));
+	return self;
+}
+
+/*
 */
 VALUE _addPluginFolder(VALUE self,VALUE path)
 {
@@ -265,6 +277,8 @@ void Init_OgreRoot(VALUE rb_mOgre)
 	rb_define_singleton_method(rb_mOgre,"startRendering",RUBY_METHOD_FUNC(_startRendering),0);
 
 	rb_define_singleton_method(rb_mOgre,"shutdown",RUBY_METHOD_FUNC(_shutdown),0);
+
+	rb_define_singleton_method(rb_mOgre,"addFrameListener",RUBY_METHOD_FUNC(_addFrameListener),1);
 	
 	rb_define_singleton_method(rb_mOgre,"rendersystem",RUBY_METHOD_FUNC(_getRenderSystem),0);
 	rb_define_singleton_method(rb_mOgre,"rendersystem=",RUBY_METHOD_FUNC(_setRenderSystem),1);
