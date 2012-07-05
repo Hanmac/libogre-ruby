@@ -8,7 +8,6 @@
 #include <string>
 #include <map>
 
-
 template< class T > struct remove_pointer                    {typedef T type;};
 template< class T > struct remove_pointer<T*>                {typedef T type;};
 template< class T > struct remove_pointer<T* const>          {typedef T type;};
@@ -395,6 +394,28 @@ VALUE _##func(VALUE self)\
 #define singlereturn(func) \
 VALUE _##func(VALUE self)\
 {return wrap(_self->func());}
+
+
+
+class RubyAny
+{
+public:
+
+	RubyAny(VALUE obj);
+
+	virtual ~RubyAny();
+
+	VALUE value;
+
+	inline friend std::ostream& operator << ( std::ostream& o, const Ogre::SharedPtr<RubyAny>& v )
+	{
+		o << wrap<Ogre::String>(v->value);
+		return o;
+	}
+
+};
+
+
 
 #endif /* __RubyOgreMain_H__ */
 

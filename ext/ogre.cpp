@@ -38,6 +38,7 @@
 #include "ogretexture.hpp"
 #include "ogremesh.hpp"
 #include "ogresubmesh.hpp"
+#include "ogresubentity.hpp"
 #include "ogrematerial.hpp"
 #include "ogretechnique.hpp"
 #include "ogrepass.hpp"
@@ -187,31 +188,15 @@ Ogre::NameValuePairList* wrap< Ogre::NameValuePairList* >(const VALUE &map )
 
 
 
-class RubyAny
+RubyAny::RubyAny(VALUE obj)
+: value(obj)
 {
-public:
+	rb_hash_aset(globalholder,INT2NUM(obj),obj);
+}
 
-	RubyAny(VALUE obj)
-	: value(obj)
-	{
-		rb_hash_aset(globalholder,INT2NUM(obj),obj);
-
-	}
-
-	~RubyAny() {
-		rb_hash_delete(globalholder,INT2NUM(value));
-	}
-	VALUE get() const {return value;};
-
-	inline friend std::ostream& operator << ( std::ostream& o, const Ogre::SharedPtr<RubyAny>& v )
-	{
-		o << wrap<Ogre::String>(v->get());
-		return o;
-	}
-
-private:
-	VALUE value;
-};
+RubyAny::~RubyAny() {
+	rb_hash_delete(globalholder,INT2NUM(value));
+}
 
 VALUE wrap(void *obj,VALUE klass)
 {
@@ -228,10 +213,9 @@ VALUE wrap(T *obj,VALUE klass)\
 		result = wrap((void*)obj,klass);\
 		bind.setUserAny(Ogre::Any(Ogre::SharedPtr<RubyAny>(new RubyAny(result))));\
 	}else\
-		result = Ogre::any_cast<Ogre::SharedPtr<RubyAny> >(bind.getUserAny())->get();\
+		result = Ogre::any_cast<Ogre::SharedPtr<RubyAny> >(bind.getUserAny())->value;\
 	return result;\
 }
-
 
 #define macro_wrap(T) macro_wrap2(T,T)
 
@@ -289,6 +273,8 @@ extern "C" void Init_ogre(void)
 	Init_OgreRenderSystem(rb_mOgre);
 	Init_OgreSceneManager(rb_mOgre);
 
+	Init_OgreViewport(rb_mOgre);
+
 	Init_OgreMovableObject(rb_mOgre);
 	Init_OgreMovableObjectListener(rb_mOgre);
 	Init_OgreLight(rb_mOgre);
@@ -320,6 +306,9 @@ extern "C" void Init_ogre(void)
 	Init_OgreMesh(rb_mOgre);
 	Init_OgreSubMesh(rb_mOgre);
 	
+	Init_OgreEntity(rb_mOgre);
+	Init_OgreSubEntity(rb_mOgre);
+
 	Init_OgreTechnique(rb_mOgre);
 	Init_OgrePass(rb_mOgre);
 	Init_OgreTextureUnitState(rb_mOgre);
@@ -346,7 +335,7 @@ extern "C" void Init_ogre(void)
 
 	globalholder = rb_hash_new();
 	rb_global_variable(&globalholder);
-//
+
 //	rb_warn("%lu klasses",klassregister.size());
 //	for(klassregistertype::iterator it = klassregister.begin();
 //			it != klassregister.end();
