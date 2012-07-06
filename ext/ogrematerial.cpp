@@ -73,4 +73,5 @@ void Init_OgreMaterial(VALUE rb_mOgre)
 	rb_define_singleton_method(rb_cOgreMaterial,"activeScheme",RUBY_METHOD_FUNC(_singleton_getActiveScheme),0);
 	rb_define_singleton_method(rb_cOgreMaterial,"activeScheme=",RUBY_METHOD_FUNC(_singleton_setActiveScheme),1);
 
+	registerklass<Ogre::MaterialPtr>(rb_cOgreMaterial);
 }

@@ -143,11 +143,7 @@ VALUE _prepare(int argc,VALUE *argv,VALUE self)
 	rb_scan_args(argc, argv, "01",&backgroundThread);
 	if(!NIL_P(backgroundThread))
 		backgroundThread = Qfalse;
-	try{
-		_self->prepare(RTEST(backgroundThread));
-	}catch(Ogre::Exception& e){
-		rb_raise(wrap(e));
-	}
+	RUBYTRY(_self->prepare(RTEST(backgroundThread));)
 	return self;
 }
 /*
@@ -158,11 +154,7 @@ VALUE _load(int argc,VALUE *argv,VALUE self)
 	rb_scan_args(argc, argv, "01",&backgroundThread);
 	if(!NIL_P(backgroundThread))
 		backgroundThread = Qfalse;
-	try{
-		_self->load(RTEST(backgroundThread));
-	}catch(Ogre::Exception& e){
-		rb_raise(wrap(e));
-	}
+	RUBYTRY(_self->load(RTEST(backgroundThread));)
 	return self;
 }
 /*
@@ -311,13 +303,11 @@ VALUE _singleton_create(int argc,VALUE *argv,VALUE self)
 {
 	VALUE path,groupname,loader,params;
 	rb_scan_args(argc, argv, "13",&path,&groupname,&loader,&params);
-	try {
+	RUBYTRY(
 		return wrap(_singleton->createOrRetrieve(wrap<Ogre::String>(path),
-				unwrapResourceGroup(groupname,Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME),
-				false,NULL,wrap<Ogre::NameValuePairList*>(params)).first);
-	}catch(Ogre::Exception& e){
-		rb_raise(wrap(e));
-	}
+			unwrapResourceGroup(groupname,Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME),
+			false,NULL,wrap<Ogre::NameValuePairList*>(params)).first);
+	)
 	return Qnil;
 }
 
@@ -335,14 +325,12 @@ VALUE _singleton_prepare(int argc,VALUE *argv,VALUE self)
 {
 	VALUE path,groupname,backgroundThread,loader,params;
 	rb_scan_args(argc, argv, "23",&path,&groupname,&backgroundThread,&loader,&params);
-	try{
+	RUBYTRY(
 		return wrap(_singleton->prepare(wrap<Ogre::String>(path),
 			unwrapResourceGroup(groupname,Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME),
 			false,NULL,wrap<Ogre::NameValuePairList*>(params),RTEST(backgroundThread))
 		);
-	}catch(Ogre::Exception& e){
-		rb_raise(wrap(e));
-	}
+	)
 	return Qnil;
 }
 /*
@@ -351,14 +339,12 @@ VALUE _singleton_load(int argc,VALUE *argv,VALUE self)
 {
 	VALUE path,groupname,backgroundThread,loader,params;
 	rb_scan_args(argc, argv, "23",&path,&groupname,&backgroundThread,&loader,&params);
-	try{
+	RUBYTRY(
 		return wrap(_singleton->load(wrap<Ogre::String>(path),
 			unwrapResourceGroup(groupname,Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME),
 			false,NULL,NULL,RTEST(backgroundThread))
 		);
-	}catch(Ogre::Exception& e){
-		rb_raise(wrap(e));
-	}
+	)
 	return Qnil;
 }
 

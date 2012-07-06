@@ -50,8 +50,10 @@ void Init_OgreSceneNode(VALUE rb_mOgre)
 #if 0
 	rb_mOgre = rb_define_module("Ogre");
 #endif
+	using namespace RubyOgre::SceneNode;
+
 	rb_cOgreSceneNode = rb_define_class_under(rb_mOgre,"SceneNode",rb_cOgreNode);
 
 	registerklass<Ogre::SceneNode>(rb_cOgreSceneNode);
-
+	rb_define_method(rb_cOgreSceneNode,"attach",RUBY_METHOD_FUNC(_attach),1);
 }

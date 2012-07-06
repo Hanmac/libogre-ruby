@@ -15,6 +15,13 @@ macro_attr_bool(AutoUpdated)
 singlereturn(getName)
 singlereturn(isPrimary)
 
+singlereturn(getLastFPS)
+singlereturn(getAverageFPS)
+singlereturn(getBestFPS)
+singlereturn(getWorstFPS)
+singlereturn(getBestFrameTime)
+singlereturn(getWorstFrameTime)
+
 /*
 */
 VALUE _each(VALUE self)
@@ -43,6 +50,16 @@ VALUE _addViewport(int argc,VALUE *argv,VALUE self)
 		height = DBL2NUM(1.0f);
 	
 return wrap(_self->addViewport(wrap<Ogre::Camera*>(cam), NUM2INT(ZOrder), NUM2DBL(left),NUM2DBL(top),NUM2DBL(width),NUM2DBL(height)));
+}
+
+VALUE _removeViewport(VALUE self,VALUE ZOrder)
+{
+	if(NIL_P(ZOrder))
+		_self->removeAllViewports();
+	else
+		_self->removeViewport(NUM2INT(ZOrder));
+
+	return self;
 }
 /*
  * call-seq:
@@ -81,43 +98,6 @@ VALUE _getColorDepth(VALUE self)
 	return UINT2NUM(_self->getColourDepth());
 }
 
-/*
-*/
-VALUE _getLastFPS(VALUE self)
-{
-	return DBL2NUM(_self->getLastFPS());
-}
-/*
-*/
-VALUE _getAverageFPS(VALUE self)
-{
-return DBL2NUM(_self->getAverageFPS());
-}
-/*
-*/
-VALUE _getBestFPS(VALUE self)
-{
-return DBL2NUM(_self->getBestFPS());
-}
-/*
-*/
-VALUE _getWorstFPS(VALUE self)
-{
-return DBL2NUM(_self->getWorstFPS());
-}
-/*
-*/
-VALUE _getBestFrameTime(VALUE self)
-{
-return DBL2NUM(_self->getBestFrameTime());
-}
-/*
-*/
-VALUE _getWorstFrameTime(VALUE self)
-{
-return DBL2NUM(_self->getWorstFrameTime());
-}
-
 }}
 /*
 */
@@ -142,12 +122,22 @@ void Init_OgreRenderTarget(VALUE rb_mOgre)
 	rb_include_module(rb_cOgreRenderTarget,rb_mEnumerable);
 
 	rb_define_method(rb_cOgreRenderTarget,"addViewport",RUBY_METHOD_FUNC(_addViewport),-1);
+	rb_define_method(rb_cOgreRenderTarget,"removeViewport",RUBY_METHOD_FUNC(_removeViewport),1);
 
 	rb_define_method(rb_cOgreRenderTarget,"primary?",RUBY_METHOD_FUNC(_isPrimary),0);
 
 	rb_define_method(rb_cOgreRenderTarget,"width",RUBY_METHOD_FUNC(_getWidth),0);
 	rb_define_method(rb_cOgreRenderTarget,"height",RUBY_METHOD_FUNC(_getHeight),0);
 	rb_define_method(rb_cOgreRenderTarget,"colordepth",RUBY_METHOD_FUNC(_getColorDepth),0);
+
+
+	rb_define_method(rb_cOgreRenderTarget,"lastFPS",RUBY_METHOD_FUNC(_getLastFPS),0);
+	rb_define_method(rb_cOgreRenderTarget,"averageFPS",RUBY_METHOD_FUNC(_getAverageFPS),0);
+	rb_define_method(rb_cOgreRenderTarget,"bestFPS",RUBY_METHOD_FUNC(_getBestFPS),0);
+	rb_define_method(rb_cOgreRenderTarget,"worstFPS",RUBY_METHOD_FUNC(_getWorstFPS),0);
+
+	rb_define_method(rb_cOgreRenderTarget,"bestFrameTime",RUBY_METHOD_FUNC(_getBestFrameTime),0);
+	rb_define_method(rb_cOgreRenderTarget,"worstFrameTime",RUBY_METHOD_FUNC(_getWorstFrameTime),0);
 
 	rb_define_attr_method(rb_cOgreRenderTarget,"active",_getActive,_setActive);
 	rb_define_attr_method(rb_cOgreRenderTarget,"autoUpdated",_getAutoUpdated,_setAutoUpdated);

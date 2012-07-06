@@ -35,7 +35,7 @@ inline VALUE wrap< Ogre::FileNotFoundException >(Ogre::FileNotFoundException *ex
 template <>
 inline VALUE wrap< Ogre::InvalidParametersException >(Ogre::InvalidParametersException *exception )
 {
-	return Data_Wrap_Struct(rb_eOgreFileNotFoundError, NULL, free, exception);
+	return Data_Wrap_Struct(rb_eOgreInvalidParametersException, NULL, free, exception);
 }
 template <>
 inline VALUE wrap< Ogre::UnimplementedException >(Ogre::UnimplementedException *exception )

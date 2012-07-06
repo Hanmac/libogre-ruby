@@ -65,12 +65,15 @@ singlereturn(getDestinationRenderSystem)
 */
 VALUE _createLight(int argc,VALUE *argv,VALUE self)
 {
+	RUBYTRY(
 	VALUE name;
 	rb_scan_args(argc, argv, "01",&name);
 	if(NIL_P(name))
 		return wrap(_self->createLight());
 	else
 		return wrap(_self->createLight(wrap<Ogre::String>(name)));
+	)
+	return Qnil;
 }
 /*
  * call-seq:
@@ -102,6 +105,7 @@ VALUE _hasLight(VALUE self,VALUE name)
 */
 VALUE _destroyLight(int argc,VALUE *argv,VALUE self)
 {
+	RUBYTRY(
 	VALUE name;
 	rb_scan_args(argc, argv, "01",&name);
 	if(NIL_P(name))
@@ -110,6 +114,7 @@ VALUE _destroyLight(int argc,VALUE *argv,VALUE self)
 		_self->destroyLight(wrap<Ogre::Light*>(name));
 	else
 		_self->destroyLight(wrap<Ogre::String>(name));
+	)
 	return Qnil;
 }
 
@@ -121,9 +126,10 @@ VALUE _destroyLight(int argc,VALUE *argv,VALUE self)
 */
 VALUE _createEntity(int argc,VALUE *argv,VALUE self)
 {
+
 	VALUE mesh,name;
 	rb_scan_args(argc, argv, "11",&mesh,&name);
-
+	RUBYTRY(
 	if(SYMBOL_P(mesh))
 	{
 		if(NIL_P(name))
@@ -142,6 +148,8 @@ VALUE _createEntity(int argc,VALUE *argv,VALUE self)
 		else
 			return wrap(_self->createEntity(wrap<Ogre::String>(name),wrap<Ogre::String>(mesh)));
 	}
+	)
+	return Qnil;
 }
 /*
  * call-seq:
@@ -175,12 +183,14 @@ VALUE _destroyEntity(int argc,VALUE *argv,VALUE self)
 {
 	VALUE name;
 	rb_scan_args(argc, argv, "01",&name);
+	RUBYTRY(
 	if(NIL_P(name))
 		_self->destroyAllEntities();
 	else if(rb_obj_is_kind_of(name,rb_cOgreEntity))
 		_self->destroyEntity(wrap<Ogre::Entity*>(name));
 	else
 		_self->destroyEntity(wrap<Ogre::String>(name));
+	)
 	return Qnil;
 }
 
@@ -194,7 +204,10 @@ VALUE _destroyEntity(int argc,VALUE *argv,VALUE self)
 */
 VALUE _createCamera(VALUE self,VALUE name)
 {
+	RUBYTRY(
 	return wrap(_self->createCamera(wrap<Ogre::String>(name)));
+	)
+	return Qnil;
 }
 /*
  * call-seq:
@@ -228,12 +241,14 @@ VALUE _destroyCamera(int argc,VALUE *argv,VALUE self)
 {
 	VALUE name;
 	rb_scan_args(argc, argv, "01",&name);
+	RUBYTRY(
 	if(NIL_P(name))
 		_self->destroyAllCameras();
 	else if(rb_obj_is_kind_of(name,rb_cOgreCamera))
 		_self->destroyCamera(wrap<Ogre::Camera*>(name));
 	else
 		_self->destroyCamera(wrap<Ogre::String>(name));
+	)
 	return Qnil;
 }
 
@@ -259,10 +274,13 @@ VALUE _createBillboardChain(int argc,VALUE *argv,VALUE self)
 {
 	VALUE name;
 	rb_scan_args(argc, argv, "01",&name);
+	RUBYTRY(
 	if(NIL_P(name))
 		return wrap(_self->createBillboardChain());
 	else
 		return wrap(_self->createBillboardChain(wrap<Ogre::String>(name)));
+	)
+	return Qnil;
 }
 /*
  * call-seq:
@@ -296,12 +314,14 @@ VALUE _destroyBillboardChain(int argc,VALUE *argv,VALUE self)
 {
 	VALUE name;
 	rb_scan_args(argc, argv, "01",&name);
+	RUBYTRY(
 	if(NIL_P(name))
 		_self->destroyAllBillboardChains();
 	else if(rb_obj_is_kind_of(name,rb_cOgreLight))
 		_self->destroyBillboardChain(wrap<Ogre::BillboardChain*>(name));
 	else
 		_self->destroyBillboardChain(wrap<Ogre::String>(name));
+	)
 	return Qnil;
 }
 
@@ -316,10 +336,13 @@ VALUE _createRibbonTrail(int argc,VALUE *argv,VALUE self)
 {
 	VALUE name;
 	rb_scan_args(argc, argv, "01",&name);
+	RUBYTRY(
 	if(NIL_P(name))
 		return wrap(_self->createRibbonTrail());
 	else
 		return wrap(_self->createRibbonTrail(wrap<Ogre::String>(name)));
+	)
+	return Qnil;
 }
 /*
  * call-seq:
@@ -353,12 +376,14 @@ VALUE _destroyRibbonTrail(int argc,VALUE *argv,VALUE self)
 {
 	VALUE name;
 	rb_scan_args(argc, argv, "01",&name);
+	RUBYTRY(
 	if(NIL_P(name))
 		_self->destroyAllRibbonTrails();
 	else if(rb_obj_is_kind_of(name,rb_cOgreLight))
 		_self->destroyRibbonTrail(wrap<Ogre::RibbonTrail*>(name));
 	else
 		_self->destroyRibbonTrail(wrap<Ogre::String>(name));
+	)
 	return Qnil;
 }
 
@@ -374,10 +399,13 @@ VALUE _createBillboardSet(int argc,VALUE *argv,VALUE self)
 {
 	VALUE name;
 	rb_scan_args(argc, argv, "01",&name);
+	RUBYTRY(
 	if(NIL_P(name))
 		return wrap(_self->createBillboardSet());
 	else
 		return wrap(_self->createBillboardSet(wrap<Ogre::String>(name)));
+	)
+	return Qnil;
 }
 /*
  * call-seq:
@@ -411,12 +439,14 @@ VALUE _destroyBillboardSet(int argc,VALUE *argv,VALUE self)
 {
 	VALUE name;
 	rb_scan_args(argc, argv, "01",&name);
+	RUBYTRY(
 	if(NIL_P(name))
 		_self->destroyAllBillboardSets();
 	else if(rb_obj_is_kind_of(name,rb_cOgreLight))
 		_self->destroyBillboardSet(wrap<Ogre::BillboardSet*>(name));
 	else
 		_self->destroyBillboardSet(wrap<Ogre::String>(name));
+	)
 	return Qnil;
 }
 
@@ -430,10 +460,13 @@ VALUE _createManualObject(int argc,VALUE *argv,VALUE self)
 {
 	VALUE name;
 	rb_scan_args(argc, argv, "01",&name);
+	RUBYTRY(
 	if(NIL_P(name))
 		return wrap(_self->createManualObject());
 	else
 		return wrap(_self->createManualObject(wrap<Ogre::String>(name)));
+	)
+	return Qnil;
 }
 /*
  * call-seq:
@@ -467,12 +500,14 @@ VALUE _destroyManualObject(int argc,VALUE *argv,VALUE self)
 {
 	VALUE name;
 	rb_scan_args(argc, argv, "01",&name);
+	RUBYTRY(
 	if(NIL_P(name))
 		_self->destroyAllManualObjects();
 	else if(rb_obj_is_kind_of(name,rb_cOgreLight))
 		_self->destroyManualObject(wrap<Ogre::ManualObject*>(name));
 	else
 		_self->destroyManualObject(wrap<Ogre::String>(name));
+	)
 	return Qnil;
 }
 
@@ -487,10 +522,13 @@ VALUE _createSceneNode(int argc,VALUE *argv,VALUE self)
 {
 	VALUE name;
 	rb_scan_args(argc, argv, "01",&name);
+	RUBYTRY(
 	if(NIL_P(name))
 		return wrap(_self->createSceneNode());
 	else
 		return wrap(_self->createSceneNode(wrap<Ogre::String>(name)));
+	)
+	return Qnil;
 }
 /*
  * call-seq:
@@ -522,10 +560,12 @@ VALUE _hasSceneNode(VALUE self,VALUE name)
 */
 VALUE _destroySceneNode(VALUE self,VALUE name)
 {
+	RUBYTRY(
 	if(rb_obj_is_kind_of(name,rb_cOgreSceneNode))
 		_self->destroySceneNode(wrap<Ogre::SceneNode*>(name));
 	else
 		_self->destroySceneNode(wrap<Ogre::String>(name));
+	)
 	return Qnil;
 }
 

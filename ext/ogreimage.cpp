@@ -31,7 +31,7 @@ VALUE _initialize(int argc,VALUE* argv,VALUE self)
 	VALUE path,groupname;
 	rb_scan_args(argc, argv, "11",&path,&groupname);
 	Ogre::String result;
-	try {
+	RUBYTRY(
 		if(rb_obj_is_kind_of(path,rb_cOgreDataStream)){
 			Ogre::DataStreamPtr stream = wrap<Ogre::DataStreamPtr>(path);
 			_self->load(stream, unwrapResourceGroup(groupname,Ogre::StringUtil::BLANK));
@@ -41,9 +41,7 @@ VALUE _initialize(int argc,VALUE* argv,VALUE self)
 						Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
 					);
 		}
-	} catch (Ogre::Exception& e){
-		rb_raise(wrap(e));
-	}
+	)
 	return self;
 }
 /*

@@ -46,15 +46,13 @@ VALUE _addResourceLocation(int argc,VALUE *argv,VALUE self)
 	VALUE path,type,resGroup,recursive;
 	rb_scan_args(argc, argv, "22",&path,&type,&resGroup,&recursive);
 
-	try{
+	RUBYTRY(
 		_self->addResourceLocation(wrap< Ogre::String >(path),
 			wrap< Ogre::String >(type),
 			unwrapResourceGroup(resGroup,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME),
 			RTEST(recursive)
 		);
-	}catch(Ogre::Exception& e){
-		rb_raise(wrap(e));
-	}
+	)
 	return self;
 }
 /*
@@ -84,7 +82,7 @@ VALUE _createFileStream(int argc,VALUE *argv,VALUE self)
 	Ogre::String groupName = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
 	Ogre::String pattern = Ogre::StringUtil::BLANK;
 	bool overwrite=false;
-
+	RUBYTRY(
 	if(rb_obj_is_kind_of(hash,rb_cHash))
 	{
 		temp = rb_hash_aref(hash,ID2SYM(rb_intern("group_name")));
@@ -96,6 +94,8 @@ VALUE _createFileStream(int argc,VALUE *argv,VALUE self)
 	}
 
 	return wrap(_self->createFileStream(wrap< Ogre::String >(name),groupName,overwrite,pattern));
+	)
+	return Qnil;
 }
 /*
 */
@@ -105,6 +105,7 @@ VALUE _openFileStream(int argc,VALUE *argv,VALUE self)
 	rb_scan_args(argc, argv, "11",&name,&hash);
 	Ogre::String groupName = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
 	Ogre::String pattern = Ogre::StringUtil::BLANK;
+	RUBYTRY(
 	if(rb_obj_is_kind_of(hash,rb_cHash))
 	{
 		temp = rb_hash_aref(hash,ID2SYM(rb_intern("group_name")));
@@ -113,6 +114,8 @@ VALUE _openFileStream(int argc,VALUE *argv,VALUE self)
 			pattern = wrap< Ogre::String >(temp);
 	}
 	return wrap(_self->openFileStream(wrap< Ogre::String >(name),groupName,pattern));
+	)
+	return Qnil;
 }
 /*
 */
@@ -120,11 +123,9 @@ VALUE _createRenderWindow(int argc,VALUE *argv,VALUE self)
 {
 	VALUE autoCreate,name;
 	rb_scan_args(argc, argv, "20",&autoCreate,&name);
-	try{
+	RUBYTRY(
 		return wrap(_self->initialise(RTEST(autoCreate),wrap< Ogre::String >(name)));
-	}catch(Ogre::Exception& e){
-		rb_raise(wrap(e));
-	}
+	)
 	return Qnil;
 }
 /*
@@ -203,11 +204,7 @@ VALUE _listPlugins(VALUE self)
 */
 VALUE _unloadPlugin(VALUE self,VALUE val)
 {
-	try{
-		_self->unloadPlugin(wrap< Ogre::String >(val));
-	}catch(Ogre::Exception& e){
-		rb_raise(wrap(e));
-	}
+	RUBYTRY(_self->unloadPlugin(wrap< Ogre::String >(val));)
 	return self;
 }
 
@@ -220,11 +217,9 @@ VALUE _createSceneManager(int argc,VALUE *argv,VALUE self)
 	Ogre::String result;
 	if(!NIL_P(instanceName))
 		result = wrap< Ogre::String >(instanceName);
-	try{
+	RUBYTRY(
 		return wrap(_self->createSceneManager(wrap< Ogre::String >(typeName),result));
-	}catch(Ogre::Exception& e){
-		rb_raise(wrap(e));
-	}
+	)
 	return Qnil;
 }
 /*

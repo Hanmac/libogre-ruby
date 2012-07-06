@@ -77,7 +77,7 @@ VALUE _singleton_createPlane(int argc,VALUE *argv,VALUE self)
 		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("upVector")))))
 			upVector = wrap<Ogre::Vector3>(temp);
     }
-	try {
+	RUBYTRY(
 		return wrap(_manager->createPlane(wrap<Ogre::String>(name),
 			unwrapResourceGroup(groupName,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME),
 			wrap<Ogre::Plane>(plane),
@@ -88,9 +88,7 @@ VALUE _singleton_createPlane(int argc,VALUE *argv,VALUE self)
 			uTile,vTile,
 			upVector
 			));
-	}catch(Ogre::Exception& e){
-		rb_raise(wrap(e));
-	}
+	)
 	return Qnil;
 
 }

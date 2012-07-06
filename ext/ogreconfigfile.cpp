@@ -4,13 +4,16 @@
 #define _self wrap<Ogre::ConfigFile*>(self)
 VALUE rb_cOgreConfigFile;
 
-VALUE OgreConfigFile_alloc(VALUE self)
+namespace RubyOgre {
+namespace ConfigFile {
+
+VALUE _alloc(VALUE self)
 {
 	return wrap(new Ogre::ConfigFile);
 }
 /*
 */
-VALUE OgreConfigFile_initialize(int argc,VALUE* argv,VALUE self)
+VALUE _initialize(int argc,VALUE* argv,VALUE self)
 {
 	VALUE file,hash,temp;
 	bool trimWhitespace = true;
@@ -23,16 +26,14 @@ VALUE OgreConfigFile_initialize(int argc,VALUE* argv,VALUE self)
 		if(!NIL_P(temp=rb_hash_aref(hash,ID2SYM(rb_intern("separators")))))
 			separators = wrap<Ogre::String>(temp);
 	}
-	try{
+	RUBYTRY(
 		if(rb_obj_is_kind_of(file,rb_cOgreDataStream))
 			_self->load(wrap<Ogre::DataStreamPtr>(file),separators,trimWhitespace);
 		else if(!rb_obj_is_kind_of(hash,rb_cHash) || NIL_P(temp=rb_hash_aref(hash,ID2SYM(rb_intern("group_name")))))
 			_self->load(wrap<Ogre::String>(file),separators,trimWhitespace);
 		else
 			_self->load(wrap<Ogre::String>(file),wrap<Ogre::String>(temp),separators,trimWhitespace);
-	}catch(Ogre::Exception& e){
-		rb_raise(wrap(e));
-	}
+	)
 	return self;
 }
 /*
@@ -41,7 +42,7 @@ VALUE OgreConfigFile_initialize(int argc,VALUE* argv,VALUE self)
  * 
  * returns all settings of the given key.
 */
-VALUE OgreConfigFile_get(int argc,VALUE* argv,VALUE self)
+VALUE _get(int argc,VALUE* argv,VALUE self)
 {
 	VALUE key,section;
 	rb_scan_args(argc, argv, "11",&key,&section);
@@ -50,11 +51,7 @@ VALUE OgreConfigFile_get(int argc,VALUE* argv,VALUE self)
 		temp = Ogre::StringUtil::BLANK;
 	else
 		temp = wrap<Ogre::String>(section);
-	try{
-		return wrap(_self->getMultiSetting(wrap<Ogre::String>(key),temp));
-	}catch(Ogre::Exception& e){
-		rb_raise(wrap(e));
-	}
+	RUBYTRY(return wrap<Ogre::String>(_self->getMultiSetting(wrap<Ogre::String>(key),temp));)
 	return Qnil;
 }
 /*
@@ -64,7 +61,7 @@ VALUE OgreConfigFile_get(int argc,VALUE* argv,VALUE self)
  * 
  * iterates the ConfigFile
 */
-VALUE OgreConfigFile_each(VALUE self)
+VALUE _each(VALUE self)
 {
 	RETURN_ENUMERATOR(self,0,NULL);
 	Ogre::ConfigFile::SectionIterator sec = _self->getSectionIterator();
@@ -78,6 +75,7 @@ VALUE OgreConfigFile_each(VALUE self)
 	return self;
 }
 
+}}
 /*
  * Document-class: Ogre::ConfigFile
  * 
@@ -88,11 +86,13 @@ void Init_OgreConfigFile(VALUE rb_mOgre)
 #if 0
 	rb_mOgre = rb_define_module("Ogre");
 #endif
+	using namespace RubyOgre::ConfigFile;
+
 	rb_cOgreConfigFile = rb_define_class_under(rb_mOgre,"ConfigFile",rb_cObject);
-	rb_define_alloc_func(rb_cOgreConfigFile,OgreConfigFile_alloc);
-	rb_define_method(rb_cOgreConfigFile,"initialize",RUBY_METHOD_FUNC(OgreConfigFile_initialize),-1);
-	rb_define_method(rb_cOgreConfigFile,"[]",RUBY_METHOD_FUNC(OgreConfigFile_get),-1);
-	rb_define_method(rb_cOgreConfigFile,"each",RUBY_METHOD_FUNC(OgreConfigFile_each),0);
+	rb_define_alloc_func(rb_cOgreConfigFile,_alloc);
+	rb_define_method(rb_cOgreConfigFile,"initialize",RUBY_METHOD_FUNC(_initialize),-1);
+	rb_define_method(rb_cOgreConfigFile,"[]",RUBY_METHOD_FUNC(_get),-1);
+	rb_define_method(rb_cOgreConfigFile,"each",RUBY_METHOD_FUNC(_each),0);
 
 	rb_include_module(rb_cOgreConfigFile,rb_mEnumerable);
 

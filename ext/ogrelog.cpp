@@ -60,22 +60,14 @@ VALUE _log(int argc,VALUE *argv,VALUE self)
 	Ogre::LogMessageLevel olevel = wrapenum<Ogre::LogMessageLevel>(level);
 	if(NIL_P(mask))
 		mask = Qfalse;
-	try{
-		_self->logMessage(wrap<Ogre::String>(message), olevel, RTEST(mask));
-	}catch(Ogre::Exception& e){
-		rb_raise(wrap(e));
-	}
+	RUBYTRY(_self->logMessage(wrap<Ogre::String>(message), olevel, RTEST(mask));)
 	return self;
 }
 /*
 */
 VALUE _logshift(VALUE self,VALUE message)
 {
-	try{
-		_self->logMessage(wrap<Ogre::String>(message), Ogre::LML_NORMAL, false);
-	}catch(Ogre::Exception& e){
-		rb_raise(wrap(e));
-	}
+	RUBYTRY(_self->logMessage(wrap<Ogre::String>(message), Ogre::LML_NORMAL, false);)
 	return self;
 }
 
@@ -118,11 +110,7 @@ VALUE _singleton_createLog(int argc,VALUE *argv,VALUE self)
 		debuggeroutput = Qtrue;
 	if(NIL_P(suppressFileOutput))
 		suppressFileOutput = Qfalse;
-	try{
-		return wrap(_singleton->createLog(wrap<Ogre::String>(name),RTEST(defaultlog),RTEST(debuggeroutput),RTEST(suppressFileOutput)));
-	}catch(Ogre::Exception& e){
-		rb_raise(wrap(e));
-	}
+	RUBYTRY(return wrap(_singleton->createLog(wrap<Ogre::String>(name),RTEST(defaultlog),RTEST(debuggeroutput),RTEST(suppressFileOutput)));)
 	return Qnil;
 }
 /*
@@ -134,22 +122,14 @@ VALUE _singleton_log(int argc,VALUE *argv,VALUE self)
 	Ogre::LogMessageLevel olevel = wrapenum<Ogre::LogMessageLevel>(level);
 	if(NIL_P(mask))
 		mask = Qfalse;
-	try{
-		_singleton->logMessage(wrap<Ogre::String>(message), olevel, RTEST(mask));
-	}catch(Ogre::Exception& e){
-		rb_raise(wrap(e));
-	}
+	RUBYTRY(_singleton->logMessage(wrap<Ogre::String>(message), olevel, RTEST(mask));)
 	return self;
 }
 /*
 */
 VALUE _singleton_logshift(VALUE self,VALUE message)
 {
-	try{
-		_singleton->logMessage(wrap<Ogre::String>(message), Ogre::LML_NORMAL, false);
-	}catch(Ogre::Exception& e){
-		rb_raise(wrap(e));
-	}
+	RUBYTRY(_singleton->logMessage(wrap<Ogre::String>(message), Ogre::LML_NORMAL, false);)
 	return self;
 }
 
@@ -163,19 +143,14 @@ VALUE _singleton_logshift(VALUE self,VALUE message)
 */
 VALUE _singleton_getLog(VALUE self,VALUE name)
 {
-	try{
-		return wrap(_singleton->getLog(wrap<Ogre::String>(name)));
-	}catch(Ogre::Exception& e){
-		rb_raise(wrap(e));
-	}
+	RUBYTRY(return wrap(_singleton->getLog(wrap<Ogre::String>(name)));)
 	return Qnil;
 }
 /*
 */
 VALUE _singleton_getdefaultLog(VALUE self)
 {
-	Ogre::Log *temp = _singleton->getDefaultLog();
-	return temp ? wrap(temp) : Qnil;
+	return wrap(_singleton->getDefaultLog());
 }
 /*
 */

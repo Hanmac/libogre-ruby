@@ -5,24 +5,14 @@
 void Init_OgreResourceGroup(VALUE rb_mOgre);
 extern VALUE rb_cOgreResourceGroup;
 
-struct ResourceGroup
+struct RubyResourceGroup
 {
 	std::string name;
 };
 
 template <>
-inline VALUE wrap< ResourceGroup >(ResourceGroup *resgroup )
-{
-	return Data_Wrap_Struct(rb_cOgreResourceGroup, NULL, free, resgroup);
-}
+VALUE wrap< RubyResourceGroup >(RubyResourceGroup *resgroup );
 
 template <>
-inline ResourceGroup* wrap< ResourceGroup* >(const VALUE &vresgroup)
-{
-	if ( ! rb_obj_is_kind_of(vresgroup, rb_cOgreResourceGroup) )
-		return NULL;
-	ResourceGroup *resgroup;
-  Data_Get_Struct( vresgroup, ResourceGroup, resgroup);
-	return resgroup;
-}
+RubyResourceGroup* wrap< RubyResourceGroup* >(const VALUE &vresgroup);
 #endif /* __RubyOgreResourceGroup_H__ */

@@ -330,20 +330,18 @@ VALUE Ogre_dummy4(VALUE self,VALUE obj1,VALUE obj2,VALUE obj3,VALUE obj4);
 
 void rb_define_attr_method(VALUE klass,std::string name,VALUE(get)(VALUE),VALUE(set)(VALUE,VALUE));
 
+#define RUBYTRY(body) try { body }catch(Ogre::Exception& e){rb_raise(wrap(e));}
+
 #define macro_attr_func(attr,funcget,funcset,wrapget,wrapset) \
 VALUE _get##attr(VALUE self)\
 { \
-	try { return wrapget(_self->funcget); }catch(Ogre::Exception& e){\
-		rb_raise(wrap(e));\
-	}\
+	RUBYTRY(return wrapget(_self->funcget);)\
 	return Qnil;\
 }\
 \
 VALUE _set##attr(VALUE self,VALUE other)\
 {\
-	try {	_self->funcset(wrapset(other));	}catch(Ogre::Exception& e){\
-		rb_raise(wrap(e));\
-	}\
+	RUBYTRY(_self->funcset(wrapset(other));)\
 	return other;\
 }
 
@@ -387,13 +385,13 @@ VALUE _set##attr(VALUE self,VALUE other)\
 
 #define singlefunc(func) \
 VALUE _##func(VALUE self)\
-{_self->func();return self;}
+{RUBYTRY(_self->func();)return self;}
 
 
 
 #define singlereturn(func) \
 VALUE _##func(VALUE self)\
-{return wrap(_self->func());}
+{RUBYTRY(return wrap(_self->func());)return Qnil;}
 
 
 
