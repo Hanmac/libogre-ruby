@@ -10,6 +10,6 @@ template <>
 VALUE wrap< Ogre::CompositorPtr >(Ogre::CompositorPtr *compositor );
 
 template <>
-Ogre::Compositor* wrap< Ogre::Compositor* >(const VALUE &vcompositor);
+Ogre::CompositorPtr wrap< Ogre::CompositorPtr >(const VALUE &vcompositor);
 
 #endif /* __RubyOgreCompositor_H__ */

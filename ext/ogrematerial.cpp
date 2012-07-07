@@ -1,6 +1,10 @@
 #include "ogreresource.hpp"
+#include "ogreexception.hpp"
 #include "ogrematerial.hpp"
 #include "ogretechnique.hpp"
+
+#define _self wrap<Ogre::MaterialPtr>(self)
+#define _manager Ogre::MaterialManager::getSingletonPtr()
 
 template <>
 VALUE wrap< Ogre::MaterialPtr >(Ogre::MaterialPtr *material )
@@ -9,13 +13,14 @@ VALUE wrap< Ogre::MaterialPtr >(Ogre::MaterialPtr *material )
 }
 
 template <>
-Ogre::Material* wrap< Ogre::Material* >(const VALUE &vmaterial)
+Ogre::MaterialPtr wrap< Ogre::MaterialPtr >(const VALUE &vmaterial)
 {
-	return unwrapPtr<Ogre::MaterialPtr>(vmaterial, rb_cOgreMaterial)->get();
+	if(rb_obj_is_kind_of(vmaterial,rb_cString))
+		return _manager->getByName(wrap<Ogre::String>(vmaterial));
+
+	return *unwrapPtr<Ogre::MaterialPtr>(vmaterial, rb_cOgreMaterial);
 }
 
-#define _self wrap<Ogre::Material*>(self)
-#define _singleton Ogre::MaterialManager::getSingletonPtr()
 VALUE rb_cOgreMaterial;
 
 namespace RubyOgre
@@ -43,13 +48,13 @@ VALUE _each(VALUE self)
 */
 VALUE _singleton_getActiveScheme(VALUE self)
 {
-	return wrap(_singleton->getActiveScheme());
+	return wrap(_manager->getActiveScheme());
 }
 /*
 */
 VALUE _singleton_setActiveScheme(VALUE self,VALUE val)
 {
-	_singleton->setActiveScheme(wrap<Ogre::String>(val));
+	_manager->setActiveScheme(wrap<Ogre::String>(val));
 	return val;
 }
 

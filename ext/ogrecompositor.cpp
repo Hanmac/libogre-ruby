@@ -1,7 +1,9 @@
 #include "ogreresource.hpp"
+#include "ogreexception.hpp"
 #include "ogrecompositor.hpp"
 #include "ogrerendertarget.hpp"
-#define _self wrap<Ogre::Compositor*>(self)
+#define _self wrap<Ogre::CompositorPtr>(self)
+#define _manager Ogre::CompositorManager::getSingletonPtr()
 VALUE rb_cOgreCompositor;
 
 template <>
@@ -11,21 +13,18 @@ VALUE wrap< Ogre::CompositorPtr >(Ogre::CompositorPtr *compositor )
 }
 
 template <>
-Ogre::Compositor* wrap< Ogre::Compositor* >(const VALUE &vcompositor)
+Ogre::CompositorPtr wrap< Ogre::CompositorPtr >(const VALUE &vcompositor)
 {
-	return unwrapPtr<Ogre::CompositorPtr>(vcompositor, rb_cOgreCompositor)->get();
+	if(rb_obj_is_kind_of(vcompositor,rb_cString))
+		return _manager->getByName(wrap<Ogre::String>(vcompositor));
+	return *unwrapPtr<Ogre::CompositorPtr>(vcompositor, rb_cOgreCompositor);
 }
 
 
 namespace RubyOgre {
 namespace Compositor {
 
-/*
-*/
-VALUE _createTechnique(VALUE self)
-{
-	return wrap(_self->createTechnique());
-}
+singlereturn(createTechnique)
 
 /*
 */
