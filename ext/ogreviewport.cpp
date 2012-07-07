@@ -62,6 +62,11 @@ VALUE _addListener(VALUE self,VALUE obj)
 }
 
 
+VALUE _compositorchain(VALUE self)
+{
+	return wrap(Ogre::CompositorManager::getSingletonPtr()->getCompositorChain(_self));
+}
+
 }
 }
 
@@ -103,6 +108,8 @@ void Init_OgreViewport(VALUE rb_mOgre)
 	rb_define_attr_method(rb_cOgreViewport,"top",_getTop,_setTop);
 	rb_define_attr_method(rb_cOgreViewport,"width",_getWidth,_setWidth);
 	rb_define_attr_method(rb_cOgreViewport,"height",_getHeight,_setHeight);
+
+	rb_define_method(rb_cOgreViewport,"compositor_chain",RUBY_METHOD_FUNC(_compositorchain),0);
 
 
 	rb_define_method(rb_cOgreViewport,"actual_left",RUBY_METHOD_FUNC(_getActualLeft),0);

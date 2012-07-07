@@ -46,6 +46,7 @@
 #include "ogrelayerblendmode.hpp"
 
 #include "ogrecompositor.hpp"
+#include "ogrecompositorchain.hpp"
 #include "ogretexturedefinition.hpp"
 #include "ogrecompositiontechnique.hpp"
 
@@ -316,6 +317,7 @@ extern "C" void Init_ogre(void)
 	
 	Init_OgreCompositor(rb_mOgre);
 	Init_OgreCompositionTechnique(rb_mOgre);
+	Init_OgreCompositorChain(rb_mOgre);
 	Init_OgreTextureDefinition(rb_mOgre);
 	
 	Init_OgreParticleSystem(rb_mOgre);
