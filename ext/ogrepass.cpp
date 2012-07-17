@@ -37,7 +37,7 @@ macro_attr(NormaliseNormals,bool)
 macro_attr(TransparentSortingEnabled,bool)
 macro_attr(TransparentSortingForced,bool)
 
-
+singlereturn(createTextureUnitState)
 
 singlereturn(getFogOverride)
 
@@ -75,6 +75,23 @@ VALUE _each(VALUE self)
 	wrap<Ogre::TextureUnitState*>( _self->getTextureUnitStateIterator());
 	return self;
 }
+
+/*
+ *
+ */
+VALUE _get(VALUE self,VALUE idx)
+{
+	if(rb_obj_is_kind_of(idx,rb_cString))
+		return wrap(_self->getTextureUnitState(wrap<Ogre::String>(idx)));
+	else{
+		size_t i = NUM2UINT(idx);
+		if(i >= _self->getNumTextureUnitStates())
+			return wrap(_self->getTextureUnitState(i));
+		return Qnil;
+	}
+}
+
+
 
 /*
  * call-seq:
@@ -283,7 +300,9 @@ void Init_OgrePass(VALUE rb_mOgre)
 	rb_define_method(rb_cOgrePass,"fragmentProgram",RUBY_METHOD_FUNC(_getFragmentProgramName),0);// :nodoc:
 	rb_define_method(rb_cOgrePass,"geometryProgram",RUBY_METHOD_FUNC(_getGeometryProgramName),0);// :nodoc:
 
+	rb_define_method(rb_cOgrePass,"create",RUBY_METHOD_FUNC(_createTextureUnitState),0);
 
+	rb_define_method(rb_cOgrePass,"[]",RUBY_METHOD_FUNC(_get),1);
 	rb_define_method(rb_cOgrePass,"each",RUBY_METHOD_FUNC(_each),0);
 	rb_include_module(rb_cOgrePass,rb_mEnumerable);
 	

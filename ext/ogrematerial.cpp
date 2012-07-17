@@ -45,6 +45,20 @@ VALUE _each(VALUE self)
 	return self;
 }
 /*
+ *
+ */
+VALUE _get(VALUE self,VALUE idx)
+{
+	if(rb_obj_is_kind_of(idx,rb_cString))
+		return wrap(_self->getTechnique(wrap<Ogre::String>(idx)));
+	else{
+		size_t i = NUM2UINT(idx);
+		if(i >= _self->getNumTechniques())
+			return wrap(_self->getTechnique(i));
+		return Qnil;
+	}
+}
+/*
 */
 VALUE _singleton_getActiveScheme(VALUE self)
 {
@@ -75,6 +89,8 @@ void Init_OgreMaterial(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreMaterial,"each",RUBY_METHOD_FUNC(_each),0);
 	rb_include_module(rb_cOgreMaterial,rb_mEnumerable);
 	
+	rb_define_method(rb_cOgreMaterial,"[]",RUBY_METHOD_FUNC(_get),1);
+
 	rb_define_singleton_method(rb_cOgreMaterial,"activeScheme",RUBY_METHOD_FUNC(_singleton_getActiveScheme),0);
 	rb_define_singleton_method(rb_cOgreMaterial,"activeScheme=",RUBY_METHOD_FUNC(_singleton_setActiveScheme),1);
 

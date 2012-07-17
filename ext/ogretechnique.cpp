@@ -18,6 +18,10 @@ singlereturn(isTransparentSortingForced);
 singlereturn(isLoaded);
 
 singlereturn(createPass);
+
+macro_attr(ShadowCasterMaterial,Ogre::MaterialPtr)
+macro_attr(ShadowReceiverMaterial,Ogre::MaterialPtr)
+
 /*
 */
 VALUE _each(VALUE self)
@@ -25,6 +29,21 @@ VALUE _each(VALUE self)
 	RETURN_ENUMERATOR(self,0,NULL);
 	wrap<Ogre::Pass*>(_self->getPassIterator());
 	return self;
+}
+
+/*
+ *
+ */
+VALUE _get(VALUE self,VALUE idx)
+{
+	if(rb_obj_is_kind_of(idx,rb_cString))
+		return wrap(_self->getPass(wrap<Ogre::String>(idx)));
+	else{
+		size_t i = NUM2UINT(idx);
+		if(i >= _self->getNumPasses())
+			return wrap(_self->getPass(i));
+		return Qnil;
+	}
 }
 
 }}
@@ -47,6 +66,8 @@ void Init_OgreTechnique(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreTechnique,"each",RUBY_METHOD_FUNC(_each),0);
 	rb_include_module(rb_cOgreTechnique,rb_mEnumerable);
 	
+	rb_define_method(rb_cOgreTechnique,"[]",RUBY_METHOD_FUNC(_get),1);
+
 	rb_define_attr_method(rb_cOgreTechnique,"name",_getName,_setName);
 	rb_define_attr_method(rb_cOgreTechnique,"schemename",_getSchemeName,_setSchemeName);
 	
