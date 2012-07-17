@@ -4,7 +4,7 @@
 #include "ogreplane.hpp"
 #include "ogrevector3.hpp"
 #include "ogresubmesh.hpp"
-#define _self wrap<Ogre::Mesh*>(self)
+#define _self wrap<Ogre::MeshPtr>(self)
 #define _manager Ogre::MeshManager::getSingletonPtr()
 VALUE rb_cOgreMesh;
 
@@ -15,9 +15,9 @@ VALUE wrap< Ogre::MeshPtr >(Ogre::MeshPtr *mesh )
 }
 
 template <>
-Ogre::Mesh* wrap< Ogre::Mesh* >(const VALUE &vmesh)
+Ogre::MeshPtr wrap< Ogre::MeshPtr >(const VALUE &vmesh)
 {
-	return unwrapPtr<Ogre::MeshPtr>(vmesh, rb_cOgreMesh)->get();
+	return *unwrapPtr<Ogre::MeshPtr>(vmesh, rb_cOgreMesh);
 }
 
 
@@ -35,6 +35,29 @@ VALUE _each(VALUE self)
 	return self;
 }
 
+/*
+ *
+ */
+VALUE _export(int argc,VALUE *argv,VALUE self)
+{
+	VALUE filename,opt,endian = Qnil,version = Qnil;
+	rb_scan_args(argc, argv, "11",&filename,&opt);
+
+	if(rb_obj_is_kind_of(opt,rb_cHash))
+	{
+		endian = rb_hash_aref(opt,ID2SYM(rb_intern("endian")));
+		version = rb_hash_aref(opt,ID2SYM(rb_intern("version")));
+	}
+
+	Ogre::MeshSerializer serial;
+	serial.exportMesh(_self.get(),
+		wrap<Ogre::String>(filename),
+		wrapenum<Ogre::MeshVersion>(version),
+		wrapenum<Ogre::MeshSerializer::Endian>(endian)
+	);
+
+	return self;
+}
 
 /*
  *         MeshPtr createPlane(
@@ -109,6 +132,19 @@ void Init_OgreMesh(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreMesh,"each",RUBY_METHOD_FUNC(_each),0);
 	rb_include_module(rb_cOgreMesh,rb_mEnumerable);
 
+	rb_define_method(rb_cOgreMesh,"export",RUBY_METHOD_FUNC(_export),-1);
+
 	rb_define_singleton_method(rb_cOgreMesh,"createPlane",RUBY_METHOD_FUNC(_singleton_createPlane),-1);
 
+	registerenum<Ogre::MeshVersion>("Ogre::MeshVersion")
+		.add(Ogre::MESH_VERSION_LATEST,"latest")
+		.add(Ogre::MESH_VERSION_1_8,"v1_8")
+		.add(Ogre::MESH_VERSION_1_7,"v1_7")
+		.add(Ogre::MESH_VERSION_1_4,"v1_4")
+		.add(Ogre::MESH_VERSION_1_0,"v1_0");
+
+	registerenum<Ogre::MeshSerializer::Endian>("Ogre::MeshSerializer::Endian")
+		.add(Ogre::MeshSerializer::ENDIAN_NATIVE,"native")
+		.add(Ogre::MeshSerializer::ENDIAN_BIG,"big")
+		.add(Ogre::MeshSerializer::ENDIAN_LITTLE,"little");
 }

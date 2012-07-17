@@ -10,6 +10,6 @@ template <>
 VALUE wrap< Ogre::MeshPtr >(Ogre::MeshPtr *mesh );
 
 template <>
-Ogre::Mesh* wrap< Ogre::Mesh* >(const VALUE &vmesh);
+Ogre::MeshPtr wrap< Ogre::MeshPtr >(const VALUE &vmesh);
 
 #endif /* __RubyOgreMesh_H__ */
