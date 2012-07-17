@@ -19,16 +19,12 @@ namespace Node
 
 macro_attr(Position,Ogre::Vector3)
 macro_attr(Scale,Ogre::Vector3)
-macro_attr(Orientation,Ogre::Quaternion);
+macro_attr(Orientation,Ogre::Quaternion)
+
+macro_attr(Listener,Ogre::Node::Listener*)
 
 singlereturn(getName)
-
-/*
-*/
-VALUE _numChildren(VALUE self)
-{
-	return UINT2NUM(_self->numChildren());
-}
+singlereturn(numChildren)
 
 /*
 */
@@ -58,20 +54,6 @@ VALUE _inspect(VALUE self)
 	return rb_f_sprintf(3,array);
 }
 
-/*
-*/
-VALUE _getListener(VALUE self)
-{
-	Ogre::Node::Listener *temp = _self->getListener();
-	return temp ? wrap(temp) : Qnil;
-}
-/*
-*/
-VALUE _setListener(VALUE self,VALUE val)
-{
-	_self->setListener(wrap<Ogre::Node::Listener*>(val));
-	return val;
-}
 /*
 */
 VALUE _each(VALUE self)
@@ -152,6 +134,35 @@ VALUE _createChild(int argc,VALUE *argv,VALUE self)
 	}
 }
 
+/*
+*/
+VALUE _roll(int argc,VALUE *argv,VALUE self)
+{
+	VALUE angle,space;
+	rb_scan_args(argc, argv, "11",&angle,&space);
+	_self->roll(wrap<Ogre::Radian>(angle),wrapenum<Ogre::Node::TransformSpace>(space));
+	return self;
+}
+/*
+*/
+VALUE _yaw(int argc,VALUE *argv,VALUE self)
+{
+	VALUE angle,space;
+	rb_scan_args(argc, argv, "11",&angle,&space);
+	_self->yaw(wrap<Ogre::Radian>(angle),wrapenum<Ogre::Node::TransformSpace>(space));
+	return self;
+}
+/*
+*/
+VALUE _pitch(int argc,VALUE *argv,VALUE self)
+{
+	VALUE angle,space;
+	rb_scan_args(argc, argv, "11",&angle,&space);
+	_self->pitch(wrap<Ogre::Radian>(angle),wrapenum<Ogre::Node::TransformSpace>(space));
+	return self;
+}
+
+
 }
 }
 void Init_OgreNode(VALUE rb_mOgre)
@@ -182,11 +193,22 @@ void Init_OgreNode(VALUE rb_mOgre)
 	
 	rb_define_attr_method(rb_cOgreNode,"position",_getPosition,_setPosition);
 	rb_define_attr_method(rb_cOgreNode,"scale",_getScale,_setScale);
-	
+
+
+	rb_define_method(rb_cOgreNode,"roll",RUBY_METHOD_FUNC(_roll),-1);
+	rb_define_method(rb_cOgreNode,"yaw",RUBY_METHOD_FUNC(_yaw),-1);
+	rb_define_method(rb_cOgreNode,"pitch",RUBY_METHOD_FUNC(_pitch),-1);
+
 
 	rb_define_method(rb_cOgreNode,"each",RUBY_METHOD_FUNC(_each),0);
 	rb_include_module(rb_cOgreNode,rb_mEnumerable);
 	rb_define_method(rb_cOgreNode,"[]",RUBY_METHOD_FUNC(_getChild),1);
 
 	registerklass<Ogre::Node>(rb_cOgreNode);
+
+	registerenum<Ogre::Node::TransformSpace>("Ogre::Node::TransformSpace")
+		.add(Ogre::Node::TS_LOCAL,"local")
+		.add(Ogre::Node::TS_PARENT,"parent")
+		.add(Ogre::Node::TS_WORLD,"world");
+
 }
