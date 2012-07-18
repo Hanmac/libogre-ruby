@@ -57,6 +57,23 @@ VALUE _export(int argc,VALUE *argv,VALUE self)
 	);
 
 	return self;
+
+}
+
+/*
+ *
+ */
+VALUE _singleton_createManual(int argc,VALUE *argv,VALUE self)
+{
+	VALUE name, groupName;
+	rb_scan_args(argc, argv, "11",&name,&groupName);
+	RUBYTRY(
+		_manager->createManual(wrap<Ogre::String>(name),
+			unwrapResourceGroup(groupName,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
+		);
+	);
+
+	return Qnil;
 }
 
 /*
@@ -134,6 +151,7 @@ void Init_OgreMesh(VALUE rb_mOgre)
 
 	rb_define_method(rb_cOgreMesh,"export",RUBY_METHOD_FUNC(_export),-1);
 
+	rb_define_singleton_method(rb_cOgreMesh,"createManual",RUBY_METHOD_FUNC(_singleton_createManual),-1);
 	rb_define_singleton_method(rb_cOgreMesh,"createPlane",RUBY_METHOD_FUNC(_singleton_createPlane),-1);
 
 	registerenum<Ogre::MeshVersion>("Ogre::MeshVersion")
