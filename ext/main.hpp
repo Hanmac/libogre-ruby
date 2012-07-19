@@ -21,7 +21,9 @@ struct enumtype
 {
 	std::string name;
 	typedef std::map<int,ID> value_type;
+	typedef std::map<ID,int> link_type;
 	value_type values;
+	link_type links;
 
 	int defaults;
 
@@ -30,6 +32,11 @@ struct enumtype
 		values.insert(std::make_pair(enumo,rb_intern(sym)));
 		return *this;
 	}
+	enumtype& link(int enumo,const char* sym)
+		{
+			links.insert(std::make_pair(rb_intern(sym),enumo));
+			return *this;
+		}
 };
 //typedef std::map<int,ID > enumtype;
 typedef std::map<std::string,enumtype > enumregistertype;
@@ -140,12 +147,16 @@ T wrapenum(const VALUE &arg){
 		else if(SYMBOL_P(arg))
 		{
 			ID id = SYM2ID(arg);
-			for(enumtype::value_type::iterator it2 = it->second.values.begin();
-					it2 != it->second.values.end();
-					++it2)
+			enumtype::link_type::iterator it2 = it->second.links.find(id);
+			if(it2 != it->second.links.end())
+				return (T)it2->second;
+
+			for(enumtype::value_type::iterator it3 = it->second.values.begin();
+					it3 != it->second.values.end();
+					++it3)
 			{
-				if(it2->second == id)
-					return (T)it2->first;
+				if(it3->second == id)
+					return (T)it3->first;
 			}
 			rb_raise(rb_eTypeError,"%s is not a %s-Enum.",rb_id2name(id),it->second.name.c_str());
 		}else
@@ -254,6 +265,12 @@ VALUE wrap< unsigned short >(const unsigned short &st );
 
 template <>
 unsigned short wrap< unsigned short >(const VALUE &val );
+
+template <>
+VALUE wrap< unsigned int >(const unsigned int &st );
+
+template <>
+unsigned int wrap< unsigned int >(const VALUE &val );
 
 
 /*

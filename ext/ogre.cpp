@@ -145,6 +145,19 @@ unsigned short wrap< unsigned short >(const VALUE &val )
 }
 
 template <>
+VALUE wrap< unsigned int >(const unsigned int &st )
+{
+	return UINT2NUM(st);
+}
+
+template <>
+unsigned int wrap< unsigned int >(const VALUE &val )
+{
+	return NUM2UINT(val);
+}
+
+
+template <>
 VALUE wrap< Ogre::String >(const Ogre::String &st )
 {
 	return rb_str_new2(st.c_str());
