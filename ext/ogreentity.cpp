@@ -17,7 +17,8 @@ macro_attr(DisplaySkeleton,bool)
 VALUE _each(VALUE self)
 {
 	RETURN_ENUMERATOR(self,0,NULL);
-	for (unsigned int i = 0; i < _self->getNumSubEntities(); ++i)
+	unsigned int count = _self->getNumSubEntities();
+	for (unsigned int i = 0; i < count; ++i)
 		rb_yield(wrap(_self->getSubEntity(i)));
 	return self;
 }
@@ -55,6 +56,8 @@ void Init_OgreEntity(VALUE rb_mOgre)
 	rb_include_module(rb_cOgreEntity,rb_mEnumerable);
 	
 	rb_define_method(rb_cOgreEntity,"each_attached",RUBY_METHOD_FUNC(_each_attached),0);
+
+	rb_define_method(rb_cOgreEntity,"mesh",RUBY_METHOD_FUNC(_getMesh),0);
 
 	registerklass<Ogre::Entity>(rb_cOgreEntity);
 }

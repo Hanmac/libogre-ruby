@@ -23,59 +23,22 @@ macro_attr(LightMask,uint)
 
 macro_attr(Listener,Ogre::MovableObject::Listener*)
 
-/*
-*/
-VALUE _getName(VALUE self)
-{
-	return wrap(_self->getName());
-}
+singlereturn(getName)
+singlereturn(getMovableType)
+singlereturn(getParentNode)
 
-/*
-*/
-VALUE _getMovableType(VALUE self)
-{
-	return wrap(_self->getMovableType());
-}
-/*
-*/
-VALUE _getParentNode(VALUE self)
-{
-	return wrap(_self->getParentNode());
-}
+singlereturn(getBoundingBox)
+singlereturn(getBoundingRadius)
 
-/*
-*/
-VALUE _isAttached(VALUE self)
-{
-	return _self->isAttached() ? Qtrue : Qfalse;
-}
+singlereturn(isAttached)
+singlereturn(isVisible)
+
 /*
 */
 VALUE _detach(VALUE self)
 {
 	_self->detachFromParent();
 	return self;
-}
-
-/*
-*/
-VALUE _isVisible(VALUE self)
-{
-	return _self->isVisible() ? Qtrue : Qfalse;
-}
-
-
-/*
-*/
-VALUE _getBoundingBox(VALUE self)
-{
-	return wrap(_self->getBoundingBox());
-}
-/*
-*/
-VALUE _getBoundingRadius(VALUE self)
-{
-	return DBL2NUM(_self->getBoundingRadius());
 }
 
 /*

@@ -3,6 +3,7 @@
 VALUE rb_mOgreError;
 VALUE rb_eOgreIOError;
 VALUE rb_eOgreItemIdentityException;
+VALUE rb_eOgreInvalidParametersException;
 VALUE rb_eOgreFileNotFoundError;
 VALUE rb_eOgreUnimplementedException;
 VALUE rb_eOgreInvalidStateException;
@@ -46,6 +47,7 @@ void Init_OgreException(VALUE rb_mOgre)
 	rb_eOgreItemIdentityException = rb_define_class_under(rb_mOgreError,"ItemIdentityException",rb_eKeyError);
 	rb_eOgreUnimplementedException = rb_define_class_under(rb_mOgreError,"UnimplementedException",rb_eNotImpError);
 	rb_eOgreInvalidStateException = rb_define_class_under(rb_mOgreError,"InvalidStateException",rb_eException);
+	rb_eOgreInvalidParametersException = rb_define_class_under(rb_mOgreError,"InvalidParameterException",rb_eException);
 	rb_eOgreInternalErrorException = rb_define_class_under(rb_mOgreError,"InternalErrorException",rb_eSyntaxError);
 	
 	

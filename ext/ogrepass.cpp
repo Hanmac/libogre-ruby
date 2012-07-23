@@ -85,7 +85,7 @@ VALUE _get(VALUE self,VALUE idx)
 		return wrap(_self->getTextureUnitState(wrap<Ogre::String>(idx)));
 	else{
 		size_t i = NUM2UINT(idx);
-		if(i >= _self->getNumTextureUnitStates())
+		if(i < _self->getNumTextureUnitStates())
 			return wrap(_self->getTextureUnitState(i));
 		return Qnil;
 	}

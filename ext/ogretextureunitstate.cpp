@@ -18,22 +18,21 @@ macro_attr(IsAlpha,bool)
 macro_attr(CurrentFrame,unsigned int)
 macro_attr(NumMipmaps,int)
 
-macro_attr(TextureUScroll,double)
-macro_attr(TextureVScroll,double)
-macro_attr(TextureUScale,double)
-macro_attr(TextureVScale,double)
+macro_attr(TextureUScroll,Ogre::Real)
+macro_attr(TextureVScroll,Ogre::Real)
+macro_attr(TextureUScale,Ogre::Real)
+macro_attr(TextureVScale,Ogre::Real)
 
 macro_attr(TextureRotate,Ogre::Radian)
 
 macro_attr(Name,Ogre::String)
+macro_attr(TextureName,Ogre::String)
 macro_attr(TextureNameAlias,Ogre::String)
 
-macro_attr(BindingType,Ogre::TextureUnitState::BindingType)
-macro_attr(ContentType,Ogre::TextureUnitState::ContentType)
+macro_attr_enum(BindingType,Ogre::TextureUnitState::BindingType)
+macro_attr_enum(ContentType,Ogre::TextureUnitState::ContentType)
 
-macro_attr(DesiredFormat,Ogre::PixelFormat)
-
-//macro_attr(TextureType,Ogre::TextureType)
+macro_attr_enum(DesiredFormat,Ogre::PixelFormat)
 
 macro_attr(TextureBorderColour,Ogre::ColourValue)
 
@@ -43,6 +42,11 @@ macro_attr(TextureTransform,Ogre::Matrix4)
 
 macro_attr(TextureAnisotropy,unsigned int)
 macro_attr(TextureMipmapBias,float)
+
+singlereturn(getTextureType)
+singlereturn(getColourBlendMode)
+singlereturn(getAlphaBlendMode)
+
 
 /*
  *
@@ -63,12 +67,18 @@ VALUE _setFrameTextureName(VALUE self,VALUE frame,VALUE name)
 	return self;
 }
 
-
-VALUE _getColorBlendMode(VALUE self)
+/*
+ *
+ */
+VALUE _addFrameTextureName(VALUE self,VALUE frame)
 {
-	return wrap(_self->getColourBlendMode());
+	_self->addFrameTextureName(wrap<Ogre::String>(frame));
+	return self;
 }
 
+/*
+ *
+ */
 VALUE _setColorBlendMode(VALUE self,VALUE val)
 {
 	Ogre::LayerBlendModeEx* cval = wrap< Ogre::LayerBlendModeEx* >(val);
@@ -79,12 +89,9 @@ VALUE _setColorBlendMode(VALUE self,VALUE val)
 	return val;
 }
 
-
-VALUE _getAlphaBlendMode(VALUE self)
-{
-	return wrap(_self->getAlphaBlendMode());
-}
-
+/*
+ *
+ */
 VALUE _setAlphaBlendMode(VALUE self,VALUE val)
 {
 	Ogre::LayerBlendModeEx* cval = wrap< Ogre::LayerBlendModeEx* >(val);
@@ -95,6 +102,44 @@ VALUE _setAlphaBlendMode(VALUE self,VALUE val)
 	return val;
 }
 
+VALUE _getTextureFiltering(VALUE self)
+{
+	VALUE result =rb_hash_new();
+
+//	Ogre::FilterType ft[] = {Ogre::FT_MIN,Ogre::FT_MAG,Ogre::FT_MIP};
+//	size_t size = sizeof(ft) / sizeof(Ogre::FilterType);
+//	for(int i = 0;i < size;++i)
+//		rb_hash_aset(result,wrapenum(ft[i]),wrapenum(_self->getTextureFiltering(ft[i])));
+
+	rb_hash_aset(result,wrapenum(Ogre::FT_MIN),wrapenum(_self->getTextureFiltering(Ogre::FT_MIN)));
+	rb_hash_aset(result,wrapenum(Ogre::FT_MAG),wrapenum(_self->getTextureFiltering(Ogre::FT_MAG)));
+	rb_hash_aset(result,wrapenum(Ogre::FT_MIP),wrapenum(_self->getTextureFiltering(Ogre::FT_MIP)));
+	return result;
+}
+
+int _setTextureFiltering_each(VALUE key,VALUE value,VALUE self)
+{
+	_self->setTextureFiltering(wrapenum<Ogre::FilterType>(key),wrapenum<Ogre::FilterOptions>(value));
+	return ST_CONTINUE;
+}
+
+VALUE _setTextureFiltering(VALUE self,VALUE obj)
+{
+
+	if(rb_obj_is_kind_of(obj,rb_cArray))
+	{
+		_self->setTextureFiltering(
+			wrapenum<Ogre::FilterOptions>(RARRAY_PTR(obj)[0]),
+			wrapenum<Ogre::FilterOptions>(RARRAY_PTR(obj)[1]),
+			wrapenum<Ogre::FilterOptions>(RARRAY_PTR(obj)[2])
+			);
+	}else if(rb_obj_is_kind_of(obj,rb_cHash))
+	{
+		rb_hash_foreach(obj,(int (*)(ANYARGS))(_setTextureFiltering_each),self);
+	}else
+		_self->setTextureFiltering(wrapenum<Ogre::TextureFilterOptions>(obj));
+	return obj;
+}
 
 }}
 
@@ -127,7 +172,8 @@ void Init_OgreTextureUnitState(VALUE rb_mOgre)
 	rb_undef_alloc_func(rb_cOgreTextureUnitState);
 
 	rb_define_attr_method(rb_cOgreTextureUnitState,"name",_getName,_setName);
-	rb_define_attr_method(rb_cOgreTextureUnitState,"name_alias",_getTextureNameAlias,_setTextureNameAlias);
+	rb_define_attr_method(rb_cOgreTextureUnitState,"texture_name",_getTextureName,_setTextureName);
+	rb_define_attr_method(rb_cOgreTextureUnitState,"texture_name_alias",_getTextureNameAlias,_setTextureNameAlias);
 
 
 	rb_define_attr_method(rb_cOgreTextureUnitState,"alpha",_getIsAlpha,_setIsAlpha);
@@ -142,11 +188,14 @@ void Init_OgreTextureUnitState(VALUE rb_mOgre)
 
 	rb_define_attr_method(rb_cOgreTextureUnitState,"textureRotate",_getTextureRotate,_setTextureRotate);
 
-	rb_define_attr_method(rb_cOgreTextureUnitState,"colorBlendMode",_getColorBlendMode,_setColorBlendMode);
+	rb_define_attr_method(rb_cOgreTextureUnitState,"colorBlendMode",_getColourBlendMode,_setColorBlendMode);
 	rb_define_attr_method(rb_cOgreTextureUnitState,"alphaBlendMode",_getAlphaBlendMode,_setAlphaBlendMode);
 
 	rb_define_method(rb_cOgreTextureUnitState,"[]",RUBY_METHOD_FUNC(_getFrameTextureName),1);
 	rb_define_method(rb_cOgreTextureUnitState,"[]=",RUBY_METHOD_FUNC(_setFrameTextureName),2);
+
+	rb_define_method(rb_cOgreTextureUnitState,"<<",RUBY_METHOD_FUNC(_addFrameTextureName),1);
+
 
 	registerklass<Ogre::TextureUnitState>(rb_cOgreTextureUnitState);
 }

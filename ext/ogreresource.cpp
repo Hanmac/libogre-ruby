@@ -283,7 +283,8 @@ VALUE _singleton_create(int argc,VALUE *argv,VALUE self)
 	RUBYTRY(
 		return wrap(_singleton->createOrRetrieve(wrap<Ogre::String>(path),
 			unwrapResourceGroup(groupname,Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME),
-			false,NULL,wrap<Ogre::NameValuePairList*>(params)).first);
+			false,NULL,wrap<Ogre::NameValuePairList*>(params)).first
+		);
 	)
 	return Qnil;
 }

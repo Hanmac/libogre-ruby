@@ -5,6 +5,7 @@
 #include "ogreentity.hpp"
 #include "ogremesh.hpp"
 #include "ogrecolor.hpp"
+#include "ogrevector3.hpp"
 #include "ogrescenenode.hpp"
 #define _self wrap<Ogre::SceneManager*>(self)
 VALUE rb_cOgreSceneManager,rb_cOgreSceneManagerMetaData;
@@ -65,13 +66,43 @@ singlereturn(getDestinationRenderSystem)
 */
 VALUE _createLight(int argc,VALUE *argv,VALUE self)
 {
+	VALUE name,opt;
+	Ogre::Light *result;
 	RUBYTRY(
-	VALUE name;
-	rb_scan_args(argc, argv, "01",&name);
+
+
+
+	rb_scan_args(argc, argv, "02",&name,&opt);
+
+	if(rb_obj_is_kind_of(name,rb_cHash))
+		std::swap(name,opt);
+
 	if(NIL_P(name))
-		return wrap(_self->createLight());
+		result = _self->createLight();
 	else
-		return wrap(_self->createLight(wrap<Ogre::String>(name)));
+		result = _self->createLight(wrap<Ogre::String>(name));
+
+	if(rb_obj_is_kind_of(opt,rb_cHash))
+	{
+		VALUE temp;
+		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("type")))))
+			result->setType(wrapenum<Ogre::Light::LightTypes>(temp));
+
+		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("position")))))
+			result->setPosition(wrap<Ogre::Vector3>(temp));
+
+		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("direction")))))
+			result->setDirection(wrap<Ogre::Vector3>(temp));
+
+		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("diffuseColor")))))
+			result->setDiffuseColour(wrap<Ogre::ColourValue>(temp));
+
+		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("specularColor")))))
+			result->setSpecularColour(wrap<Ogre::ColourValue>(temp));
+
+	}
+
+	return wrap(result);
 	)
 	return Qnil;
 }
@@ -202,11 +233,30 @@ VALUE _destroyEntity(int argc,VALUE *argv,VALUE self)
  * 
  * creates a Camera.
 */
-VALUE _createCamera(VALUE self,VALUE name)
+VALUE _createCamera(int argc,VALUE *argv,VALUE self)
 {
+	VALUE name,opt;
+	Ogre::Camera *result;
+
+	rb_scan_args(argc, argv, "11",&name,&opt);
+
 	RUBYTRY(
-	return wrap(_self->createCamera(wrap<Ogre::String>(name)));
+		result = _self->createCamera(wrap<Ogre::String>(name));
+
+	if(rb_obj_is_kind_of(opt,rb_cHash))
+	{
+		VALUE temp;
+		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("position")))))
+			result->setPosition(wrap<Ogre::Vector3>(temp));
+		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("look_at")))))
+			result->lookAt(wrap<Ogre::Vector3>(temp));
+
+		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("near_clip_distance")))))
+			result->setNearClipDistance(NUM2DBL(temp));
+	}
+	return wrap(result);
 	)
+
 	return Qnil;
 }
 /*
@@ -703,7 +753,7 @@ void Init_OgreSceneManager(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreSceneManager,"hasRibbonTrail?",RUBY_METHOD_FUNC(_hasRibbonTrail),1);
 	rb_define_method(rb_cOgreSceneManager,"destroyRibbonTrail",RUBY_METHOD_FUNC(_destroyRibbonTrail),-1);
 
-	rb_define_method(rb_cOgreSceneManager,"createCamera",RUBY_METHOD_FUNC(_createCamera),1);
+	rb_define_method(rb_cOgreSceneManager,"createCamera",RUBY_METHOD_FUNC(_createCamera),-1);
 	rb_define_method(rb_cOgreSceneManager,"getCamera",RUBY_METHOD_FUNC(_getCamera),1);
 	rb_define_method(rb_cOgreSceneManager,"hasCamera?",RUBY_METHOD_FUNC(_hasCamera),1);
 	rb_define_method(rb_cOgreSceneManager,"destroyCamera",RUBY_METHOD_FUNC(_destroyCamera),-1);

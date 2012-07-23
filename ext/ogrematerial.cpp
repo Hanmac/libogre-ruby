@@ -55,7 +55,7 @@ VALUE _get(VALUE self,VALUE idx)
 		return wrap(_self->getTechnique(wrap<Ogre::String>(idx)));
 	else{
 		size_t i = NUM2UINT(idx);
-		if(i >= _self->getNumTechniques())
+		if(i < _self->getNumTechniques())
 			return wrap(_self->getTechnique(i));
 		return Qnil;
 	}

@@ -40,7 +40,7 @@ VALUE _get(VALUE self,VALUE idx)
 		return wrap(_self->getPass(wrap<Ogre::String>(idx)));
 	else{
 		size_t i = NUM2UINT(idx);
-		if(i >= _self->getNumPasses())
+		if(i < _self->getNumPasses())
 			return wrap(_self->getPass(i));
 		return Qnil;
 	}

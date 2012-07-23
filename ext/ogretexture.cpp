@@ -119,7 +119,7 @@ VALUE _singleton_createManual(int argc,VALUE *argv,VALUE self)
 			unwrapResourceGroup(group,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME),
 				wrapenum<Ogre::TextureType>(texType),
 				NUM2UINT(width),NUM2UINT(height),NUM2UINT(depth),
-				NUM2INT(mips),wrapenum<Ogre::PixelFormat>(texType),
+				NUM2INT(mips),wrapenum<Ogre::PixelFormat>(format),
 				wrapenum<Ogre::TextureUsage>(usage)
 		));
 	)
@@ -180,6 +180,8 @@ void Init_OgreTexture(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreTexture,"src_depth",RUBY_METHOD_FUNC(_getSrcDepth),0);
 
 	rb_define_method(rb_cOgreTexture,"to_image",RUBY_METHOD_FUNC(_convertToImage),-1);
+
+	rb_define_method(rb_cOgreTexture,"render_target",RUBY_METHOD_FUNC(_getRenderTarget),-1);
 
 	rb_define_singleton_method(rb_cOgreTexture,"create_manual",RUBY_METHOD_FUNC(_singleton_createManual),-1);
 
