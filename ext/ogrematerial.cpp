@@ -7,9 +7,11 @@
 #define _manager Ogre::MaterialManager::getSingletonPtr()
 
 template <>
-VALUE wrap< Ogre::MaterialPtr >(Ogre::MaterialPtr *material )
+VALUE wrap< Ogre::MaterialPtr >(const Ogre::MaterialPtr &material )
 {
-	return Data_Wrap_Struct(rb_cOgreMaterial, NULL, free, material);
+	if(material.isNull())
+		return Qnil;
+	return Data_Wrap_Struct(rb_cOgreMaterial, NULL, free, new Ogre::MaterialPtr(material));
 }
 
 template <>

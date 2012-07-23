@@ -9,48 +9,25 @@
 VALUE rb_cOgreResource;
 
 template <>
-VALUE wrap< Ogre::Resource >(Ogre::Resource *resource )
-{
-	if(resource == NULL)
-		return Qnil;
-	if(Ogre::Material *tmp = dynamic_cast<Ogre::Material*>(resource))
-		return wrap(new Ogre::MaterialPtr(tmp));
-	if(Ogre::Mesh *tmp = dynamic_cast<Ogre::Mesh*>(resource))
-		return wrap(new Ogre::MeshPtr(tmp));
-	if(Ogre::Texture *tmp = dynamic_cast<Ogre::Texture*>(resource))
-		return wrap(new Ogre::TexturePtr(tmp));
-	if(Ogre::Font *tmp = dynamic_cast<Ogre::Font*>(resource))
-		return wrap(new Ogre::FontPtr(tmp));
-	if(Ogre::Skeleton *tmp = dynamic_cast<Ogre::Skeleton*>(resource))
-		return wrap(new Ogre::SkeletonPtr(tmp));
-	if(Ogre::Compositor *tmp = dynamic_cast<Ogre::Compositor*>(resource))
-		return wrap(new Ogre::CompositorPtr(tmp));
-	if(Ogre::GpuProgram *tmp = dynamic_cast<Ogre::GpuProgram*>(resource))
-		return wrap(new Ogre::GpuProgramPtr(tmp));
-
-	return Qnil;
-}
-
-
-template <>
 VALUE wrap< Ogre::ResourcePtr >(const Ogre::ResourcePtr& resource )
 {
-	if(resource.get() == NULL)
+	if(resource.isNull())
 		return Qnil;
+
 	if(dynamic_cast<Ogre::Material*>(resource.get()))
-		return wrap(new Ogre::MaterialPtr(resource));
+		return wrap(Ogre::MaterialPtr(resource));
 	if(dynamic_cast<Ogre::Mesh*>(resource.get()))
-		return wrap(new Ogre::MeshPtr(resource));
+		return wrap(Ogre::MeshPtr(resource));
 	if(dynamic_cast<Ogre::Texture*>(resource.get()))
-		return wrap(new Ogre::TexturePtr(resource));
+		return wrap(Ogre::TexturePtr(resource));
 	if(dynamic_cast<Ogre::Font*>(resource.get()))
-		return wrap(new Ogre::FontPtr(resource));
+		return wrap(Ogre::FontPtr(resource));
 	if(dynamic_cast<Ogre::Skeleton*>(resource.get()))
-		return wrap(new Ogre::SkeletonPtr(resource));
+		return wrap(Ogre::SkeletonPtr(resource));
 	if(dynamic_cast<Ogre::Compositor*>(resource.get()))
-		return wrap(new Ogre::CompositorPtr(resource));
+		return wrap(Ogre::CompositorPtr(resource));
 	if(dynamic_cast<Ogre::GpuProgram*>(resource.get()))
-		return wrap(new Ogre::GpuProgramPtr(resource));
+		return wrap(Ogre::GpuProgramPtr(resource));
 
 	return Qnil;
 }

@@ -14,9 +14,9 @@ extern VALUE rb_cOgreGpuProgram;
 
 
 template <>
-VALUE wrap< Ogre::GpuProgramPtr >(Ogre::GpuProgramPtr *GpuProgram );
+VALUE wrap< Ogre::GpuProgramPtr >(const Ogre::GpuProgramPtr &gpupogram );
 
 template <>
-Ogre::GpuProgram* wrap< Ogre::GpuProgram* >(const VALUE &vGpuProgram);
+Ogre::GpuProgram* wrap< Ogre::GpuProgram* >(const VALUE &vgpuprogram);
 
 #endif /* __RubyOgreGpuProgram_H__ */

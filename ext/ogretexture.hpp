@@ -7,9 +7,9 @@ extern VALUE rb_cOgreTexture;
 
 
 template <>
-VALUE wrap< Ogre::TexturePtr >(Ogre::TexturePtr *texture );
+VALUE wrap< Ogre::TexturePtr >(const Ogre::TexturePtr &texture );
 
 template <>
-Ogre::Texture* wrap< Ogre::Texture* >(const VALUE &vtexture);
+Ogre::TexturePtr wrap< Ogre::TexturePtr >(const VALUE &vtexture);
 
 #endif /* __RubyOgreTexture_H__ */

@@ -9,7 +9,7 @@ extern VALUE rb_cOgreSkeleton;
 
 
 template <>
-VALUE wrap< Ogre::SkeletonPtr >(Ogre::SkeletonPtr *skeleton );
+VALUE wrap< Ogre::SkeletonPtr >(const Ogre::SkeletonPtr &skeleton );
 
 template <>
 Ogre::Skeleton* wrap< Ogre::Skeleton* >(const VALUE &vskeleton);

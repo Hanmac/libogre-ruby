@@ -7,9 +7,11 @@
 VALUE rb_cOgreCompositor;
 
 template <>
-VALUE wrap< Ogre::CompositorPtr >(Ogre::CompositorPtr *compositor )
+VALUE wrap< Ogre::CompositorPtr >(const Ogre::CompositorPtr &compositor )
 {
-	return Data_Wrap_Struct(rb_cOgreCompositor, NULL, free, compositor);
+	if(compositor.isNull())
+		return Qnil;
+	return Data_Wrap_Struct(rb_cOgreCompositor, NULL, free,new Ogre::CompositorPtr(compositor));
 }
 
 template <>

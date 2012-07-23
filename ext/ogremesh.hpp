@@ -7,7 +7,7 @@ extern VALUE rb_cOgreMesh;
 
 
 template <>
-VALUE wrap< Ogre::MeshPtr >(Ogre::MeshPtr *mesh );
+VALUE wrap< Ogre::MeshPtr >(const Ogre::MeshPtr &mesh );
 
 template <>
 Ogre::MeshPtr wrap< Ogre::MeshPtr >(const VALUE &vmesh);

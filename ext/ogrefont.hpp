@@ -9,9 +9,9 @@ extern VALUE rb_cOgreFont;
 
 
 template <>
-VALUE wrap< Ogre::FontPtr >(Ogre::FontPtr *font );
+VALUE wrap< Ogre::FontPtr >(const Ogre::FontPtr &font );
 
 template <>
-Ogre::Font* wrap< Ogre::Font* >(const VALUE &vfont);
+Ogre::FontPtr wrap< Ogre::FontPtr >(const VALUE &vfont);
 
 #endif /* __RubyOgreFont_H__ */

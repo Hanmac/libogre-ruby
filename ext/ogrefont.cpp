@@ -2,19 +2,25 @@
 #include "ogrefont.hpp"
 #include "ogrematerial.hpp"
 #include "ogreexception.hpp"
-#define _self wrap<Ogre::Font*>(self)
+#define _self wrap<Ogre::FontPtr>(self)
+#define _manager Ogre::FontManager::getSingletonPtr()
 VALUE rb_cOgreFont;
 
 template <>
-VALUE wrap< Ogre::FontPtr >(Ogre::FontPtr *font )
+VALUE wrap< Ogre::FontPtr >(const Ogre::FontPtr &font )
 {
-	return Data_Wrap_Struct(rb_cOgreFont, NULL, free, font);
+	if(font.isNull())
+		return Qnil;
+	return Data_Wrap_Struct(rb_cOgreFont, NULL, free, new Ogre::FontPtr(font));
 }
 
 template <>
-Ogre::Font* wrap< Ogre::Font* >(const VALUE &vfont)
+Ogre::FontPtr wrap< Ogre::FontPtr >(const VALUE &vfont)
 {
-	return unwrapPtr<Ogre::FontPtr>(vfont, rb_cOgreFont)->get();
+	if(rb_obj_is_kind_of(vfont,rb_cString))
+		return _manager->getByName(wrap<Ogre::String>(vfont));
+
+	return *unwrapPtr<Ogre::FontPtr>(vfont, rb_cOgreFont);
 }
 
 

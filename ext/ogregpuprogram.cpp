@@ -12,15 +12,20 @@
 VALUE rb_cOgreGpuProgram;
 
 template <>
-VALUE wrap< Ogre::GpuProgramPtr >(Ogre::GpuProgramPtr *GpuProgram )
+VALUE wrap< Ogre::GpuProgramPtr >(const Ogre::GpuProgramPtr &gpuprogram )
 {
-	return Data_Wrap_Struct(rb_cOgreGpuProgram, NULL, free, GpuProgram);
+	if(gpuprogram.isNull())
+		return Qnil;
+	return Data_Wrap_Struct(rb_cOgreGpuProgram, NULL, free, new Ogre::GpuProgramPtr(gpuprogram));
 }
 
 template <>
-Ogre::GpuProgram* wrap< Ogre::GpuProgram* >(const VALUE &vGpuProgram)
+Ogre::GpuProgram* wrap< Ogre::GpuProgram* >(const VALUE &vgpuprogram)
 {
-	return unwrapPtr<Ogre::GpuProgramPtr>(vGpuProgram, rb_cOgreGpuProgram)->get();
+	if(rb_obj_is_kind_of(vgpuprogram,rb_cString))
+		return dynamic_cast<Ogre::GpuProgram*>(_manager->getByName(wrap<Ogre::String>(vgpuprogram)).get());
+
+	return unwrapPtr<Ogre::GpuProgramPtr>(vgpuprogram, rb_cOgreGpuProgram)->get();
 }
 
 

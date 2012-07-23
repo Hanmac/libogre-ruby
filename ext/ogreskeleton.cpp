@@ -1,18 +1,27 @@
 #include "ogreresource.hpp"
+#include "ogreexception.hpp"
 #include "ogrebone.hpp"
-#define _self wrap<Ogre::Skeleton*>(self)
+#define _self wrap<Ogre::SkeletonPtr>(self)
+#define _manager Ogre::SkeletonManager::getSingletonPtr()
+
 VALUE rb_cOgreSkeleton;
 
 template <>
-VALUE wrap< Ogre::SkeletonPtr >(Ogre::SkeletonPtr *skeleton )
+VALUE wrap< Ogre::SkeletonPtr >(const Ogre::SkeletonPtr &skeleton )
 {
-	return Data_Wrap_Struct(rb_cOgreSkeleton, NULL, free, skeleton);
+	if(!skeleton.get())
+		return Qnil;
+
+	return Data_Wrap_Struct(rb_cOgreSkeleton, NULL, free, new Ogre::SkeletonPtr(skeleton));
 }
 
 template <>
-Ogre::Skeleton* wrap< Ogre::Skeleton* >(const VALUE &vskeleton)
+Ogre::SkeletonPtr wrap< Ogre::SkeletonPtr >(const VALUE &vskeleton)
 {
-	return unwrapPtr<Ogre::SkeletonPtr>(vskeleton, rb_cOgreSkeleton)->get();
+	if(rb_obj_is_kind_of(vskeleton,rb_cString))
+		return _manager->getByName(wrap<Ogre::String>(vskeleton));
+
+	return *unwrapPtr<Ogre::SkeletonPtr>(vskeleton, rb_cOgreSkeleton);
 }
 
 
