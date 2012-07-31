@@ -83,7 +83,7 @@ Ogre::String unwrapResourceGroup(VALUE obj,const Ogre::String &defaultgroup)
 		return defaultgroup;
 	if(SYMBOL_P(obj))
 	{
-		ID id = ID2SYM(obj);
+		ID id = SYM2ID(obj);
 		if(id == rb_intern("default"))
 			return Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
 		if(id == rb_intern("internal"))
