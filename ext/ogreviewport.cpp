@@ -16,6 +16,8 @@ macro_attr(BackgroundColour,Ogre::ColourValue)
 macro_attr(MaterialScheme,Ogre::String)
 macro_attr(Camera,Ogre::Camera*)
 
+macro_attr(VisibilityMask,uint)
+
 macro_attr(OverlaysEnabled,bool)
 macro_attr(ShadowsEnabled,bool)
 macro_attr(SkiesEnabled,bool)
@@ -75,13 +77,15 @@ void Init_OgreViewport(VALUE rb_mOgre)
 #if 0
 	rb_mOgre = rb_define_module("Ogre");
 	
-	rb_define_attr(rb_cOgreViewport,"backgroundColor",1,1);
-	rb_define_attr(rb_cOgreViewport,"schemename",1,1);
+	rb_define_attr(rb_cOgreViewport,"background_color",1,1);
+	rb_define_attr(rb_cOgreViewport,"scheme_name",1,1);
 	rb_define_attr(rb_cOgreViewport,"camera",1,1);
 	
-	rb_define_attr(rb_cOgreViewport,"overlaysEnabled",1,1);
-	rb_define_attr(rb_cOgreViewport,"shadowsEnabled",1,1);
-	rb_define_attr(rb_cOgreViewport,"skiesEnabled",1,1);
+	rb_define_attr(rb_cOgreViewport,"visibility_mask",1,1);
+
+	rb_define_attr(rb_cOgreViewport,"overlays_enabled",1,1);
+	rb_define_attr(rb_cOgreViewport,"shadows_enabled",1,1);
+	rb_define_attr(rb_cOgreViewport,"skies_enabled",1,1);
 	
 	rb_define_attr(rb_cOgreViewport,"left",1,1);
 	rb_define_attr(rb_cOgreViewport,"top",1,1);
@@ -96,13 +100,16 @@ void Init_OgreViewport(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreViewport,"target",RUBY_METHOD_FUNC(_getTarget),0);
 	rb_define_method(rb_cOgreViewport,"update",RUBY_METHOD_FUNC(_update),0);
 	
-	rb_define_attr_method(rb_cOgreViewport,"backgroundColor",_getBackgroundColour,_setBackgroundColour);
-	rb_define_attr_method(rb_cOgreViewport,"schemename",_getMaterialScheme,_setMaterialScheme);
+	rb_define_attr_method(rb_cOgreViewport,"background_color",_getBackgroundColour,_setBackgroundColour);
+	rb_define_attr_method(rb_cOgreViewport,"scheme_name",_getMaterialScheme,_setMaterialScheme);
 	rb_define_attr_method(rb_cOgreViewport,"camera",_getCamera,_setCamera);
+
+
+	rb_define_attr_method(rb_cOgreViewport,"visibility_mask",_getVisibilityMask,_setVisibilityMask);
 	
-	rb_define_attr_method(rb_cOgreViewport,"overlaysEnabled",_getOverlaysEnabled,_setOverlaysEnabled);
-	rb_define_attr_method(rb_cOgreViewport,"shadowsEnabled",_getShadowsEnabled,_setShadowsEnabled);
-	rb_define_attr_method(rb_cOgreViewport,"skiesEnabled",_getSkiesEnabled,_setSkiesEnabled);
+	rb_define_attr_method(rb_cOgreViewport,"overlays_enabled",_getOverlaysEnabled,_setOverlaysEnabled);
+	rb_define_attr_method(rb_cOgreViewport,"shadows_enabled",_getShadowsEnabled,_setShadowsEnabled);
+	rb_define_attr_method(rb_cOgreViewport,"skies_enabled",_getSkiesEnabled,_setSkiesEnabled);
 	
 	rb_define_attr_method(rb_cOgreViewport,"left",_getLeft,_setLeft);
 	rb_define_attr_method(rb_cOgreViewport,"top",_getTop,_setTop);
@@ -117,7 +124,7 @@ void Init_OgreViewport(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreViewport,"actual_width",RUBY_METHOD_FUNC(_getActualWidth),0);
 	rb_define_method(rb_cOgreViewport,"actual_height",RUBY_METHOD_FUNC(_getActualHeight),0);
 
-	rb_define_method(rb_cOgreViewport,"addListener",RUBY_METHOD_FUNC(_addListener),1);
+	rb_define_method(rb_cOgreViewport,"add_listener",RUBY_METHOD_FUNC(_addListener),1);
 
 	registerklass<Ogre::Viewport>(rb_cOgreViewport);
 }

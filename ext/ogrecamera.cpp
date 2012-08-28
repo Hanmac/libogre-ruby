@@ -98,8 +98,8 @@ void Init_OgreCamera(VALUE rb_mOgre)
 	rb_define_attr(rb_cOgreCamera,"direction",1,1);
 	rb_define_attr(rb_cOgreCamera,"orientation",1,1);
 	
-	rb_define_attr(rb_cOgreCamera,"lodBias",1,1);
-	rb_define_attr(rb_cOgreCamera,"lodCamera",1,1);
+	rb_define_attr(rb_cOgreCamera,"lod_bias",1,1);
+	rb_define_attr(rb_cOgreCamera,"lod_camera",1,1);
 #endif
 	using namespace RubyOgre::Camera;
 	rb_cOgreCamera = rb_define_class_under(rb_mOgre,"Camera",rb_cOgreFrustum);
@@ -117,8 +117,8 @@ void Init_OgreCamera(VALUE rb_mOgre)
 	rb_define_attr_method(rb_cOgreCamera,"direction",_getDirection,_setDirection);
 	rb_define_attr_method(rb_cOgreCamera,"orientation",_getOrientation,_setOrientation);
 	
-	rb_define_attr_method(rb_cOgreCamera,"lodBias",_getLodBias,_setLodBias);
-	rb_define_attr_method(rb_cOgreCamera,"lodCamera",_getLodCamera,_setLodCamera);
+	rb_define_attr_method(rb_cOgreCamera,"lod_bias",_getLodBias,_setLodBias);
+	rb_define_attr_method(rb_cOgreCamera,"lod_camera",_getLodCamera,_setLodCamera);
 
 	registerklass<Ogre::Camera>(rb_cOgreCamera);
 }

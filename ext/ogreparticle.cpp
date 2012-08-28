@@ -39,7 +39,7 @@ void Init_OgreParticle(VALUE rb_mOgre)
 	rb_undef_alloc_func(rb_cOgreParticle);
 
 	rb_define_attr_method(rb_cOgreParticle,"rotation",_getRotation,_setRotation);
-	rb_define_attr_method(rb_cOgreParticle,"rotationSpeed",_get_rotationSpeed,_set_rotationSpeed);
+	rb_define_attr_method(rb_cOgreParticle,"rotation_speed",_get_rotationSpeed,_set_rotationSpeed);
 	
 	rb_define_attr_method(rb_cOgreParticle,"color",_get_colour,_set_colour);
 

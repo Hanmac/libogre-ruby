@@ -120,8 +120,8 @@ void Init_OgreMovableObject(VALUE rb_mOgre)
 	using namespace RubyOgre::MovableObject;
 	
 	rb_define_method(rb_mOgreMovableObject,"name",RUBY_METHOD_FUNC(_getName),0);
-	rb_define_method(rb_mOgreMovableObject,"movableType",RUBY_METHOD_FUNC(_getMovableType),0);
-	rb_define_method(rb_mOgreMovableObject,"parentNode",RUBY_METHOD_FUNC(_getParentNode),0);
+	rb_define_method(rb_mOgreMovableObject,"movable_type",RUBY_METHOD_FUNC(_getMovableType),0);
+	rb_define_method(rb_mOgreMovableObject,"parent_node",RUBY_METHOD_FUNC(_getParentNode),0);
 
 	rb_define_method(rb_mOgreMovableObject,"attached?",RUBY_METHOD_FUNC(_isAttached),0);
 
@@ -136,24 +136,24 @@ void Init_OgreMovableObject(VALUE rb_mOgre)
 	rb_define_method(rb_mOgreMovableObject,"boundingRadius",RUBY_METHOD_FUNC(_getBoundingRadius),0);
 	
 	
-	rb_define_method(rb_mOgreMovableObject,"addQueryFlags",RUBY_METHOD_FUNC(_addQueryFlags),1);
-	rb_define_method(rb_mOgreMovableObject,"addVisibilityFlags",RUBY_METHOD_FUNC(_addVisibilityFlags),1);
-	rb_define_method(rb_mOgreMovableObject,"removeQueryFlags",RUBY_METHOD_FUNC(_removeQueryFlags),1);
-	rb_define_method(rb_mOgreMovableObject,"removeVisibilityFlags",RUBY_METHOD_FUNC(_removeVisibilityFlags),1);
+	rb_define_method(rb_mOgreMovableObject,"add_query_flags",RUBY_METHOD_FUNC(_addQueryFlags),1);
+	rb_define_method(rb_mOgreMovableObject,"add_visibility_flags",RUBY_METHOD_FUNC(_addVisibilityFlags),1);
+	rb_define_method(rb_mOgreMovableObject,"remove_query_flags",RUBY_METHOD_FUNC(_removeQueryFlags),1);
+	rb_define_method(rb_mOgreMovableObject,"remove_visibility_flags",RUBY_METHOD_FUNC(_removeVisibilityFlags),1);
 	
 	
 	
-	rb_define_attr_method(rb_mOgreMovableObject,"renderingDistance",_getRenderingDistance,_setRenderingDistance);
+	rb_define_attr_method(rb_mOgreMovableObject,"rendering_distance",_getRenderingDistance,_setRenderingDistance);
 	
 	rb_define_attr_method(rb_mOgreMovableObject,"listener",_getListener,_setListener);
 	
 	rb_define_attr_method(rb_mOgreMovableObject,"visible",_getVisible,_setVisible);
 	
-	rb_define_attr_method(rb_mOgreMovableObject,"renderQueueGroup",_getRenderQueueGroup,_setRenderQueueGroup);
-	rb_define_attr_method(rb_mOgreMovableObject,"visibilityFlags",_getVisibilityFlags,_setVisibilityFlags);
-	rb_define_attr_method(rb_mOgreMovableObject,"queryFlags",_getQueryFlags,_setQueryFlags);
+	rb_define_attr_method(rb_mOgreMovableObject,"render_queue_group",_getRenderQueueGroup,_setRenderQueueGroup);
+	rb_define_attr_method(rb_mOgreMovableObject,"visibility_flags",_getVisibilityFlags,_setVisibilityFlags);
+	rb_define_attr_method(rb_mOgreMovableObject,"query_flags",_getQueryFlags,_setQueryFlags);
 	
-	rb_define_attr_method(rb_mOgreMovableObject,"lightMask",_getLightMask,_setLightMask);
+	rb_define_attr_method(rb_mOgreMovableObject,"light_mask",_getLightMask,_setLightMask);
 	
 	registerklass<Ogre::MovableObject>(rb_mOgreMovableObject);
 }

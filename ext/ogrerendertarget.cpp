@@ -121,8 +121,8 @@ void Init_OgreRenderTarget(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreRenderTarget,"each",RUBY_METHOD_FUNC(_each),0);
 	rb_include_module(rb_cOgreRenderTarget,rb_mEnumerable);
 
-	rb_define_method(rb_cOgreRenderTarget,"addViewport",RUBY_METHOD_FUNC(_addViewport),-1);
-	rb_define_method(rb_cOgreRenderTarget,"removeViewport",RUBY_METHOD_FUNC(_removeViewport),1);
+	rb_define_method(rb_cOgreRenderTarget,"add_viewport",RUBY_METHOD_FUNC(_addViewport),-1);
+	rb_define_method(rb_cOgreRenderTarget,"remove_viewport",RUBY_METHOD_FUNC(_removeViewport),1);
 
 	rb_define_method(rb_cOgreRenderTarget,"primary?",RUBY_METHOD_FUNC(_isPrimary),0);
 
@@ -136,11 +136,11 @@ void Init_OgreRenderTarget(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreRenderTarget,"bestFPS",RUBY_METHOD_FUNC(_getBestFPS),0);
 	rb_define_method(rb_cOgreRenderTarget,"worstFPS",RUBY_METHOD_FUNC(_getWorstFPS),0);
 
-	rb_define_method(rb_cOgreRenderTarget,"bestFrameTime",RUBY_METHOD_FUNC(_getBestFrameTime),0);
-	rb_define_method(rb_cOgreRenderTarget,"worstFrameTime",RUBY_METHOD_FUNC(_getWorstFrameTime),0);
+	rb_define_method(rb_cOgreRenderTarget,"best_frame_time",RUBY_METHOD_FUNC(_getBestFrameTime),0);
+	rb_define_method(rb_cOgreRenderTarget,"worst_frame_time",RUBY_METHOD_FUNC(_getWorstFrameTime),0);
 
 	rb_define_attr_method(rb_cOgreRenderTarget,"active",_getActive,_setActive);
-	rb_define_attr_method(rb_cOgreRenderTarget,"autoUpdated",_getAutoUpdated,_setAutoUpdated);
+	rb_define_attr_method(rb_cOgreRenderTarget,"auto_updated",_getAutoUpdated,_setAutoUpdated);
 	rb_define_attr_method(rb_cOgreRenderTarget,"priority",_getPriority,_setPriority);
 
 	registerklass<Ogre::RenderTarget>(rb_cOgreRenderTarget);

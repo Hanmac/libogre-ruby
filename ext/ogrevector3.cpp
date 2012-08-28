@@ -112,7 +112,7 @@ VALUE _minusself(VALUE self)
 VALUE _compare(VALUE self,VALUE other)
 {
 	if(rb_obj_is_kind_of(other,rb_cOgreVector3)){
-		Ogre::Vector3 temp = *wrap<Ogre::Vector3*>(other);
+		Ogre::Vector3 temp = wrap<Ogre::Vector3>(other);
 		return INT2NUM(*_self > temp ? 1 : *_self < temp ? -1 : 0);
 	}else
 		return Qnil;

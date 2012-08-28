@@ -73,8 +73,8 @@ void Init_OgreTechnique(VALUE rb_mOgre)
 	
 	rb_define_method(rb_cOgreTechnique,"supported?",RUBY_METHOD_FUNC(_isSupported),0);
 	rb_define_method(rb_cOgreTechnique,"transparent?",RUBY_METHOD_FUNC(_isTransparent),0);
-	rb_define_method(rb_cOgreTechnique,"transparentSortingEnabled?",RUBY_METHOD_FUNC(_isTransparentSortingEnabled),0);
-	rb_define_method(rb_cOgreTechnique,"transparentSortingForced?",RUBY_METHOD_FUNC(_isTransparentSortingForced),0);
+	rb_define_method(rb_cOgreTechnique,"transparent_sorting_enabled?",RUBY_METHOD_FUNC(_isTransparentSortingEnabled),0);
+	rb_define_method(rb_cOgreTechnique,"transparent_sorting_forced?",RUBY_METHOD_FUNC(_isTransparentSortingForced),0);
 	rb_define_method(rb_cOgreTechnique,"loaded?",RUBY_METHOD_FUNC(_isLoaded),0);
 
 	registerklass<Ogre::Technique>(rb_cOgreTechnique);

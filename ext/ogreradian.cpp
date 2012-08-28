@@ -115,7 +115,7 @@ VALUE OgreRadian_inspect(VALUE self)
 */
 VALUE OgreRadian_compare(VALUE self,VALUE other)
 {
-	Ogre::Radian temp = *wrap<Ogre::Radian*>(other);
+	Ogre::Radian temp = wrap<Ogre::Radian>(other);
 	return INT2NUM(*_self > temp ? 1 : *_self < temp ? -1 : 0);
 }
 
@@ -123,21 +123,21 @@ VALUE OgreRadian_compare(VALUE self,VALUE other)
 */
 VALUE OgreRadian_plus(VALUE self,VALUE other)
 {
-	return wrap(*_self + *wrap<Ogre::Radian*>(other));
+	return wrap(*_self + wrap<Ogre::Radian>(other));
 }
 
 /*
 */
 VALUE OgreRadian_minus(VALUE self,VALUE other)
 {
-	return wrap(*_self - *wrap<Ogre::Radian*>(other));
+	return wrap(*_self - wrap<Ogre::Radian>(other));
 }
 
 /*
 */
 VALUE OgreRadian_mal(VALUE self,VALUE other)
 {
-	return wrap(*_self * *wrap<Ogre::Radian*>(other));
+	return wrap(*_self * wrap<Ogre::Radian>(other));
 }
 
 /*

@@ -239,7 +239,7 @@ void Init_OgrePass(VALUE rb_mOgre)
 	rb_define_attr(rb_cOgrePass,"ambient",1,1);
 	rb_define_attr(rb_cOgrePass,"diffuse",1,1);
 	rb_define_attr(rb_cOgrePass,"specular",1,1);
-	rb_define_attr(rb_cOgrePass,"selfIllumination",1,1);
+	rb_define_attr(rb_cOgrePass,"self_illumination",1,1);
 
 	rb_define_attr(rb_cOgrePass,"fog_override",1,1);
 	rb_define_attr(rb_cOgrePass,"fog_mode",1,1);
@@ -249,19 +249,19 @@ void Init_OgrePass(VALUE rb_mOgre)
 	rb_define_attr(rb_cOgrePass,"fog_end",1,1);
 
 
-	rb_define_attr(rb_cOgrePass,"vertexProgramName",1,1);
-	rb_define_attr(rb_cOgrePass,"shadowCasterVertexProgramName",1,1);
-	rb_define_attr(rb_cOgrePass,"shadowReceiverVertexProgramName",1,1);
-	rb_define_attr(rb_cOgrePass,"shadowReceiverFragmentProgramName",1,1);
-	rb_define_attr(rb_cOgrePass,"fragmentProgramName",1,1);
-	rb_define_attr(rb_cOgrePass,"geometryProgramName",1,1);
+	rb_define_attr(rb_cOgrePass,"vertex_program_name",1,1);
+	rb_define_attr(rb_cOgrePass,"shadow_caster_vertex_program_name",1,1);
+	rb_define_attr(rb_cOgrePass,"shadow_receiver_vertex_program_name",1,1);
+	rb_define_attr(rb_cOgrePass,"shadow_receiver_fragment_program_name",1,1);
+	rb_define_attr(rb_cOgrePass,"fragment_program_name",1,1);
+	rb_define_attr(rb_cOgrePass,"geometry_program_name",1,1);
 
-	rb_define_attr(rb_cOgrePass,"vertexProgram",1,0);
-	rb_define_attr(rb_cOgrePass,"shadowCasterVertexProgram",1,0);
-	rb_define_attr(rb_cOgrePass,"shadowReceiverVertexProgram",1,0);
-	rb_define_attr(rb_cOgrePass,"shadowReceiverFragmentProgram",1,0);
-	rb_define_attr(rb_cOgrePass,"fragmentProgram",1,0);
-	rb_define_attr(rb_cOgrePass,"geometryProgram",1,0);
+	rb_define_attr(rb_cOgrePass,"vertex_program",1,0);
+	rb_define_attr(rb_cOgrePass,"shadow_caster_vertex_program",1,0);
+	rb_define_attr(rb_cOgrePass,"shadow_receiver_vertex_program",1,0);
+	rb_define_attr(rb_cOgrePass,"shadow_receiver_fragment_program",1,0);
+	rb_define_attr(rb_cOgrePass,"fragment_program",1,0);
+	rb_define_attr(rb_cOgrePass,"geometry_program",1,0);
 
 #endif
 	using namespace RubyOgre::Pass;
@@ -273,7 +273,7 @@ void Init_OgrePass(VALUE rb_mOgre)
 	rb_define_attr_method(rb_cOgrePass,"ambient",_getAmbient,_setAmbient);
 	rb_define_attr_method(rb_cOgrePass,"diffuse",_getDiffuse,_setDiffuse);
 	rb_define_attr_method(rb_cOgrePass,"specular",_getSpecular,_setSpecular);
-	rb_define_attr_method(rb_cOgrePass,"selfIllumination",_getSelfIllumination,_setSelfIllumination);
+	rb_define_attr_method(rb_cOgrePass,"self_illumination",_getSelfIllumination,_setSelfIllumination);
 
 	rb_define_attr_method(rb_cOgrePass,"fog_override",_getFogOverride,_setFogOverride);
 	rb_define_attr_method(rb_cOgrePass,"fog_mode",_getFogMode,_setFogMode);
@@ -286,19 +286,19 @@ void Init_OgrePass(VALUE rb_mOgre)
 	rb_define_attr_method(rb_cOgrePass,"illuminationStage",_getIlluminationStage,_setIlluminationStage);
 
 
-	rb_define_attr_method(rb_cOgrePass,"vertexProgramName",_getVertexProgramName,_setVertexProgram);
-	rb_define_attr_method(rb_cOgrePass,"shadowCasterVertexProgramName",_getShadowCasterVertexProgramName,_setShadowCasterVertexProgram);
-	rb_define_attr_method(rb_cOgrePass,"shadowReceiverVertexProgramName",_getShadowReceiverVertexProgramName,_setShadowReceiverVertexProgram);
-	rb_define_attr_method(rb_cOgrePass,"shadowReceiverFragmentProgramName",_getShadowReceiverFragmentProgramName,_setShadowReceiverFragmentProgram);
-	rb_define_attr_method(rb_cOgrePass,"fragmentProgramName",_getFragmentProgramName,_setFragmentProgram);
-	rb_define_attr_method(rb_cOgrePass,"geometryProgramName",_getGeometryProgramName,_setGeometryProgram);
+	rb_define_attr_method(rb_cOgrePass,"vertex_program_name",_getVertexProgramName,_setVertexProgram);
+	rb_define_attr_method(rb_cOgrePass,"shadow_caster_vertex_program_name",_getShadowCasterVertexProgramName,_setShadowCasterVertexProgram);
+	rb_define_attr_method(rb_cOgrePass,"shadow_receiver_vertex_program_name",_getShadowReceiverVertexProgramName,_setShadowReceiverVertexProgram);
+	rb_define_attr_method(rb_cOgrePass,"shadow_receiver_fragment_program_name",_getShadowReceiverFragmentProgramName,_setShadowReceiverFragmentProgram);
+	rb_define_attr_method(rb_cOgrePass,"fragment_program_name",_getFragmentProgramName,_setFragmentProgram);
+	rb_define_attr_method(rb_cOgrePass,"geometry_program_name",_getGeometryProgramName,_setGeometryProgram);
 
-	rb_define_method(rb_cOgrePass,"vertexProgram",RUBY_METHOD_FUNC(_getVertexProgramName),0);// :nodoc:
-	rb_define_method(rb_cOgrePass,"shadowCasterVertexProgram",RUBY_METHOD_FUNC(_getShadowCasterVertexProgramName),0);// :nodoc:
-	rb_define_method(rb_cOgrePass,"shadowReceiverVertexProgram",RUBY_METHOD_FUNC(_getShadowReceiverVertexProgramName),0);// :nodoc:
-	rb_define_method(rb_cOgrePass,"shadowReceiverFragmentProgram",RUBY_METHOD_FUNC(_getShadowReceiverFragmentProgramName),0);// :nodoc:
-	rb_define_method(rb_cOgrePass,"fragmentProgram",RUBY_METHOD_FUNC(_getFragmentProgramName),0);// :nodoc:
-	rb_define_method(rb_cOgrePass,"geometryProgram",RUBY_METHOD_FUNC(_getGeometryProgramName),0);// :nodoc:
+	rb_define_method(rb_cOgrePass,"vertex_program",RUBY_METHOD_FUNC(_getVertexProgramName),0);// :nodoc:
+	rb_define_method(rb_cOgrePass,"shadow_caster_vertex_program",RUBY_METHOD_FUNC(_getShadowCasterVertexProgramName),0);// :nodoc:
+	rb_define_method(rb_cOgrePass,"shadow_receiver_vertex_program",RUBY_METHOD_FUNC(_getShadowReceiverVertexProgramName),0);// :nodoc:
+	rb_define_method(rb_cOgrePass,"shadow_receiver_fragment_program",RUBY_METHOD_FUNC(_getShadowReceiverFragmentProgramName),0);// :nodoc:
+	rb_define_method(rb_cOgrePass,"fragment_program",RUBY_METHOD_FUNC(_getFragmentProgramName),0);// :nodoc:
+	rb_define_method(rb_cOgrePass,"geometry_program",RUBY_METHOD_FUNC(_getGeometryProgramName),0);// :nodoc:
 
 	rb_define_method(rb_cOgrePass,"create",RUBY_METHOD_FUNC(_createTextureUnitState),0);
 

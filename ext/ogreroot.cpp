@@ -254,42 +254,42 @@ void Init_OgreRoot(VALUE rb_mOgre)
 #endif
 	using namespace RubyOgre::Root;
 
-	rb_define_singleton_method(rb_mOgre,"addResourceLocation",RUBY_METHOD_FUNC(_addResourceLocation),-1);
+	rb_define_singleton_method(rb_mOgre,"add_resource_location",RUBY_METHOD_FUNC(_addResourceLocation),-1);
 	
-	rb_define_singleton_method(rb_mOgre,"removeResourceLocation",RUBY_METHOD_FUNC(_removeResourceLocation),-1);
-	rb_define_singleton_method(rb_mOgre,"hasMovableObjectFactory?",RUBY_METHOD_FUNC(_hasMovableObjectFactory),1);
+	rb_define_singleton_method(rb_mOgre,"remove_resource_location",RUBY_METHOD_FUNC(_removeResourceLocation),-1);
+	rb_define_singleton_method(rb_mOgre,"has_movable_object_factory?",RUBY_METHOD_FUNC(_hasMovableObjectFactory),1);
 
-	rb_define_singleton_method(rb_mOgre,"createFileStream",RUBY_METHOD_FUNC(_createFileStream),-1);
-	rb_define_singleton_method(rb_mOgre,"openFileStream",RUBY_METHOD_FUNC(_openFileStream),-1);
+	rb_define_singleton_method(rb_mOgre,"create_file_stream",RUBY_METHOD_FUNC(_createFileStream),-1);
+	rb_define_singleton_method(rb_mOgre,"open_file_stream",RUBY_METHOD_FUNC(_openFileStream),-1);
 
-	rb_define_singleton_method(rb_mOgre,"createRenderWindow",RUBY_METHOD_FUNC(_createRenderWindow),-1);
-	rb_define_singleton_method(rb_mOgre,"getAvailableRenderers",RUBY_METHOD_FUNC(_getAvailableRenderers),0);
+	rb_define_singleton_method(rb_mOgre,"create_render_window",RUBY_METHOD_FUNC(_createRenderWindow),-1);
+	rb_define_singleton_method(rb_mOgre,"available_renderers",RUBY_METHOD_FUNC(_getAvailableRenderers),0);
 
-	rb_define_singleton_method(rb_mOgre,"showConfigDialog",RUBY_METHOD_FUNC(_showConfigDialog),0);
-	rb_define_singleton_method(rb_mOgre,"saveConfig",RUBY_METHOD_FUNC(_saveConfig),0);
-	rb_define_singleton_method(rb_mOgre,"loadConfig",RUBY_METHOD_FUNC(_restoreConfig),0);
+	rb_define_singleton_method(rb_mOgre,"show_config_dialog",RUBY_METHOD_FUNC(_showConfigDialog),0);
+	rb_define_singleton_method(rb_mOgre,"save_config",RUBY_METHOD_FUNC(_saveConfig),0);
+	rb_define_singleton_method(rb_mOgre,"load_config",RUBY_METHOD_FUNC(_restoreConfig),0);
 
-	rb_define_singleton_method(rb_mOgre,"startRendering",RUBY_METHOD_FUNC(_startRendering),0);
+	rb_define_singleton_method(rb_mOgre,"start_rendering",RUBY_METHOD_FUNC(_startRendering),0);
 
 	rb_define_singleton_method(rb_mOgre,"shutdown",RUBY_METHOD_FUNC(_shutdown),0);
 
-	rb_define_singleton_method(rb_mOgre,"addFrameListener",RUBY_METHOD_FUNC(_addFrameListener),1);
+	rb_define_singleton_method(rb_mOgre,"add_frame_listener",RUBY_METHOD_FUNC(_addFrameListener),1);
 	
 	rb_define_singleton_method(rb_mOgre,"rendersystem",RUBY_METHOD_FUNC(_getRenderSystem),0);
 	rb_define_singleton_method(rb_mOgre,"rendersystem=",RUBY_METHOD_FUNC(_setRenderSystem),1);
 	rb_define_singleton_method(rb_mOgre,"initialised?",RUBY_METHOD_FUNC(_isInitialised),0);
 
-	rb_define_singleton_method(rb_mOgre,"loadPlugin",RUBY_METHOD_FUNC(_loadPlugin),1);
-	rb_define_singleton_method(rb_mOgre,"unloadPlugin",RUBY_METHOD_FUNC(_unloadPlugin),1);
+	rb_define_singleton_method(rb_mOgre,"load_plugin",RUBY_METHOD_FUNC(_loadPlugin),1);
+	rb_define_singleton_method(rb_mOgre,"unload_plugin",RUBY_METHOD_FUNC(_unloadPlugin),1);
 	
-	rb_define_singleton_method(rb_mOgre,"addPluginFolder",RUBY_METHOD_FUNC(_addPluginFolder),1);
+	rb_define_singleton_method(rb_mOgre,"add_plugin_folder",RUBY_METHOD_FUNC(_addPluginFolder),1);
 	rb_define_singleton_method(rb_mOgre,"pluginfolders",RUBY_METHOD_FUNC(_listPluginFolders),0);
 	rb_define_singleton_method(rb_mOgre,"plugins",RUBY_METHOD_FUNC(_listPlugins),0);
 	
 	rb_define_singleton_method(rb_mOgre,"each_metadata",RUBY_METHOD_FUNC(_each_metadata),0);
 	rb_define_singleton_method(rb_mOgre,"each_sceneManager",RUBY_METHOD_FUNC(_each_sceneManager),0);
 
-	rb_define_singleton_method(rb_mOgre,"createSceneManager",RUBY_METHOD_FUNC(_createSceneManager),-1);
+	rb_define_singleton_method(rb_mOgre,"create_scene_manager",RUBY_METHOD_FUNC(_createSceneManager),-1);
 	
 
 #ifdef OGRE_PLUGINDIR

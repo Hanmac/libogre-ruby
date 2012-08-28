@@ -9,10 +9,19 @@
 #include "ogreexception.hpp"
 #define _self wrap<Ogre::GpuProgram*>(self)
 #define _manager Ogre::GpuProgramManager::getSingletonPtr()
+#define _highmanager Ogre::HighLevelGpuProgramManager::getSingletonPtr()
 VALUE rb_cOgreGpuProgram;
 
 template <>
 VALUE wrap< Ogre::GpuProgramPtr >(const Ogre::GpuProgramPtr &gpuprogram )
+{
+	if(gpuprogram.isNull())
+		return Qnil;
+	return Data_Wrap_Struct(rb_cOgreGpuProgram, NULL, free, new Ogre::GpuProgramPtr(gpuprogram));
+}
+
+template <>
+VALUE wrap< Ogre::HighLevelGpuProgramPtr >(const Ogre::HighLevelGpuProgramPtr &gpuprogram )
 {
 	if(gpuprogram.isNull())
 		return Qnil;
@@ -65,6 +74,32 @@ VALUE _singleton_createProgramFromString(VALUE self,VALUE name,VALUE groupName,V
 		));
 }
 
+
+VALUE _singleton_createHighProgram(VALUE self,VALUE name,VALUE groupName,VALUE language,VALUE type)
+{
+	return wrap(_highmanager->createProgram(wrap<Ogre::String>(name),
+		unwrapResourceGroup(groupName,Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME),
+		wrap<Ogre::String>(language),
+		wrapenum<Ogre::GpuProgramType>(type)
+		));
+}
+
+
+
+/*
+*/
+VALUE _singleton_high_each(VALUE self)
+{
+	RETURN_ENUMERATOR(self,0,NULL);
+	Ogre::ResourceManager::ResourceMapIterator map = _highmanager->getResourceIterator();
+	Ogre::ResourceManager::ResourceMapIterator::iterator it;
+	for (it = map.begin(); it != map.end(); ++it)
+		rb_yield_values(2,ULONG2NUM(it->first),wrap(it->second));
+	return self;
+}
+
+
+
 }
 }
 
@@ -80,7 +115,7 @@ void Init_OgreGpuProgram(VALUE rb_mOgre)
 
 	rb_define_attr_method(rb_cOgreGpuProgram,"source",_getSource,_setSource);
 	rb_define_attr_method(rb_cOgreGpuProgram,"source_file",_getSourceFile,_setSourceFile);
-	rb_define_attr_method(rb_cOgreGpuProgram,"syntaxCode",_getSyntaxCode,_setSyntaxCode);
+	rb_define_attr_method(rb_cOgreGpuProgram,"syntax_code",_getSyntaxCode,_setSyntaxCode);
 	rb_define_attr_method(rb_cOgreGpuProgram,"type",_getType,_setType);
 
 	rb_define_method(rb_cOgreResource,"language",RUBY_METHOD_FUNC(_getLanguage),0);
@@ -88,6 +123,8 @@ void Init_OgreGpuProgram(VALUE rb_mOgre)
 	rb_define_singleton_method(rb_cOgreResource,"create_program",RUBY_METHOD_FUNC(_singleton_createProgram),5);
 	rb_define_singleton_method(rb_cOgreResource,"create_program_from_string",RUBY_METHOD_FUNC(_singleton_createProgramFromString),5);
 
+	rb_define_singleton_method(rb_cOgreResource,"create_high_program",RUBY_METHOD_FUNC(_singleton_createHighProgram),4);
+	rb_define_singleton_method(rb_cOgreResource,"high_each",RUBY_METHOD_FUNC(_singleton_high_each),0);
 
 	registerenum<Ogre::GpuProgramType>("Ogre::GpuProgramType")
 		.add(Ogre::GPT_VERTEX_PROGRAM,"vertex")

@@ -44,12 +44,8 @@ namespace RubyOgre
 {
 namespace Log
 {
-/*
-*/
-VALUE _getName(VALUE self)
-{
-	return wrap(_self->getName());
-}
+
+singlereturn(getName)
 
 /*
 */

@@ -177,7 +177,7 @@ void Init_OgreTextureUnitState(VALUE rb_mOgre)
 
 
 	rb_define_attr_method(rb_cOgreTextureUnitState,"alpha",_getIsAlpha,_setIsAlpha);
-	rb_define_attr_method(rb_cOgreTextureUnitState,"currentFrame",_getCurrentFrame,_setCurrentFrame);
+	rb_define_attr_method(rb_cOgreTextureUnitState,"current_frame",_getCurrentFrame,_setCurrentFrame);
 
 	
 	rb_define_attr_method(rb_cOgreTextureUnitState,"textureUScroll",_getTextureUScroll,_setTextureUScroll);
@@ -186,10 +186,10 @@ void Init_OgreTextureUnitState(VALUE rb_mOgre)
 	rb_define_attr_method(rb_cOgreTextureUnitState,"textureUScale",_getTextureUScale,_setTextureUScale);
 	rb_define_attr_method(rb_cOgreTextureUnitState,"textureVScale",_getTextureVScale,_setTextureVScale);
 
-	rb_define_attr_method(rb_cOgreTextureUnitState,"textureRotate",_getTextureRotate,_setTextureRotate);
+	rb_define_attr_method(rb_cOgreTextureUnitState,"texture_rotate",_getTextureRotate,_setTextureRotate);
 
-	rb_define_attr_method(rb_cOgreTextureUnitState,"colorBlendMode",_getColourBlendMode,_setColorBlendMode);
-	rb_define_attr_method(rb_cOgreTextureUnitState,"alphaBlendMode",_getAlphaBlendMode,_setAlphaBlendMode);
+	rb_define_attr_method(rb_cOgreTextureUnitState,"color_blend_mode",_getColourBlendMode,_setColorBlendMode);
+	rb_define_attr_method(rb_cOgreTextureUnitState,"alpha_blend_mode",_getAlphaBlendMode,_setAlphaBlendMode);
 
 	rb_define_method(rb_cOgreTextureUnitState,"[]",RUBY_METHOD_FUNC(_getFrameTextureName),1);
 	rb_define_method(rb_cOgreTextureUnitState,"[]=",RUBY_METHOD_FUNC(_setFrameTextureName),2);

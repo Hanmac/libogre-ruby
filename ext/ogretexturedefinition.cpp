@@ -37,8 +37,8 @@ void Init_OgreTextureDefinition(VALUE rb_mOgre)
 	rb_define_attr(rb_cOgreTextureDefinition,"width",1,1);
 	rb_define_attr(rb_cOgreTextureDefinition,"height",1,1);
 
-	rb_define_attr(rb_cOgreTextureDefinition,"widthFactor",1,1);
-	rb_define_attr(rb_cOgreTextureDefinition,"heightFactor",1,1);
+	rb_define_attr(rb_cOgreTextureDefinition,"width_factor",1,1);
+	rb_define_attr(rb_cOgreTextureDefinition,"height_factor",1,1);
 
 	#endif
 	using namespace RubyOgre::TextureDefinition;
@@ -51,8 +51,8 @@ void Init_OgreTextureDefinition(VALUE rb_mOgre)
 
 	rb_define_attr_method(rb_cOgreTextureDefinition,"width",_get_width,_set_width);
 	rb_define_attr_method(rb_cOgreTextureDefinition,"height",_get_height,_set_height);
-	rb_define_attr_method(rb_cOgreTextureDefinition,"widthFactor",_get_widthFactor,_set_widthFactor);
-	rb_define_attr_method(rb_cOgreTextureDefinition,"heightFactor",_get_heightFactor,_set_heightFactor);
+	rb_define_attr_method(rb_cOgreTextureDefinition,"width_factor",_get_widthFactor,_set_widthFactor);
+	rb_define_attr_method(rb_cOgreTextureDefinition,"height_factor",_get_heightFactor,_set_heightFactor);
 
 	registerklass<Ogre::CompositionTechnique::TextureDefinition>(rb_cOgreTextureDefinition);
 }

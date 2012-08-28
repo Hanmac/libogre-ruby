@@ -375,11 +375,11 @@ void Init_OgreResource(VALUE rb_mOgre)
 	
 
 	rb_define_singleton_method(rb_cOgreResource,"remove",RUBY_METHOD_FUNC(_singleton_remove),1);
-	rb_define_singleton_method(rb_cOgreResource,"resourceExists?",RUBY_METHOD_FUNC(_singleton_resourceExists),1);
+	rb_define_singleton_method(rb_cOgreResource,"exists?",RUBY_METHOD_FUNC(_singleton_resourceExists),1);
 	rb_define_singleton_method(rb_cOgreResource,"unload",RUBY_METHOD_FUNC(_singleton_unload),1);
 	
-	rb_define_singleton_method(rb_cOgreResource,"resourceType",RUBY_METHOD_FUNC(_singleton_getResourceType),0);
-	rb_define_singleton_method(rb_cOgreResource,"scriptPatterns",RUBY_METHOD_FUNC(_singleton_getScriptPatterns),0);
+	rb_define_singleton_method(rb_cOgreResource,"type",RUBY_METHOD_FUNC(_singleton_getResourceType),0);
+	rb_define_singleton_method(rb_cOgreResource,"script_patterns",RUBY_METHOD_FUNC(_singleton_getScriptPatterns),0);
 	
 	rb_define_singleton_method(rb_cOgreResource,"verbose",RUBY_METHOD_FUNC(_singleton_getVerbose),0);
 	rb_define_singleton_method(rb_cOgreResource,"verbose=",RUBY_METHOD_FUNC(_singleton_setVerbose),1);

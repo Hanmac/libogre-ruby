@@ -117,7 +117,7 @@ VALUE _inspect(VALUE self)
 */
 VALUE _compare(VALUE self,VALUE other)
 {
-	Ogre::Degree temp = *wrap<Ogre::Degree*>(other);
+	Ogre::Degree temp = wrap<Ogre::Degree>(other);
 	return INT2NUM(*_self > temp ? 1 : *_self < temp ? -1 : 0);
 }
 
@@ -125,21 +125,21 @@ VALUE _compare(VALUE self,VALUE other)
 */
 VALUE _plus(VALUE self,VALUE other)
 {
-	return wrap(*_self + *wrap<Ogre::Degree*>(other));
+	return wrap(*_self + wrap<Ogre::Degree>(other));
 }
 
 /*
 */
 VALUE _minus(VALUE self,VALUE other)
 {
-	return wrap(*_self - *wrap<Ogre::Degree*>(other));
+	return wrap(*_self - wrap<Ogre::Degree>(other));
 }
 
 /*
 */
 VALUE _mal(VALUE self,VALUE other)
 {
-	return wrap(*_self * *wrap<Ogre::Degree*>(other));
+	return wrap(*_self * wrap<Ogre::Degree>(other));
 }
 
 /*

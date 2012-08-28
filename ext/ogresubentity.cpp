@@ -9,6 +9,9 @@ namespace SubEntity {
 
 macro_attr(MaterialName,Ogre::String)
 macro_attr(Material,Ogre::MaterialPtr)
+macro_attr_bool(Visible)
+
+singlereturn(getSubMesh)
 
 }}
 
@@ -24,6 +27,7 @@ void Init_OgreSubEntity(VALUE rb_mOgre)
 	rb_mOgre = rb_define_module("Ogre");
 	rb_define_attr(rb_cOgreSubEntity,"materialname",1,1);
 	rb_define_attr(rb_cOgreSubEntity,"material",1,1);
+	rb_define_attr(rb_cOgreSubEntity,"visible",1,1);
 #endif
 	using namespace RubyOgre::SubEntity;
 
@@ -32,6 +36,9 @@ void Init_OgreSubEntity(VALUE rb_mOgre)
 	
 	rb_define_attr_method(rb_cOgreSubEntity,"materialname",_getMaterialName,_setMaterialName);
 	rb_define_attr_method(rb_cOgreSubEntity,"material",_getMaterial,_setMaterial);
+	rb_define_attr_method(rb_cOgreSubEntity,"visible",_getVisible,_setVisible);
+
+	rb_define_method(rb_cOgreSubEntity,"mesh",RUBY_METHOD_FUNC(_getSubMesh),0);
 
 	registerklass<Ogre::SubEntity>(rb_cOgreSubEntity);
 }

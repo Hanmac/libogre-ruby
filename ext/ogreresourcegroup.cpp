@@ -471,7 +471,7 @@ VALUE _singleton_undeclareResource(int argc,VALUE *argv,VALUE self)
 
 /*
 */
-VALUE _singleton_each_ResourceManager(VALUE self)
+VALUE _singleton_each_type(VALUE self)
 {
 	RETURN_ENUMERATOR(self,0,NULL);
 	Ogre::ResourceGroupManager::ResourceManagerIterator map = manager->getResourceManagerIterator();
@@ -522,39 +522,39 @@ void Init_OgreResourceGroup(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreResourceGroup,"createResource",RUBY_METHOD_FUNC(_createResource),-1);
 	
 
-	rb_define_singleton_method(rb_cOgreResourceGroup,"addLocation",RUBY_METHOD_FUNC(_singleton_addResourceLocation),-1);
-	rb_define_singleton_method(rb_cOgreResourceGroup,"removeLocation",RUBY_METHOD_FUNC(_singleton_removeResourceLocation),-1);
+	rb_define_singleton_method(rb_cOgreResourceGroup,"add_location",RUBY_METHOD_FUNC(_singleton_addResourceLocation),-1);
+	rb_define_singleton_method(rb_cOgreResourceGroup,"remove_location",RUBY_METHOD_FUNC(_singleton_removeResourceLocation),-1);
 
 	rb_define_singleton_method(rb_cOgreResourceGroup,"locationExists?",RUBY_METHOD_FUNC(_singleton_resourceLocationExists),-1);
 
-	rb_define_singleton_method(rb_cOgreResourceGroup,"listResourceNames",RUBY_METHOD_FUNC(_singleton_listResourceNames),-1);
+	rb_define_singleton_method(rb_cOgreResourceGroup,"list_resource_names",RUBY_METHOD_FUNC(_singleton_listResourceNames),-1);
 
-	rb_define_singleton_method(rb_cOgreResourceGroup,"listLocations",RUBY_METHOD_FUNC(_singleton_listResourceLocations),-1);
-	rb_define_singleton_method(rb_cOgreResourceGroup,"listFileInfo",RUBY_METHOD_FUNC(_singleton_listResourceFileInfo),-1);
+	rb_define_singleton_method(rb_cOgreResourceGroup,"list_locations",RUBY_METHOD_FUNC(_singleton_listResourceLocations),-1);
+	rb_define_singleton_method(rb_cOgreResourceGroup,"list_file_info",RUBY_METHOD_FUNC(_singleton_listResourceFileInfo),-1);
 
-	rb_define_singleton_method(rb_cOgreResourceGroup,"findLocation",RUBY_METHOD_FUNC(_singleton_findResourceLocation),-1);
-	rb_define_singleton_method(rb_cOgreResourceGroup,"findFileInfo",RUBY_METHOD_FUNC(_singleton_findResourceFileInfo),-1);
+	rb_define_singleton_method(rb_cOgreResourceGroup,"find_location",RUBY_METHOD_FUNC(_singleton_findResourceLocation),-1);
+	rb_define_singleton_method(rb_cOgreResourceGroup,"find_file_info",RUBY_METHOD_FUNC(_singleton_findResourceFileInfo),-1);
 
-	rb_define_singleton_method(rb_cOgreResourceGroup,"initialiseGroup",RUBY_METHOD_FUNC(_singleton_initialiseGroup),-1);
+	rb_define_singleton_method(rb_cOgreResourceGroup,"initialise_group",RUBY_METHOD_FUNC(_singleton_initialiseGroup),-1);
 
-	rb_define_singleton_method(rb_cOgreResourceGroup,"getGroups",RUBY_METHOD_FUNC(_singleton_getResourceGroups),0);
+	rb_define_singleton_method(rb_cOgreResourceGroup,"groups",RUBY_METHOD_FUNC(_singleton_getResourceGroups),0);
 	
-	rb_define_singleton_method(rb_cOgreResourceGroup,"groupInitialised?",RUBY_METHOD_FUNC(_singleton_isResourceGroupInitialised),1);
-	rb_define_singleton_method(rb_cOgreResourceGroup,"groupLoaded?",RUBY_METHOD_FUNC(_singleton_isResourceGroupLoaded),1);
-	rb_define_singleton_method(rb_cOgreResourceGroup,"groupExists?",RUBY_METHOD_FUNC(_singleton_ResourceGroupExists),1);
+	rb_define_singleton_method(rb_cOgreResourceGroup,"group_initialised?",RUBY_METHOD_FUNC(_singleton_isResourceGroupInitialised),1);
+	rb_define_singleton_method(rb_cOgreResourceGroup,"group_loaded?",RUBY_METHOD_FUNC(_singleton_isResourceGroupLoaded),1);
+	rb_define_singleton_method(rb_cOgreResourceGroup,"group_exists?",RUBY_METHOD_FUNC(_singleton_ResourceGroupExists),1);
 
-	rb_define_singleton_method(rb_cOgreResourceGroup,"clearGroup",RUBY_METHOD_FUNC(_singleton_clearResourceGroup),1);
-	rb_define_singleton_method(rb_cOgreResourceGroup,"destroyGroup",RUBY_METHOD_FUNC(_singleton_destroyResourceGroup),1);
-	rb_define_singleton_method(rb_cOgreResourceGroup,"inGlobalPool?",RUBY_METHOD_FUNC(_singleton_isResourceGroupInGlobalPool),1);
-
-
-	rb_define_singleton_method(rb_cOgreResourceGroup,"openResource",RUBY_METHOD_FUNC(_singleton_openResource),-1);
-	rb_define_singleton_method(rb_cOgreResourceGroup,"openResources",RUBY_METHOD_FUNC(_singleton_openResources),-1);
-	rb_define_singleton_method(rb_cOgreResourceGroup,"createResource",RUBY_METHOD_FUNC(_singleton_createResource),-1);
+	rb_define_singleton_method(rb_cOgreResourceGroup,"clear",RUBY_METHOD_FUNC(_singleton_clearResourceGroup),1);
+	rb_define_singleton_method(rb_cOgreResourceGroup,"destroy",RUBY_METHOD_FUNC(_singleton_destroyResourceGroup),1);
+	rb_define_singleton_method(rb_cOgreResourceGroup,"global_pool?",RUBY_METHOD_FUNC(_singleton_isResourceGroupInGlobalPool),1);
 
 
-	rb_define_singleton_method(rb_cOgreResourceGroup,"unloadGroup",RUBY_METHOD_FUNC(_singleton_unloadResourceGroup),-1);
-	rb_define_singleton_method(rb_cOgreResourceGroup,"undeclareResource",RUBY_METHOD_FUNC(_singleton_undeclareResource),-1);
+	rb_define_singleton_method(rb_cOgreResourceGroup,"open_resource",RUBY_METHOD_FUNC(_singleton_openResource),-1);
+	rb_define_singleton_method(rb_cOgreResourceGroup,"open_resources",RUBY_METHOD_FUNC(_singleton_openResources),-1);
+	rb_define_singleton_method(rb_cOgreResourceGroup,"create_resource",RUBY_METHOD_FUNC(_singleton_createResource),-1);
+
+
+	rb_define_singleton_method(rb_cOgreResourceGroup,"unload_group",RUBY_METHOD_FUNC(_singleton_unloadResourceGroup),-1);
+	rb_define_singleton_method(rb_cOgreResourceGroup,"undeclare_resource",RUBY_METHOD_FUNC(_singleton_undeclareResource),-1);
 	
-	rb_define_singleton_method(rb_cOgreResourceGroup,"each_ResourceManager",RUBY_METHOD_FUNC(_singleton_each_ResourceManager),0);
+	rb_define_singleton_method(rb_cOgreResourceGroup,"each_type",RUBY_METHOD_FUNC(_singleton_each_type),0);
 }

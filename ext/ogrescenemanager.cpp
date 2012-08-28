@@ -1,9 +1,11 @@
+
 #include "ogrescenemanager.hpp"
 #include "ogreexception.hpp"
 #include "ogrelight.hpp"
 #include "ogrecamera.hpp"
 #include "ogreentity.hpp"
 #include "ogremesh.hpp"
+#include "ogrematerial.hpp"
 #include "ogrecolor.hpp"
 #include "ogrevector3.hpp"
 #include "ogrescenenode.hpp"
@@ -60,7 +62,7 @@ singlereturn(getDestinationRenderSystem)
 
 /*
  * call-seq:
- *   createLight([name]) -> Light
+ *   create_light([name]) -> Light
  * 
  * creates a Light.
 */
@@ -69,8 +71,6 @@ VALUE _createLight(int argc,VALUE *argv,VALUE self)
 	VALUE name,opt;
 	Ogre::Light *result;
 	RUBYTRY(
-
-
 
 	rb_scan_args(argc, argv, "02",&name,&opt);
 
@@ -94,11 +94,14 @@ VALUE _createLight(int argc,VALUE *argv,VALUE self)
 		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("direction")))))
 			result->setDirection(wrap<Ogre::Vector3>(temp));
 
-		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("diffuseColor")))))
+		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("diffuse_color")))))
 			result->setDiffuseColour(wrap<Ogre::ColourValue>(temp));
 
-		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("specularColor")))))
+		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("specular_color")))))
 			result->setSpecularColour(wrap<Ogre::ColourValue>(temp));
+
+		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("visibility_flags")))))
+			result->setVisibilityFlags(NUM2ULONG(temp));
 
 	}
 
@@ -108,7 +111,7 @@ VALUE _createLight(int argc,VALUE *argv,VALUE self)
 }
 /*
  * call-seq:
- *   getLight(name) -> Light or nil
+ *   get_light(name) -> Light or nil
  * 
  * get a Light or nil
 */
@@ -118,7 +121,7 @@ VALUE _getLight(VALUE self,VALUE name)
 }
 /*
  * call-seq:
- *   hasLight?(name) -> bool
+ *   has_light?(name) -> bool
  * 
  * return true if light with that name exist
 */
@@ -129,7 +132,7 @@ VALUE _hasLight(VALUE self,VALUE name)
 
 /*
  * call-seq:
- *   destroyLight([name]) -> nil
+ *   destroy_light([name]) -> nil
  * 
  * destroy a Light.
  * if not name is given, destroy all lights
@@ -151,40 +154,59 @@ VALUE _destroyLight(int argc,VALUE *argv,VALUE self)
 
 /*
  * call-seq:
- *   createEntity([name]) -> Entity
+ *   create_entity([name]) -> Entity
  *
  * creates a Entity.
 */
 VALUE _createEntity(int argc,VALUE *argv,VALUE self)
 {
 
-	VALUE mesh,name;
-	rb_scan_args(argc, argv, "11",&mesh,&name);
+	VALUE mesh,name,opt;
+	rb_scan_args(argc, argv, "12",&mesh,&name,&opt);
+
+	if(rb_obj_is_kind_of(name,rb_cHash))
+		std::swap(name,opt);
+
 	RUBYTRY(
-	if(SYMBOL_P(mesh))
-	{
-		if(NIL_P(name))
-			return wrap(_self->createEntity(wrapenum<Ogre::SceneManager::PrefabType>(mesh)));
-		else
-			return wrap(_self->createEntity(wrap<Ogre::String>(name),wrapenum<Ogre::SceneManager::PrefabType>(mesh)));
-	}else if(rb_obj_is_kind_of(mesh,rb_cOgreMesh))
-	{
-		if(NIL_P(name))
-			return wrap(_self->createEntity(wrap<Ogre::MeshPtr>(mesh)));
-		else
-			return wrap(_self->createEntity(wrap<Ogre::String>(name),wrap<Ogre::MeshPtr>(mesh)));
-	}else{
-		if(NIL_P(name))
-			return wrap(_self->createEntity(wrap<Ogre::String>(mesh)));
-		else
-			return wrap(_self->createEntity(wrap<Ogre::String>(name),wrap<Ogre::String>(mesh)));
-	}
+		Ogre::Entity *result;
+		if(SYMBOL_P(mesh))
+		{
+			if(NIL_P(name))
+				result = _self->createEntity(wrapenum<Ogre::SceneManager::PrefabType>(mesh));
+			else
+				result = _self->createEntity(wrap<Ogre::String>(name),wrapenum<Ogre::SceneManager::PrefabType>(mesh));
+		}else if(rb_obj_is_kind_of(mesh,rb_cOgreMesh))
+		{
+			if(NIL_P(name))
+				result = _self->createEntity(wrap<Ogre::MeshPtr>(mesh));
+			else
+				result = _self->createEntity(wrap<Ogre::String>(name),wrap<Ogre::MeshPtr>(mesh));
+		}else{
+			if(NIL_P(name))
+				result = _self->createEntity(wrap<Ogre::String>(mesh));
+			else
+				result = _self->createEntity(wrap<Ogre::String>(name),wrap<Ogre::String>(mesh));
+		}
+
+		if(!NIL_P(opt))
+		{
+			VALUE temp;
+			if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("material")))))
+				result->setMaterial(wrap<Ogre::MaterialPtr>(temp));
+
+			if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("visibility_flags")))))
+				result->setVisibilityFlags(NUM2ULONG(temp));
+
+
+		}
+
+		return wrap(result);
 	)
 	return Qnil;
 }
 /*
  * call-seq:
- *   getEntity(name) -> Entity or nil
+ *   get_entity(name) -> Entity or nil
  *
  * get a Entity or nil
 */
@@ -194,7 +216,7 @@ VALUE _getEntity(VALUE self,VALUE name)
 }
 /*
  * call-seq:
- *   hasEntity?(name) -> bool
+ *   has_entity?(name) -> bool
  *
  * return true if Entity with that name exist
 */
@@ -205,7 +227,7 @@ VALUE _hasEntity(VALUE self,VALUE name)
 
 /*
  * call-seq:
- *   destroyEntity([name]) -> nil
+ *   destroy_entity([name]) -> nil
  *
  * destroy a Entity.
  * if not name is given, destroy all Entitys
@@ -229,7 +251,7 @@ VALUE _destroyEntity(int argc,VALUE *argv,VALUE self)
 
 /*
  * call-seq:
- *   createCamera(name) -> Camera
+ *   create_camera(name) -> Camera
  * 
  * creates a Camera.
 */
@@ -261,7 +283,7 @@ VALUE _createCamera(int argc,VALUE *argv,VALUE self)
 }
 /*
  * call-seq:
- *   getCamera(name) -> Camera or nil
+ *   get_camera(name) -> Camera or nil
  * 
  * get a Camera or nil
 */
@@ -271,7 +293,7 @@ VALUE _getCamera(VALUE self,VALUE name)
 }
 /*
  * call-seq:
- *   hasCamera?(name) -> bool
+ *   has_camera?(name) -> bool
  * 
  * return true if light with that name exist
 */
@@ -282,7 +304,7 @@ VALUE _hasCamera(VALUE self,VALUE name)
 
 /*
  * call-seq:
- *   destroyCamera([name]) -> nil
+ *   destroy_camera([name]) -> nil
  * 
  * destroy a Camera.
  * if not name is given, destroy all lights
@@ -316,7 +338,7 @@ VALUE _each_camera(VALUE self)
 
 /*
  * call-seq:
- *   createBillboardChain([name]) -> BillboardChain
+ *   create_billboard_chain([name]) -> BillboardChain
  *
  * creates a BillboardChain.
 */
@@ -334,7 +356,7 @@ VALUE _createBillboardChain(int argc,VALUE *argv,VALUE self)
 }
 /*
  * call-seq:
- *   getBillboardChain(name) -> BillboardChain or nil
+ *   get_billboard_chain(name) -> BillboardChain or nil
  *
  * get a BillboardChain or nil
 */
@@ -344,7 +366,7 @@ VALUE _getBillboardChain(VALUE self,VALUE name)
 }
 /*
  * call-seq:
- *   hasBillboardChain?(name) -> bool
+ *   has_billboard_chain?(name) -> bool
  *
  * return true if BillboardChain with that name exist
 */
@@ -355,7 +377,7 @@ VALUE _hasBillboardChain(VALUE self,VALUE name)
 
 /*
  * call-seq:
- *   destroyBillboardChain([name]) -> nil
+ *   destroy_billboard_chain([name]) -> nil
  *
  * destroy a Light.
  * if not name is given, destroy all lights
@@ -378,7 +400,7 @@ VALUE _destroyBillboardChain(int argc,VALUE *argv,VALUE self)
 
 /*
  * call-seq:
- *   createRibbonTrail([name]) -> RibbonTrail
+ *   create_ribbon_trail([name]) -> RibbonTrail
  *
  * creates a RibbonTrail.
 */
@@ -396,7 +418,7 @@ VALUE _createRibbonTrail(int argc,VALUE *argv,VALUE self)
 }
 /*
  * call-seq:
- *   getRibbonTrail(name) -> RibbonTrail or nil
+ *   get_ribbon_trail(name) -> RibbonTrail or nil
  *
  * get a RibbonTrail or nil
 */
@@ -406,7 +428,7 @@ VALUE _getRibbonTrail(VALUE self,VALUE name)
 }
 /*
  * call-seq:
- *   hasRibbonTrail?(name) -> bool
+ *   has_ribbon_trail?(name) -> bool
  *
  * return true if RibbonTrail with that name exist
 */
@@ -417,10 +439,10 @@ VALUE _hasRibbonTrail(VALUE self,VALUE name)
 
 /*
  * call-seq:
- *   destroyRibbonTrail([name]) -> nil
+ *   destroy_ribbon_trail([name]) -> nil
  *
- * destroy a Light.
- * if not name is given, destroy all lights
+ * destroy a RibbonTrail.
+ * if not name is given, destroy all RibbonTrails
 */
 VALUE _destroyRibbonTrail(int argc,VALUE *argv,VALUE self)
 {
@@ -441,7 +463,7 @@ VALUE _destroyRibbonTrail(int argc,VALUE *argv,VALUE self)
 
 /*
  * call-seq:
- *   createBillboardSet([name]) -> BillboardSet
+ *   create_billboard_set([name]) -> BillboardSet
  *
  * creates a BillboardSet.
 */
@@ -459,7 +481,7 @@ VALUE _createBillboardSet(int argc,VALUE *argv,VALUE self)
 }
 /*
  * call-seq:
- *   getBillboardSet(name) -> BillboardSet or nil
+ *   get_billboard_set(name) -> BillboardSet or nil
  *
  * get a BillboardSet or nil
 */
@@ -469,7 +491,7 @@ VALUE _getBillboardSet(VALUE self,VALUE name)
 }
 /*
  * call-seq:
- *   hasBillboardSet?(name) -> bool
+ *   has_billboard_set?(name) -> bool
  *
  * return true if BillboardSet with that name exist
 */
@@ -480,10 +502,10 @@ VALUE _hasBillboardSet(VALUE self,VALUE name)
 
 /*
  * call-seq:
- *   destroyBillboardSet([name]) -> nil
+ *   destroy_billboard_set([name]) -> nil
  *
- * destroy a Light.
- * if not name is given, destroy all lights
+ * destroy a BillboardSet.
+ * if not name is given, destroy all BillboardSets
 */
 VALUE _destroyBillboardSet(int argc,VALUE *argv,VALUE self)
 {
@@ -502,7 +524,7 @@ VALUE _destroyBillboardSet(int argc,VALUE *argv,VALUE self)
 
 /*
  * call-seq:
- *   createManualObject([name]) -> ManualObject
+ *   create_manual_object([name]) -> ManualObject
  *
  * creates a ManualObject.
 */
@@ -520,7 +542,7 @@ VALUE _createManualObject(int argc,VALUE *argv,VALUE self)
 }
 /*
  * call-seq:
- *   getManualObject(name) -> ManualObject or nil
+ *   get_manual_object(name) -> ManualObject or nil
  *
  * get a ManualObject or nil
 */
@@ -530,7 +552,7 @@ VALUE _getManualObject(VALUE self,VALUE name)
 }
 /*
  * call-seq:
- *   hasManualObject?(name) -> bool
+ *   has_manual_object?(name) -> bool
  *
  * return true if ManualObject with that name exist
 */
@@ -541,7 +563,7 @@ VALUE _hasManualObject(VALUE self,VALUE name)
 
 /*
  * call-seq:
- *   destroyManualObject([name]) -> nil
+ *   destroy_manual_object([name]) -> nil
  *
  * destroy a Light.
  * if not name is given, destroy all lights
@@ -564,9 +586,9 @@ VALUE _destroyManualObject(int argc,VALUE *argv,VALUE self)
 
 /*
  * call-seq:
- *   createSceneNode([name]) -> Light
+ *   create_scene_node([name]) -> Light
  * 
- * creates a Light.
+ * creates a SceneNode.
 */
 VALUE _createSceneNode(int argc,VALUE *argv,VALUE self)
 {
@@ -582,7 +604,7 @@ VALUE _createSceneNode(int argc,VALUE *argv,VALUE self)
 }
 /*
  * call-seq:
- *   getSceneNode(name) -> SceneNode or nil
+ *   get_scene_node(name) -> SceneNode or nil
  * 
  * get a SceneNode or nil
 */
@@ -592,7 +614,7 @@ VALUE _getSceneNode(VALUE self,VALUE name)
 }
 /*
  * call-seq:
- *   hasSceneNode?(name) -> bool
+ *   has_scene_node?(name) -> bool
  * 
  * return true if SceneNode with that name not exist
 */
@@ -603,7 +625,7 @@ VALUE _hasSceneNode(VALUE self,VALUE name)
 
 /*
  * call-seq:
- *   destroyLight(name) -> nil
+ *   destroy_scene_node(name) -> nil
  *
  * destroy a SceneNode.
  * 
@@ -728,51 +750,51 @@ void Init_OgreSceneManager(VALUE rb_mOgre)
 	rb_cOgreSceneManager = rb_define_class_under(rb_mOgre,"SceneManager",rb_cObject);
 	rb_undef_alloc_func(rb_cOgreSceneManager);
 	
-	rb_define_method(rb_cOgreSceneManager,"createLight",RUBY_METHOD_FUNC(_createLight),-1);
-	rb_define_method(rb_cOgreSceneManager,"getLight",RUBY_METHOD_FUNC(_getLight),1);
-	rb_define_method(rb_cOgreSceneManager,"hasLight?",RUBY_METHOD_FUNC(_hasLight),1);
-	rb_define_method(rb_cOgreSceneManager,"destroyLight",RUBY_METHOD_FUNC(_destroyLight),-1);
+	rb_define_method(rb_cOgreSceneManager,"create_light",RUBY_METHOD_FUNC(_createLight),-1);
+	rb_define_method(rb_cOgreSceneManager,"get_light",RUBY_METHOD_FUNC(_getLight),1);
+	rb_define_method(rb_cOgreSceneManager,"has_light?",RUBY_METHOD_FUNC(_hasLight),1);
+	rb_define_method(rb_cOgreSceneManager,"destroy_light",RUBY_METHOD_FUNC(_destroyLight),-1);
 
-	rb_define_method(rb_cOgreSceneManager,"createEntity",RUBY_METHOD_FUNC(_createEntity),-1);
-	rb_define_method(rb_cOgreSceneManager,"getEntity",RUBY_METHOD_FUNC(_getEntity),1);
-	rb_define_method(rb_cOgreSceneManager,"hasEntity?",RUBY_METHOD_FUNC(_hasEntity),1);
-	rb_define_method(rb_cOgreSceneManager,"destroyEntity",RUBY_METHOD_FUNC(_destroyEntity),-1);
+	rb_define_method(rb_cOgreSceneManager,"create_entity",RUBY_METHOD_FUNC(_createEntity),-1);
+	rb_define_method(rb_cOgreSceneManager,"get_entity",RUBY_METHOD_FUNC(_getEntity),1);
+	rb_define_method(rb_cOgreSceneManager,"has_entity?",RUBY_METHOD_FUNC(_hasEntity),1);
+	rb_define_method(rb_cOgreSceneManager,"destroy_entity",RUBY_METHOD_FUNC(_destroyEntity),-1);
 
-	rb_define_method(rb_cOgreSceneManager,"createBillboardChain",RUBY_METHOD_FUNC(_createBillboardChain),-1);
-	rb_define_method(rb_cOgreSceneManager,"getBillboardChain",RUBY_METHOD_FUNC(_getBillboardChain),1);
-	rb_define_method(rb_cOgreSceneManager,"hasBillboardChain?",RUBY_METHOD_FUNC(_hasBillboardChain),1);
-	rb_define_method(rb_cOgreSceneManager,"destroyBillboardChain",RUBY_METHOD_FUNC(_destroyBillboardChain),-1);
+	rb_define_method(rb_cOgreSceneManager,"create_billboard_chain",RUBY_METHOD_FUNC(_createBillboardChain),-1);
+	rb_define_method(rb_cOgreSceneManager,"get_billboard_chain",RUBY_METHOD_FUNC(_getBillboardChain),1);
+	rb_define_method(rb_cOgreSceneManager,"has_billboard_chain?",RUBY_METHOD_FUNC(_hasBillboardChain),1);
+	rb_define_method(rb_cOgreSceneManager,"destroy_billboard_chain",RUBY_METHOD_FUNC(_destroyBillboardChain),-1);
 
-	rb_define_method(rb_cOgreSceneManager,"createBillboardSet",RUBY_METHOD_FUNC(_createBillboardSet),-1);
-	rb_define_method(rb_cOgreSceneManager,"getBillboardSet",RUBY_METHOD_FUNC(_getBillboardSet),1);
-	rb_define_method(rb_cOgreSceneManager,"hasBillboardSet?",RUBY_METHOD_FUNC(_hasBillboardSet),1);
-	rb_define_method(rb_cOgreSceneManager,"destroyBillboardSet",RUBY_METHOD_FUNC(_destroyBillboardSet),-1);
+	rb_define_method(rb_cOgreSceneManager,"create_billboard_set",RUBY_METHOD_FUNC(_createBillboardSet),-1);
+	rb_define_method(rb_cOgreSceneManager,"get_billboard_set",RUBY_METHOD_FUNC(_getBillboardSet),1);
+	rb_define_method(rb_cOgreSceneManager,"has_billboard_set?",RUBY_METHOD_FUNC(_hasBillboardSet),1);
+	rb_define_method(rb_cOgreSceneManager,"destroy_billboard_set",RUBY_METHOD_FUNC(_destroyBillboardSet),-1);
 
-	rb_define_method(rb_cOgreSceneManager,"createRibbonTrail",RUBY_METHOD_FUNC(_createRibbonTrail),-1);
-	rb_define_method(rb_cOgreSceneManager,"getRibbonTrail",RUBY_METHOD_FUNC(_getRibbonTrail),1);
-	rb_define_method(rb_cOgreSceneManager,"hasRibbonTrail?",RUBY_METHOD_FUNC(_hasRibbonTrail),1);
-	rb_define_method(rb_cOgreSceneManager,"destroyRibbonTrail",RUBY_METHOD_FUNC(_destroyRibbonTrail),-1);
+	rb_define_method(rb_cOgreSceneManager,"create_ribbon_trail",RUBY_METHOD_FUNC(_createRibbonTrail),-1);
+	rb_define_method(rb_cOgreSceneManager,"get_ribbon_trail",RUBY_METHOD_FUNC(_getRibbonTrail),1);
+	rb_define_method(rb_cOgreSceneManager,"has_ribbon_trail?",RUBY_METHOD_FUNC(_hasRibbonTrail),1);
+	rb_define_method(rb_cOgreSceneManager,"destroy_ribbon_trail",RUBY_METHOD_FUNC(_destroyRibbonTrail),-1);
 
-	rb_define_method(rb_cOgreSceneManager,"createCamera",RUBY_METHOD_FUNC(_createCamera),-1);
-	rb_define_method(rb_cOgreSceneManager,"getCamera",RUBY_METHOD_FUNC(_getCamera),1);
-	rb_define_method(rb_cOgreSceneManager,"hasCamera?",RUBY_METHOD_FUNC(_hasCamera),1);
-	rb_define_method(rb_cOgreSceneManager,"destroyCamera",RUBY_METHOD_FUNC(_destroyCamera),-1);
+	rb_define_method(rb_cOgreSceneManager,"create_camera",RUBY_METHOD_FUNC(_createCamera),-1);
+	rb_define_method(rb_cOgreSceneManager,"get_camera",RUBY_METHOD_FUNC(_getCamera),1);
+	rb_define_method(rb_cOgreSceneManager,"has_camera?",RUBY_METHOD_FUNC(_hasCamera),1);
+	rb_define_method(rb_cOgreSceneManager,"destroy_camera",RUBY_METHOD_FUNC(_destroyCamera),-1);
 	
 	rb_define_method(rb_cOgreSceneManager,"each_camera",RUBY_METHOD_FUNC(_each_camera),0);
 
-	rb_define_method(rb_cOgreSceneManager,"createSceneNode",RUBY_METHOD_FUNC(_createSceneNode),-1);
-	rb_define_method(rb_cOgreSceneManager,"getSceneNode",RUBY_METHOD_FUNC(_getSceneNode),1);
-	rb_define_method(rb_cOgreSceneManager,"hasSceneNode?",RUBY_METHOD_FUNC(_hasSceneNode),1);
-	rb_define_method(rb_cOgreSceneManager,"destroySceneNode",RUBY_METHOD_FUNC(_destroySceneNode),1);
+	rb_define_method(rb_cOgreSceneManager,"create_scene_node",RUBY_METHOD_FUNC(_createSceneNode),-1);
+	rb_define_method(rb_cOgreSceneManager,"get_scene_node",RUBY_METHOD_FUNC(_getSceneNode),1);
+	rb_define_method(rb_cOgreSceneManager,"has_scene_node?",RUBY_METHOD_FUNC(_hasSceneNode),1);
+	rb_define_method(rb_cOgreSceneManager,"destroy_scene_node",RUBY_METHOD_FUNC(_destroySceneNode),1);
 
-	rb_define_method(rb_cOgreSceneManager,"rootSceneNode",RUBY_METHOD_FUNC(_getRootSceneNode),0);
-	rb_define_method(rb_cOgreSceneManager,"currentViewport",RUBY_METHOD_FUNC(_getCurrentViewport),0);
-	rb_define_method(rb_cOgreSceneManager,"skyPlaneNode",RUBY_METHOD_FUNC(_getSkyPlaneNode),0);
-	rb_define_method(rb_cOgreSceneManager,"skyBoxNode",RUBY_METHOD_FUNC(_getSkyBoxNode),0);
-	rb_define_method(rb_cOgreSceneManager,"skyDomeNode",RUBY_METHOD_FUNC(_getSkyDomeNode),0);
+	rb_define_method(rb_cOgreSceneManager,"root_scene_node",RUBY_METHOD_FUNC(_getRootSceneNode),0);
+	rb_define_method(rb_cOgreSceneManager,"current_viewport",RUBY_METHOD_FUNC(_getCurrentViewport),0);
+	rb_define_method(rb_cOgreSceneManager,"sky_plane_node",RUBY_METHOD_FUNC(_getSkyPlaneNode),0);
+	rb_define_method(rb_cOgreSceneManager,"sky_box_node",RUBY_METHOD_FUNC(_getSkyBoxNode),0);
+	rb_define_method(rb_cOgreSceneManager,"sky_dome_node",RUBY_METHOD_FUNC(_getSkyDomeNode),0);
 	
-	rb_define_attr_method(rb_cOgreSceneManager,"shadowColour",_getShadowColour,_setShadowColour);
-	rb_define_attr_method(rb_cOgreSceneManager,"ambientLight",_getAmbientLight,_setAmbientLight);
+	rb_define_attr_method(rb_cOgreSceneManager,"shadow_color",_getShadowColour,_setShadowColour);
+	rb_define_attr_method(rb_cOgreSceneManager,"ambient_light",_getAmbientLight,_setAmbientLight);
 
 	rb_define_method(rb_cOgreSceneManager,"each",RUBY_METHOD_FUNC(_each),1);
 	rb_include_module(rb_cOgreSceneManager,rb_mEnumerable);

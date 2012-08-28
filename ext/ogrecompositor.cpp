@@ -92,10 +92,10 @@ void Init_OgreCompositor(VALUE rb_mOgre)
 	
 	rb_define_method(rb_cOgreCompositor,"each_supported",RUBY_METHOD_FUNC(_each_supported),0);
 	
-	rb_define_method(rb_cOgreCompositor,"createTechnique",RUBY_METHOD_FUNC(_createTechnique),0);
+	rb_define_method(rb_cOgreCompositor,"create_technique",RUBY_METHOD_FUNC(_createTechnique),0);
 	rb_define_method(rb_cOgreCompositor,"[]",RUBY_METHOD_FUNC(_getTechnique),1);
 
-	rb_define_method(rb_cOgreCompositor,"renderTarget",RUBY_METHOD_FUNC(_getRenderTarget),1);
+	rb_define_method(rb_cOgreCompositor,"render_target",RUBY_METHOD_FUNC(_getRenderTarget),1);
 	
 	rb_define_method(rb_cOgreCompositor,"texture",RUBY_METHOD_FUNC(_texture),2);
 	rb_define_method(rb_cOgreCompositor,"texturename",RUBY_METHOD_FUNC(_texturename),2);

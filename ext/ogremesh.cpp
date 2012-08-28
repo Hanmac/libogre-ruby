@@ -161,8 +161,8 @@ void Init_OgreMesh(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreMesh,"skeleton",RUBY_METHOD_FUNC(_getSkeleton),0);
 	rb_define_method(rb_cOgreMesh,"skeleton_name",RUBY_METHOD_FUNC(_getSkeletonName),0);
 
-	rb_define_singleton_method(rb_cOgreMesh,"createManual",RUBY_METHOD_FUNC(_singleton_createManual),-1);
-	rb_define_singleton_method(rb_cOgreMesh,"createPlane",RUBY_METHOD_FUNC(_singleton_createPlane),-1);
+	rb_define_singleton_method(rb_cOgreMesh,"create_manual",RUBY_METHOD_FUNC(_singleton_createManual),-1);
+	rb_define_singleton_method(rb_cOgreMesh,"create_plane",RUBY_METHOD_FUNC(_singleton_createPlane),-1);
 
 	registerenum<Ogre::MeshVersion>("Ogre::MeshVersion")
 		.add(Ogre::MESH_VERSION_LATEST,"latest")

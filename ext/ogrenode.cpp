@@ -1,4 +1,5 @@
 #include "ogrenode.hpp"
+#include "ogreradian.hpp"
 #include "ogrevector3.hpp"
 #include "ogreexception.hpp"
 #include "ogrequaternion.hpp"
@@ -182,10 +183,10 @@ void Init_OgreNode(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreNode,"name",RUBY_METHOD_FUNC(_getName),0);
 	rb_define_method(rb_cOgreNode,"size",RUBY_METHOD_FUNC(_numChildren),0);
 	
-	rb_define_method(rb_cOgreNode,"addChild",RUBY_METHOD_FUNC(_addChild),1);
-	rb_define_method(rb_cOgreNode,"removeChild",RUBY_METHOD_FUNC(_removeChild),1);
+	rb_define_method(rb_cOgreNode,"add_child",RUBY_METHOD_FUNC(_addChild),1);
+	rb_define_method(rb_cOgreNode,"remove_child",RUBY_METHOD_FUNC(_removeChild),1);
 
-	rb_define_method(rb_cOgreNode,"createChild",RUBY_METHOD_FUNC(_createChild),-1);
+	rb_define_method(rb_cOgreNode,"create_child",RUBY_METHOD_FUNC(_createChild),-1);
 
 	rb_define_method(rb_cOgreNode,"inspect",RUBY_METHOD_FUNC(_inspect),0);
 

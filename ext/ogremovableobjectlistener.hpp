@@ -16,26 +16,12 @@ class RubyMovableObjectListener : public Ogre::MovableObject::Listener {
 	void objectMoved(Ogre::MovableObject* obj);
 };
 
-extern std::map<VALUE,RubyMovableObjectListener*> movableObjectListenerHolder;
-
 //*
 template <>
-inline VALUE wrap< RubyMovableObjectListener >(RubyMovableObjectListener *obj )
-{
-	return obj->mRuby;
-}
+VALUE wrap< RubyMovableObjectListener >(RubyMovableObjectListener *obj );
 template <>
-inline VALUE wrap< Ogre::MovableObject::Listener >(Ogre::MovableObject::Listener *obj )
-{
-	return wrap<RubyMovableObjectListener>(reinterpret_cast<RubyMovableObjectListener*>(obj));
-}
+VALUE wrap< Ogre::MovableObject::Listener >(Ogre::MovableObject::Listener *obj );
 //*/
 template <>
-inline Ogre::MovableObject::Listener* wrap< Ogre::MovableObject::Listener* >(const VALUE &vmovable)
-{
-	std::map<VALUE,RubyMovableObjectListener*>::iterator it = movableObjectListenerHolder.find(vmovable);
-	if(it != movableObjectListenerHolder.end())
-		return it->second;
-	return new RubyMovableObjectListener(vmovable);
-}
+Ogre::MovableObject::Listener* wrap< Ogre::MovableObject::Listener* >(const VALUE &vmovable);
 #endif /* __RubyOgreMovableObject_H__ */

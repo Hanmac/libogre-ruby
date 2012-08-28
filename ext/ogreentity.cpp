@@ -34,6 +34,16 @@ VALUE _each_attached(VALUE self)
 	return self;
 }
 
+
+/*
+ *
+ */
+VALUE _setMaterial(VALUE self,VALUE other)
+{
+
+	return other;
+}
+
 }}
 
 /*

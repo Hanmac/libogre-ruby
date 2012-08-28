@@ -11,6 +11,9 @@ namespace CompositionTechnique {
 macro_attr(SchemeName,Ogre::String)
 macro_attr(CompositorLogicName,Ogre::String)
 
+singlereturn(createTargetPass)
+singlereturn(getParent)
+
 /*
 */
 VALUE _each(VALUE self)
@@ -20,19 +23,6 @@ VALUE _each(VALUE self)
 	return self;
 }
 
-/*
-*/
-VALUE _createTargetPass(VALUE self)
-{
-	return wrap(_self->createTargetPass());
-}
-
-/*
-*/
-VALUE _parent(VALUE self)
-{
-	return wrap(_self->getParent());
-}
 /*
 */
 VALUE _each_texturedefinition(VALUE self)
@@ -67,11 +57,11 @@ void Init_OgreCompositionTechnique(VALUE rb_mOgre)
 
 	rb_define_method(rb_cOgreCompositionTechnique,"each_texturedefinition",RUBY_METHOD_FUNC(_each_texturedefinition),0);
 
-	rb_define_method(rb_cOgreCompositionTechnique,"createTargetPass",RUBY_METHOD_FUNC(_createTargetPass),0);
+	rb_define_method(rb_cOgreCompositionTechnique,"create_target_pass",RUBY_METHOD_FUNC(_createTargetPass),0);
 
-	rb_define_method(rb_cOgreCompositionTechnique,"createTextureDefinition",RUBY_METHOD_FUNC(_createTextureDefinition),1);
+	rb_define_method(rb_cOgreCompositionTechnique,"create_texture_definition",RUBY_METHOD_FUNC(_createTextureDefinition),1);
 
-	rb_define_method(rb_cOgreCompositionTechnique,"parent",RUBY_METHOD_FUNC(_parent),0);
+	rb_define_method(rb_cOgreCompositionTechnique,"parent",RUBY_METHOD_FUNC(_getParent),0);
 
 	rb_define_attr_method(rb_cOgreCompositionTechnique,"scheme_name",_getSchemeName,_setSchemeName);
 	
