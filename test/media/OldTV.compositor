@@ -1,0 +1,24 @@
+compositor "Old TV"
+{
+    technique
+    {
+        texture rt0 target_width target_height PF_R8G8B8
+
+        // render scene to a texture
+        target rt0 { input previous }
+
+        target_output
+        {
+            // Start with clear output
+            input none
+
+            pass render_quad
+            {
+                // convert the previous render target to a black and white image, add some noise, distort it,
+                // then render to scene aligned quad
+                material Ogre/Compositor/OldTV
+                input 0 rt0
+            }
+        }
+    }
+}
