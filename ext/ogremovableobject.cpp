@@ -7,6 +7,16 @@
 
 VALUE rb_mOgreMovableObject;
 
+template <>
+Ogre::MovableObject* wrap< Ogre::MovableObject* >(const VALUE &val )
+{
+	if(rb_obj_is_kind_of(val, rb_cOgreParticleSystem))
+		return wrap< Ogre::ParticleSystem* >(val);
+
+	return unwrapPtr<Ogre::MovableObject>(val,rb_mOgreMovableObject);
+}
+
+
 namespace RubyOgre
 {
 namespace MovableObject

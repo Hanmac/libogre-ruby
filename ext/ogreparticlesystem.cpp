@@ -10,11 +10,11 @@ VALUE rb_cOgreParticleSystem;
 namespace RubyOgre {
 namespace ParticleSystem {
 
-macro_attr(SpeedFactor,double)
-macro_attr(IterationInterval,double)
-macro_attr(NonVisibleUpdateTimeout,double)
-macro_attr(DefaultWidth,double)
-macro_attr(DefaultHeight,double)
+macro_attr(SpeedFactor,Ogre::Real)
+macro_attr(IterationInterval,Ogre::Real)
+macro_attr(NonVisibleUpdateTimeout,Ogre::Real)
+macro_attr(DefaultWidth,Ogre::Real)
+macro_attr(DefaultHeight,Ogre::Real)
 
 
 macro_attr(Emitting,bool)
@@ -22,7 +22,18 @@ macro_attr(CullIndividually,bool)
 macro_attr(SortingEnabled,bool)
 macro_attr(KeepParticlesInLocalSpace,bool)
 
+
+macro_attr(ParticleQuota,size_t)
+macro_attr(EmittedEmitterQuota,size_t)
+
+singlereturn(getMaterialName)
+singlereturn(getResourceGroupName)
+singlereturn(getRendererName)
+singlereturn(getOrigin)
+
 singlefunc(clear)
+singlefunc(removeAllAffectors)
+singlefunc(removeAllEmitters)
 /*
 */
 VALUE _single_each_affector(VALUE self)
@@ -59,13 +70,15 @@ VALUE _single_each_template(VALUE self)
 */
 VALUE _addEmitter(VALUE self,VALUE name)
 {
-	return wrap(_self->addEmitter(wrap<Ogre::String>(name)));
+	RUBYTRY(return wrap(_self->addEmitter(wrap<Ogre::String>(name)));)
+	return Qnil;
 }
 /*
 */
 VALUE _addAffector(VALUE self,VALUE name)
 {
-	return wrap(_self->addAffector(wrap<Ogre::String>(name)));
+	RUBYTRY(return wrap(_self->addAffector(wrap<Ogre::String>(name)));)
+	return Qnil;
 }
 
 /*
@@ -118,21 +131,12 @@ Particle * 	createEmitterParticle (const String &emitterName)
 Particle * 	getParticle (size_t index)
 */
 
-
-VALUE _getMaterialName(VALUE self)
-{
-	return wrap(_self->getMaterialName());
-}
 VALUE _setMaterialName(VALUE self,VALUE val)
 {
 	_self->setMaterialName(wrap<Ogre::String>(val),_self->getResourceGroupName());
 	return val;
 }
 
-VALUE _getResourceGroupName(VALUE self)
-{
-	return wrap(_self->getResourceGroupName());
-}
 VALUE _setResourceGroupName(VALUE self,VALUE val)
 {
 	_self->setMaterialName(_self->getMaterialName(),wrap<Ogre::String>(val));
@@ -140,23 +144,15 @@ VALUE _setResourceGroupName(VALUE self,VALUE val)
 }
 
 
-VALUE _getRendererName(VALUE self)
-{
-	return wrap(_self->getRendererName());
-}
 VALUE _setRendererName(VALUE self,VALUE val)
 {
-	_self->setRenderer(wrap<Ogre::String>(val));
+	RUBYTRY(_self->setRenderer(wrap<Ogre::String>(val));)
 	return val;
 }
 
-VALUE _getOrigin(VALUE self)
-{
-	return wrap(_self->getOrigin());
-}
 VALUE _setOrigin(VALUE self,VALUE val)
 {
-	_self->_notifyOrigin(wrap<Ogre::String>(val));
+	RUBYTRY(_self->_notifyOrigin(wrap<Ogre::String>(val));)
 	return val;
 }
 
@@ -235,5 +231,5 @@ void Init_OgreParticleSystem(VALUE rb_mOgre)
 	rb_define_singleton_method(rb_cOgreParticleSystem,"each_renderer",RUBY_METHOD_FUNC(_single_each_renderer),0);
 	rb_define_singleton_method(rb_cOgreParticleSystem,"each_template",RUBY_METHOD_FUNC(_single_each_template),0);
 
-	registerklass<Ogre::ParticleSystem*>(rb_cOgreParticleSystem);
+	registerklass<Ogre::ParticleSystem>(rb_cOgreParticleSystem);
 }

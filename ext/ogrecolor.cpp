@@ -237,6 +237,27 @@ VALUE _inspect(VALUE self)
 	array[5]=_get_a(self);
 	return rb_f_sprintf(6,array);
 }
+
+/*
+ * call-seq:
+ *   color.inspect -> String
+ *
+ * ===Return value
+ * String
+*/
+VALUE _to_s(VALUE self)
+{
+	VALUE array[5];
+	array[0]=rb_str_new2("(%f, %f, %f, %f)");
+	array[1]=_get_r(self);
+	array[2]=_get_g(self);
+	array[3]=_get_b(self);
+	array[4]=_get_a(self);
+	return rb_f_sprintf(5,array);
+}
+
+
+
 /*
 * call-seq:
  *   color == other -> true or false 
@@ -410,6 +431,7 @@ void Init_OgreColor(VALUE rb_mOgre)
 
 
 	rb_define_method(rb_cOgreColor,"inspect",RUBY_METHOD_FUNC(_inspect),0);
+	rb_define_method(rb_cOgreColor,"to_s",RUBY_METHOD_FUNC(_to_s),0);
 
 	rb_define_method(rb_cOgreColor,"==",RUBY_METHOD_FUNC(_equal),1);
 	rb_define_method(rb_cOgreColor,"!=",RUBY_METHOD_FUNC(_nequal),1);

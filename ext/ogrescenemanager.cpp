@@ -9,6 +9,8 @@
 #include "ogrecolor.hpp"
 #include "ogrevector3.hpp"
 #include "ogrescenenode.hpp"
+#include "ogremovableobject.hpp"
+
 #define _self wrap<Ogre::SceneManager*>(self)
 VALUE rb_cOgreSceneManager,rb_cOgreSceneManagerMetaData;
 
@@ -307,7 +309,7 @@ VALUE _hasCamera(VALUE self,VALUE name)
  *   destroy_camera([name]) -> nil
  * 
  * destroy a Camera.
- * if not name is given, destroy all lights
+ * if not name is given, destroy all cameras
 */
 VALUE _destroyCamera(int argc,VALUE *argv,VALUE self)
 {
@@ -379,8 +381,8 @@ VALUE _hasBillboardChain(VALUE self,VALUE name)
  * call-seq:
  *   destroy_billboard_chain([name]) -> nil
  *
- * destroy a Light.
- * if not name is given, destroy all lights
+ * destroy a BillboardChain.
+ * if not name is given, destroy all billboardchains
 */
 VALUE _destroyBillboardChain(int argc,VALUE *argv,VALUE self)
 {
@@ -389,7 +391,7 @@ VALUE _destroyBillboardChain(int argc,VALUE *argv,VALUE self)
 	RUBYTRY(
 	if(NIL_P(name))
 		_self->destroyAllBillboardChains();
-	else if(rb_obj_is_kind_of(name,rb_cOgreLight))
+	else if(rb_obj_is_kind_of(name,rb_cOgreBillboardChain))
 		_self->destroyBillboardChain(wrap<Ogre::BillboardChain*>(name));
 	else
 		_self->destroyBillboardChain(wrap<Ogre::String>(name));
@@ -451,7 +453,7 @@ VALUE _destroyRibbonTrail(int argc,VALUE *argv,VALUE self)
 	RUBYTRY(
 	if(NIL_P(name))
 		_self->destroyAllRibbonTrails();
-	else if(rb_obj_is_kind_of(name,rb_cOgreLight))
+	else if(rb_obj_is_kind_of(name,rb_cOgreRibbonTrail))
 		_self->destroyRibbonTrail(wrap<Ogre::RibbonTrail*>(name));
 	else
 		_self->destroyRibbonTrail(wrap<Ogre::String>(name));
@@ -514,7 +516,7 @@ VALUE _destroyBillboardSet(int argc,VALUE *argv,VALUE self)
 	RUBYTRY(
 	if(NIL_P(name))
 		_self->destroyAllBillboardSets();
-	else if(rb_obj_is_kind_of(name,rb_cOgreLight))
+	else if(rb_obj_is_kind_of(name,rb_cOgreBillboardSet))
 		_self->destroyBillboardSet(wrap<Ogre::BillboardSet*>(name));
 	else
 		_self->destroyBillboardSet(wrap<Ogre::String>(name));
@@ -565,8 +567,8 @@ VALUE _hasManualObject(VALUE self,VALUE name)
  * call-seq:
  *   destroy_manual_object([name]) -> nil
  *
- * destroy a Light.
- * if not name is given, destroy all lights
+ * destroy a ManualObject.
+ * if not name is given, destroy all manual_objects
 */
 VALUE _destroyManualObject(int argc,VALUE *argv,VALUE self)
 {
@@ -575,10 +577,68 @@ VALUE _destroyManualObject(int argc,VALUE *argv,VALUE self)
 	RUBYTRY(
 	if(NIL_P(name))
 		_self->destroyAllManualObjects();
-	else if(rb_obj_is_kind_of(name,rb_cOgreLight))
-		_self->destroyManualObject(wrap<Ogre::ManualObject*>(name));
+//	else if(rb_obj_is_kind_of(name,rb_cOgreManualObject))
+//		_self->destroyManualObject(wrap<Ogre::ManualObject*>(name));
 	else
 		_self->destroyManualObject(wrap<Ogre::String>(name));
+	)
+	return Qnil;
+}
+
+/*
+ * call-seq:
+ *   create_particle_system(name,template) -> ParticleSystem
+ *
+ * creates a ManualObject.
+*/
+VALUE _createParticleSystem(int argc,VALUE *argv,VALUE self)
+{
+	VALUE name,temp;
+	rb_scan_args(argc, argv, "20",&name,&temp);
+	RUBYTRY(
+		return wrap(_self->createParticleSystem(wrap<Ogre::String>(name),wrap<Ogre::String>(temp)));
+	)
+	return Qnil;
+}
+/*
+ * call-seq:
+ *   get_particle_system(name) -> ParticleSystem or nil
+ *
+ * get a ManualObject or nil
+*/
+VALUE _getParticleSystem(VALUE self,VALUE name)
+{
+	return wrap(_self->getParticleSystem(wrap<Ogre::String>(name)));
+}
+/*
+ * call-seq:
+ *   has_particle_system?(name) -> bool
+ *
+ * return true if ParticleSystem with that name exist
+*/
+VALUE _hasParticleSystem(VALUE self,VALUE name)
+{
+	return wrap(_self->hasParticleSystem(wrap<Ogre::String>(name)));
+}
+
+/*
+ * call-seq:
+ *   destroy_particle_system([name]) -> nil
+ *
+ * destroy a ParticleSystem.
+ * if not name is given, destroy all ParticleSystems
+*/
+VALUE _destroyParticleSystem(int argc,VALUE *argv,VALUE self)
+{
+	VALUE name;
+	rb_scan_args(argc, argv, "01",&name);
+	RUBYTRY(
+	if(NIL_P(name))
+		_self->destroyAllParticleSystems();
+	else if(rb_obj_is_kind_of(name,rb_cOgreParticleSystem))
+		_self->destroyParticleSystem(wrap<Ogre::ParticleSystem*>(name));
+	else
+		_self->destroyParticleSystem(wrap<Ogre::String>(name));
 	)
 	return Qnil;
 }
@@ -774,6 +834,16 @@ void Init_OgreSceneManager(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreSceneManager,"get_ribbon_trail",RUBY_METHOD_FUNC(_getRibbonTrail),1);
 	rb_define_method(rb_cOgreSceneManager,"has_ribbon_trail?",RUBY_METHOD_FUNC(_hasRibbonTrail),1);
 	rb_define_method(rb_cOgreSceneManager,"destroy_ribbon_trail",RUBY_METHOD_FUNC(_destroyRibbonTrail),-1);
+
+	rb_define_method(rb_cOgreSceneManager,"create_manual_object",RUBY_METHOD_FUNC(_createManualObject),-1);
+	rb_define_method(rb_cOgreSceneManager,"get_manual_object",RUBY_METHOD_FUNC(_getManualObject),1);
+	rb_define_method(rb_cOgreSceneManager,"has_manual_object?",RUBY_METHOD_FUNC(_hasManualObject),1);
+	rb_define_method(rb_cOgreSceneManager,"destroy_manual_object",RUBY_METHOD_FUNC(_destroyManualObject),-1);
+
+	rb_define_method(rb_cOgreSceneManager,"create_particle_system",RUBY_METHOD_FUNC(_createParticleSystem),-1);
+	rb_define_method(rb_cOgreSceneManager,"get_particle_system",RUBY_METHOD_FUNC(_getParticleSystem),1);
+	rb_define_method(rb_cOgreSceneManager,"has_particle_system?",RUBY_METHOD_FUNC(_hasParticleSystem),1);
+	rb_define_method(rb_cOgreSceneManager,"destroy_particle_system",RUBY_METHOD_FUNC(_destroyParticleSystem),-1);
 
 	rb_define_method(rb_cOgreSceneManager,"create_camera",RUBY_METHOD_FUNC(_createCamera),-1);
 	rb_define_method(rb_cOgreSceneManager,"get_camera",RUBY_METHOD_FUNC(_getCamera),1);

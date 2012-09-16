@@ -180,6 +180,8 @@ VALUE _marshal_load(VALUE self,VALUE load)
 */
  /* Document-const: Zero
  * a zero Matrix3 */
+/* Document-const: Identity
+ * a identity Matrix3 */
 void Init_OgreMatrix3(VALUE rb_mOgre)
 {
 #if 0
@@ -214,4 +216,6 @@ void Init_OgreMatrix3(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreMatrix3,"marshal_load",RUBY_METHOD_FUNC(_marshal_load),1);
 
 	rb_define_const(rb_cOgreMatrix3,"Zero",wrap(Ogre::Matrix3::ZERO));
+	rb_define_const(rb_cOgreMatrix3,"Identity",wrap(Ogre::Matrix3::IDENTITY));
+
 }

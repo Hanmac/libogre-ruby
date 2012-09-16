@@ -45,8 +45,8 @@ void Init_OgreCompositionTechnique(VALUE rb_mOgre)
 {
 #if 0
 	rb_mOgre = rb_define_module("Ogre");
-	rb_define_attr(rb_cOgreCompositionTechnique,"schemename",1,1);
-	rb_define_attr(rb_cOgreCompositionTechnique,"compositorlogicname",1,1);
+	rb_define_attr(rb_cOgreCompositionTechnique,"scheme_name",1,1);
+	rb_define_attr(rb_cOgreCompositionTechnique,"compositor_logicname",1,1);
 #endif
 	using namespace RubyOgre::CompositionTechnique;;
 

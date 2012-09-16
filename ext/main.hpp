@@ -65,7 +65,7 @@ VALUE wrap(Ogre::Node *obj,VALUE klass);
 VALUE wrap(Ogre::Frustum *obj,VALUE klass);
 VALUE wrap(Ogre::BillboardChain *obj,VALUE klass);
 VALUE wrap(Ogre::BillboardSet *obj,VALUE klass);
-
+VALUE wrap(Ogre::ParticleSystem *obj,VALUE klass);
 
 template <typename T>
 VALUE wrap(T *arg){

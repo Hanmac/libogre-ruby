@@ -19,6 +19,8 @@ namespace CompositorChain {
 singlereturn(getViewport)
 singlereturn(getNumCompositors)
 
+singlefunc(removeAllCompositors)
+
 /*
 */
 VALUE _each(VALUE self)
@@ -82,6 +84,67 @@ VALUE _getCompositor(VALUE self,VALUE idx)
 	}
 }
 
+VALUE _getEnable(VALUE self)
+{
+	size_t enabled=0;
+	size_t count = _self->getNumCompositors();
+	if (count == 0)
+		return Qnil;
+
+	for(size_t i = 0;i < count;++i)
+		if(_self->getCompositor(i)->getEnabled())
+			++enabled;
+
+	if(enabled == count)
+		return Qtrue;
+
+	if(enabled == 0)
+		return Qfalse;
+
+	VALUE result = rb_ary_new();
+
+	for(size_t i = 0;i < count;++i)
+		rb_ary_push(result,wrap(_self->getCompositor(i)->getEnabled()));
+
+	return result;
+}
+
+VALUE _setEnable(VALUE self,VALUE val)
+{
+	size_t count = _self->getNumCompositors();
+	for(size_t i = 0;i < count;++i)
+		_self->setCompositorEnabled(i,RTEST(val));
+	return self;
+}
+
+VALUE _delete(VALUE self,VALUE id)
+{
+	_self->_removeInstance(_self->getCompositor(wrap<Ogre::String>(id)));
+	return self;
+}
+
+VALUE _delete_at(VALUE self,VALUE idx)
+{
+	_self->removeCompositor(NUM2INT(idx));
+	return self;
+}
+/*
+*/
+VALUE _delete_if(VALUE self)
+{
+	RETURN_ENUMERATOR(self,0,NULL);
+
+	for(Ogre::CompositorChain::InstanceIterator it = _self->getCompositors();
+		it.hasMoreElements();
+		)
+	{
+		Ogre::CompositorInstance *ci = it.getNext();
+		if(RTEST(rb_yield(wrap(ci))))
+			_self->_removeInstance(ci);
+	}
+	return self;
+}
+
 }}
 
 void Init_OgreCompositorChain(VALUE rb_mOgre)
@@ -99,6 +162,7 @@ void Init_OgreCompositorChain(VALUE rb_mOgre)
 	rb_include_module(rb_cOgreCompositorChain,rb_mEnumerable);
 
 	rb_define_method(rb_cOgreCompositorChain,"size",RUBY_METHOD_FUNC(_getNumCompositors),0);
+	rb_define_method(rb_cOgreCompositorChain,"clear",RUBY_METHOD_FUNC(_removeAllCompositors),0);
 
 	rb_define_method(rb_cOgreCompositorChain,"push",RUBY_METHOD_FUNC(_push),-1);
 	rb_define_method(rb_cOgreCompositorChain,"insert",RUBY_METHOD_FUNC(_insert),-1);
@@ -106,6 +170,11 @@ void Init_OgreCompositorChain(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreCompositorChain,"<<",RUBY_METHOD_FUNC(_add_shift),1);
 	rb_define_method(rb_cOgreCompositorChain,"[]",RUBY_METHOD_FUNC(_getCompositor),1);
 
+	rb_define_method(rb_cOgreCompositorChain,"delete",RUBY_METHOD_FUNC(_delete),1);
+	rb_define_method(rb_cOgreCompositorChain,"delete_at",RUBY_METHOD_FUNC(_delete_at),1);
+	rb_define_method(rb_cOgreCompositorChain,"delete_if",RUBY_METHOD_FUNC(_delete_if),0);
+
 	rb_define_method(rb_cOgreCompositorChain,"viewport",RUBY_METHOD_FUNC(_getViewport),0);
 
+	registerklass<Ogre::CompositorChain>(rb_cOgreCompositorChain);
 }

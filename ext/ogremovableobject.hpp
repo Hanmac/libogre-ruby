@@ -13,4 +13,7 @@ extern VALUE rb_mOgreMovableObject;
 #include "ogremovableplane.hpp"
 #include "ogrefrustum.hpp"
 
+template <>
+Ogre::MovableObject* wrap< Ogre::MovableObject* >(const VALUE &val );
+
 #endif /* __RubyOgreMovableObject_H__ */

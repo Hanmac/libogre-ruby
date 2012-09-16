@@ -135,6 +135,9 @@ VALUE _marshal_load(VALUE self,VALUE load)
 */
  /* Document-const: Zero
  * a zero Matrix4 */
+/* Document-const: Identity
+ * a identity Matrix4 */
+
 void Init_OgreMatrix4(VALUE rb_mOgre)
 {
 #if 0

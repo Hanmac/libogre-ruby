@@ -102,6 +102,23 @@ VALUE _inspect(VALUE self)
 	return rb_f_sprintf(5,array);
 }
 /*
+ * call-seq:
+ *   to_s -> String
+ *
+ * ===Return value
+ * String
+*/
+VALUE _to_s(VALUE self)
+{
+	VALUE array[4];
+	array[0]=rb_str_new2("(%f, %f, %f)");
+	array[1]=_get_x(self);
+	array[2]=_get_y(self);
+	array[3]=_get_z(self);
+	return rb_f_sprintf(4,array);
+}
+
+/*
 */
 VALUE _minusself(VALUE self)
 {
@@ -338,6 +355,8 @@ void Init_OgreVector3(VALUE rb_mOgre)
 	rb_define_attr_method(rb_cOgreVector3,"z",_get_z,_set_z);
 	
 	rb_define_method(rb_cOgreVector3,"inspect",RUBY_METHOD_FUNC(_inspect),0);
+	rb_define_method(rb_cOgreVector3,"to_s",RUBY_METHOD_FUNC(_to_s),0);
+
 	rb_define_method(rb_cOgreVector3,"-@",RUBY_METHOD_FUNC(_minusself),0);
 	rb_define_method(rb_cOgreVector3,"<=>",RUBY_METHOD_FUNC(_compare),1);
 	rb_include_module(rb_cOgreVector3,rb_mComparable);

@@ -171,8 +171,8 @@ void Init_OgreMesh(VALUE rb_mOgre)
 		.add(Ogre::MESH_VERSION_1_4,"v1_4")
 		.add(Ogre::MESH_VERSION_1_0,"v1_0");
 
-	registerenum<Ogre::MeshSerializer::Endian>("Ogre::MeshSerializer::Endian")
-		.add(Ogre::MeshSerializer::ENDIAN_NATIVE,"native")
-		.add(Ogre::MeshSerializer::ENDIAN_BIG,"big")
-		.add(Ogre::MeshSerializer::ENDIAN_LITTLE,"little");
+	registerenum<Ogre::Serializer::Endian>("Ogre::Serializer::Endian")
+		.add(Ogre::Serializer::ENDIAN_NATIVE,"native")
+		.add(Ogre::Serializer::ENDIAN_BIG,"big")
+		.add(Ogre::Serializer::ENDIAN_LITTLE,"little");
 }

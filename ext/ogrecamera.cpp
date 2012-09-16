@@ -93,6 +93,7 @@ void Init_OgreCamera(VALUE rb_mOgre)
 #if 0
 	rb_mOgre = rb_define_module("Ogre");
 	rb_mOgreMovableObject = rb_define_module_under(rb_mOgre,"MovableObject");
+	rb_cOgreFrustum = rb_define_class_under(rb_mOgre,"Frustum",rb_cObject);
 	
 	rb_define_attr(rb_cOgreCamera,"position",1,1);
 	rb_define_attr(rb_cOgreCamera,"direction",1,1);

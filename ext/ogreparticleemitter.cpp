@@ -27,6 +27,8 @@ macro_attr(EmissionRate,double)
 macro_attr(ColourRangeStart,Ogre::ColourValue)
 macro_attr(ColourRangeEnd,Ogre::ColourValue)
 
+singlereturn(getType)
+
 VALUE _getParticleVelocity(VALUE self)
 {
 	if(_self->getMinParticleVelocity() == _self->getMaxParticleVelocity())
@@ -135,23 +137,27 @@ void Init_OgreParticleEmitter(VALUE rb_mOgre)
 	using namespace RubyOgre::ParticleEmitter;
 
 	rb_cOgreParticleEmitter = rb_define_class_under(rb_mOgre,"ParticleEmitter",rb_cOgreParticle);
-	rb_include_module(rb_cOgreParticleSystem,rb_mOgreStringInterface);
+	rb_include_module(rb_cOgreParticleEmitter,rb_mOgreStringInterface);
 	//überschreiben der funktion aus particle	
-	rb_define_attr_method(rb_cOgreParticle,"color",_getColour,_setColour);
-	rb_define_attr_method(rb_cOgreParticle,"position",_getPosition,_setPosition);
-	rb_define_attr_method(rb_cOgreParticle,"direction",_getDirection,_setDirection);
+	rb_define_attr_method(rb_cOgreParticleEmitter,"color",_getColour,_setColour);
+	rb_define_attr_method(rb_cOgreParticleEmitter,"position",_getPosition,_setPosition);
+	rb_define_attr_method(rb_cOgreParticleEmitter,"direction",_getDirection,_setDirection);
 	
-	rb_define_attr_method(rb_cOgreParticle,"name",_getName,_setName);
+	rb_define_attr_method(rb_cOgreParticleEmitter,"name",_getName,_setName);
 
-	rb_define_attr_method(rb_cOgreParticle,"emittedEmitter",_getEmittedEmitter,_setEmittedEmitter);
-	rb_define_attr_method(rb_cOgreParticle,"emissionRate",_getEmissionRate,_setEmissionRate);
+	rb_define_method(rb_cOgreParticleEmitter,"type",RUBY_METHOD_FUNC(_getType),0);
+
+	rb_define_attr_method(rb_cOgreParticleEmitter,"emittedEmitter",_getEmittedEmitter,_setEmittedEmitter);
+	rb_define_attr_method(rb_cOgreParticleEmitter,"emissionRate",_getEmissionRate,_setEmissionRate);
 	
-	rb_define_attr_method(rb_cOgreParticle,"particleVelocity",_getParticleVelocity,_setParticleVelocity);
-	rb_define_attr_method(rb_cOgreParticle,"duration",_getDuration,_setDuration);
-	rb_define_attr_method(rb_cOgreParticle,"timeToLive",_getTimeToLive,_setTimeToLive);
-	rb_define_attr_method(rb_cOgreParticle,"repeatDelay",_getRepeatDelay,_setRepeatDelay);
+	rb_define_attr_method(rb_cOgreParticleEmitter,"particleVelocity",_getParticleVelocity,_setParticleVelocity);
+	rb_define_attr_method(rb_cOgreParticleEmitter,"duration",_getDuration,_setDuration);
+	rb_define_attr_method(rb_cOgreParticleEmitter,"timeToLive",_getTimeToLive,_setTimeToLive);
+	rb_define_attr_method(rb_cOgreParticleEmitter,"repeatDelay",_getRepeatDelay,_setRepeatDelay);
 
-	rb_define_attr_method(rb_cOgreParticle,"angle",_getAngle,_setAngle);
-	rb_define_attr_method(rb_cOgreParticle,"colorRangeStart",_getColourRangeStart,_setColourRangeStart);
-	rb_define_attr_method(rb_cOgreParticle,"colorRangeEnd",_getColourRangeEnd,_setColourRangeEnd);
+	rb_define_attr_method(rb_cOgreParticleEmitter,"angle",_getAngle,_setAngle);
+	rb_define_attr_method(rb_cOgreParticleEmitter,"colorRangeStart",_getColourRangeStart,_setColourRangeStart);
+	rb_define_attr_method(rb_cOgreParticleEmitter,"colorRangeEnd",_getColourRangeEnd,_setColourRangeEnd);
+
+	registerklass<Ogre::ParticleEmitter>(rb_cOgreParticleEmitter);
 }

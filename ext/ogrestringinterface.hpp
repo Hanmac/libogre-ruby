@@ -8,6 +8,7 @@ extern VALUE rb_mOgreStringInterface;
 #include "ogreresource.hpp"
 #include "ogreparticlesystem.hpp"
 #include "ogreparticleemitter.hpp"
+#include "ogreparticleaffector.hpp"
 
 template <>
 Ogre::StringInterface* wrap< Ogre::StringInterface* >(const VALUE &interface);

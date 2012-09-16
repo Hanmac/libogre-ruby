@@ -25,13 +25,14 @@ require 'mkmf'
 
 dir_config("ogre")
 with_cflags("-x c++"){
-pkg_config("OGRE")
-unless(find_library("OgreMain","main") && find_header("Ogre.h"))
-	abort("need ogre-dev package.")
-end
 
 if(find_executable('pkg-config'))
- $defs << (" -DOGRE_PLUGINDIR=\\\"#{`pkg-config OGRE --variable plugindir`.chomp}/\\\"")
+	pkg_config("OGRE")
+	$defs << (" -DOGRE_PLUGINDIR=\\\"#{`pkg-config OGRE --variable plugindir`.chomp}/\\\"")
+end
+
+unless(find_library("OgreMain","main") && find_header("Ogre.h"))
+	abort("need ogre-dev package.")
 end
 #have_func("Ogre::Vector3.isNaN","Ogre.h")
 #have_struct_member("Ogre::Vector3", "isNaN","Ogre.h")

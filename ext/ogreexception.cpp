@@ -57,6 +57,7 @@ void Init_OgreException(VALUE rb_mOgre)
 	rb_include_module(rb_eOgreItemIdentityException,rb_mOgreError);
 	rb_include_module(rb_eOgreUnimplementedException,rb_mOgreError);
 	rb_include_module(rb_eOgreInvalidStateException,rb_mOgreError);
+	rb_include_module(rb_eOgreInvalidParametersException,rb_mOgreError);
 	rb_include_module(rb_eOgreInternalErrorException,rb_mOgreError);
 
 }

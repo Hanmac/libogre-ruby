@@ -1,5 +1,6 @@
 #include "ogrenode.hpp"
 #include "ogrescenenode.hpp"
+#include "ogreexception.hpp"
 //#include "ogrenodelistener.hpp"
 #define _self wrap<Ogre::SceneNode*>(self)
 
@@ -26,7 +27,7 @@ VALUE _each_attached(VALUE self)
 
 VALUE _attach(VALUE self,VALUE obj)
 {
-	_self->attachObject(wrap<Ogre::MovableObject*>(obj));
+	RUBYTRY(_self->attachObject(wrap<Ogre::MovableObject*>(obj));)
 	return self;
 }
 

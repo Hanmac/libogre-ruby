@@ -49,6 +49,7 @@
 #include "ogrecompositorchain.hpp"
 #include "ogretexturedefinition.hpp"
 #include "ogrecompositiontechnique.hpp"
+#include "ogrecompositorinstance.hpp"
 
 #include "ogreviewport.hpp"
 
@@ -160,7 +161,9 @@ unsigned int wrap< unsigned int >(const VALUE &val )
 template <>
 VALUE wrap< Ogre::String >(const Ogre::String &st )
 {
-	return rb_str_new2(st.c_str());
+	if(st.c_str())
+		return rb_str_new2(st.c_str());
+	return Qnil;
 }
 
 template <>
@@ -239,6 +242,7 @@ macro_wrap(Ogre::Renderable)
 macro_wrap2(Ogre::Frustum,Ogre::MovableObject)
 macro_wrap2(Ogre::BillboardChain,Ogre::MovableObject)
 macro_wrap2(Ogre::BillboardSet,Ogre::MovableObject)
+macro_wrap2(Ogre::ParticleSystem,Ogre::ParticleSystem)
 
 void rb_define_attr_method(VALUE klass,std::string name,VALUE(get)(VALUE),VALUE(set)(VALUE,VALUE))
 {
@@ -267,6 +271,7 @@ extern "C" void Init_ogre(void)
 	Init_OgreFont(rb_mOgre);
 	Init_OgreSkeleton(rb_mOgre);
 	Init_OgreGpuProgram(rb_mOgre);
+	Init_OgreHighGpuProgram(rb_mOgre);
 	
 	Init_OgreBillboard(rb_mOgre);
 	
@@ -331,11 +336,14 @@ extern "C" void Init_ogre(void)
 	Init_OgreCompositor(rb_mOgre);
 	Init_OgreCompositionTechnique(rb_mOgre);
 	Init_OgreCompositorChain(rb_mOgre);
+	Init_OgreCompositorInstance(rb_mOgre);
+
 	Init_OgreTextureDefinition(rb_mOgre);
 	
 	Init_OgreParticleSystem(rb_mOgre);
 	Init_OgreParticle(rb_mOgre);
 	Init_OgreParticleEmitter(rb_mOgre);
+	Init_OgreParticleAffector(rb_mOgre);
 	
 	Init_OgreSimpleSpline(rb_mOgre);
 	Init_OgreRotationalSpline(rb_mOgre);

@@ -12,7 +12,7 @@ extern VALUE rb_cOgreResource;
 #include "ogreskeleton.hpp"
 #include "ogrecompositor.hpp"
 #include "ogregpuprogram.hpp"
-
+#include "ogrehighgpuprogram.hpp"
 
 template <>
 VALUE wrap< Ogre::ResourcePtr >(const Ogre::ResourcePtr& resource );
