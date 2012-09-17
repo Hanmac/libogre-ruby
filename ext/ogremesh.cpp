@@ -4,6 +4,9 @@
 #include "ogreplane.hpp"
 #include "ogrevector3.hpp"
 #include "ogresubmesh.hpp"
+
+#include "ogreproceduralbuffer.hpp"
+
 #define _self wrap<Ogre::MeshPtr>(self)
 #define _manager Ogre::MeshManager::getSingletonPtr()
 VALUE rb_cOgreMesh;
@@ -65,6 +68,26 @@ VALUE _export(int argc,VALUE *argv,VALUE self)
 
 	return self;
 
+}
+
+/*
+ *
+ */
+VALUE _singleton_createProcedural(int argc,VALUE *argv,VALUE self)
+{
+	VALUE name, groupName;
+	rb_scan_args(argc, argv, "11",&name,&groupName);
+	RUBYTRY(
+		ProceduralBuffer *prc = new ProceduralBuffer;
+
+		rb_yield(wrap(prc));
+
+		return wrap(prc->toMesh(wrap<Ogre::String>(name),
+			unwrapResourceGroup(groupName,Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME)
+		));
+	);
+
+	return Qnil;
 }
 
 /*
