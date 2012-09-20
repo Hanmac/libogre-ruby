@@ -18,7 +18,12 @@ template <>
 Ogre::CompositorPtr wrap< Ogre::CompositorPtr >(const VALUE &vcompositor)
 {
 	if(rb_obj_is_kind_of(vcompositor,rb_cString))
-		return _manager->getByName(wrap<Ogre::String>(vcompositor));
+	{
+		Ogre::CompositorPtr ptr(_manager->getByName(wrap<Ogre::String>(vcompositor)));
+		if(ptr.isNull())
+			rb_raise(rb_eTypeError,"\"%s\" is not a %s",rb_string_value_cstr((volatile VALUE*)(&vcompositor)),rb_class2name(rb_cOgreCompositor));
+		return ptr;
+	}
 	return *unwrapPtr<Ogre::CompositorPtr>(vcompositor, rb_cOgreCompositor);
 }
 

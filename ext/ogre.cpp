@@ -45,6 +45,8 @@
 #include "ogretextureunitstate.hpp"
 #include "ogrelayerblendmode.hpp"
 
+#include "ogrepose.hpp"
+
 #include "ogrecompositor.hpp"
 #include "ogrecompositorchain.hpp"
 #include "ogretexturedefinition.hpp"
@@ -176,6 +178,13 @@ Ogre::String wrap< Ogre::String >(const VALUE &val )
 	else
 		return wrap< Ogre::String >(rb_funcall(val,rb_intern("to_s"),0));
 }
+
+template <>
+VALUE wrap< Ogre::StringVector >(const Ogre::StringVector &vec )
+{
+	return wrap<Ogre::String>(vec);
+}
+
 
 template <>
 VALUE wrap< Ogre::NameValuePairList >(const Ogre::NameValuePairList &map )
@@ -325,6 +334,8 @@ extern "C" void Init_ogre(void)
 	Init_OgreMesh(rb_mOgre);
 	Init_OgreSubMesh(rb_mOgre);
 	
+	Init_OgrePose(rb_mOgre);
+
 	Init_OgreEntity(rb_mOgre);
 	Init_OgreSubEntity(rb_mOgre);
 

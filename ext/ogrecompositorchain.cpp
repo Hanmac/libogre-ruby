@@ -61,7 +61,7 @@ VALUE _insert(int argc,VALUE *argv,VALUE self)
 
 VALUE _add_shift(VALUE self,VALUE obj)
 {
-	_self->addCompositor(wrap<Ogre::CompositorPtr>(obj));
+	RUBYTRY(_self->addCompositor(wrap<Ogre::CompositorPtr>(obj));)
 	return self;
 }
 

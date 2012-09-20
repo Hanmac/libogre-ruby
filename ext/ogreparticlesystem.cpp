@@ -98,6 +98,7 @@ VALUE _getAffector(VALUE self,VALUE id)
 */
 VALUE _each_particle(VALUE self)
 {
+	RETURN_ENUMERATOR(self,0,NULL);
 	for (unsigned int i = 0; i < _self->getNumParticles(); ++i)
 		rb_yield(wrap(_self->getParticle(i)));
 	return self;
@@ -107,6 +108,7 @@ VALUE _each_particle(VALUE self)
 */
 VALUE _each_emitter(VALUE self)
 {
+	RETURN_ENUMERATOR(self,0,NULL);
 	for (unsigned int i = 0; i < _self->getNumEmitters(); ++i)
 		rb_yield(wrap(_self->getEmitter(i)));
 	return self;
@@ -115,6 +117,7 @@ VALUE _each_emitter(VALUE self)
 */
 VALUE _each_affector(VALUE self)
 {
+	RETURN_ENUMERATOR(self,0,NULL);
 	for (unsigned int i = 0; i < _self->getNumAffectors(); ++i)
 		rb_yield(wrap(_self->getAffector(i)));
 	return self;

@@ -8,6 +8,7 @@
 #include "ogrematerial.hpp"
 #include "ogrecolor.hpp"
 #include "ogrevector3.hpp"
+#include "ogreradian.hpp"
 #include "ogrescenenode.hpp"
 #include "ogremovableobject.hpp"
 
@@ -37,6 +38,7 @@ Ogre::SceneManagerMetaData* wrap< Ogre::SceneManagerMetaData* >(const VALUE &vma
 namespace RubyOgre {
 namespace SceneManager {
 
+macro_attr_enum(ShadowTechnique,Ogre::ShadowTechnique)
 macro_attr(ShadowColour,Ogre::ColourValue)
 macro_attr(AmbientLight,Ogre::ColourValue)
 
@@ -104,7 +106,13 @@ VALUE _createLight(int argc,VALUE *argv,VALUE self)
 
 		if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("visibility_flags")))))
 			result->setVisibilityFlags(NUM2ULONG(temp));
-
+		if(result->getType() == Ogre::Light::LT_SPOTLIGHT)
+		{
+			if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("spotlight_inner_angle")))))
+				result->setSpotlightInnerAngle(wrap<Ogre::Radian>(temp));
+			if(!NIL_P(temp = rb_hash_aref(opt,ID2SYM(rb_intern("spotlight_outer_angle")))))
+				result->setSpotlightOuterAngle(wrap<Ogre::Radian>(temp));
+		}
 	}
 
 	return wrap(result);
@@ -593,10 +601,21 @@ VALUE _destroyManualObject(int argc,VALUE *argv,VALUE self)
 */
 VALUE _createParticleSystem(int argc,VALUE *argv,VALUE self)
 {
-	VALUE name,temp;
-	rb_scan_args(argc, argv, "20",&name,&temp);
+	VALUE name,temp,opts;
+	rb_scan_args(argc, argv, "21",&name,&temp,&opts);
 	RUBYTRY(
-		return wrap(_self->createParticleSystem(wrap<Ogre::String>(name),wrap<Ogre::String>(temp)));
+		Ogre::ParticleSystem *result = _self->createParticleSystem(wrap<Ogre::String>(name),wrap<Ogre::String>(temp));
+
+		if(!NIL_P(opts))
+		{
+			VALUE temp;
+
+			if(!NIL_P(temp = rb_hash_aref(opts,ID2SYM(rb_intern("visibility_flags")))))
+				result->setVisibilityFlags(NUM2ULONG(temp));
+
+		}
+
+		return wrap(result);
 	)
 	return Qnil;
 }
@@ -863,6 +882,8 @@ void Init_OgreSceneManager(VALUE rb_mOgre)
 	rb_define_method(rb_cOgreSceneManager,"sky_box_node",RUBY_METHOD_FUNC(_getSkyBoxNode),0);
 	rb_define_method(rb_cOgreSceneManager,"sky_dome_node",RUBY_METHOD_FUNC(_getSkyDomeNode),0);
 	
+	rb_define_attr_method(rb_cOgreSceneManager,"shadow_technique",_getShadowTechnique,_setShadowTechnique);
+
 	rb_define_attr_method(rb_cOgreSceneManager,"shadow_color",_getShadowColour,_setShadowColour);
 	rb_define_attr_method(rb_cOgreSceneManager,"ambient_light",_getAmbientLight,_setAmbientLight);
 
@@ -889,4 +910,13 @@ void Init_OgreSceneManager(VALUE rb_mOgre)
 		.add(Ogre::SceneManager::PT_CUBE,"cube")
 		.add(Ogre::SceneManager::PT_PLANE,"plane")
 		.add(Ogre::SceneManager::PT_SPHERE,"sphere");
+
+	registerenum<Ogre::ShadowTechnique>("Ogre::ShadowTechnique")
+		.add(Ogre::SHADOWTYPE_STENCIL_MODULATIVE,"stencil_modulative")
+		.add(Ogre::SHADOWTYPE_STENCIL_ADDITIVE,"stencil_additive")
+		.add(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE,"texture_modulative")
+		.add(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE,"texture_additive")
+		.add(Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED,"texture_modulative_integrated")
+		.add(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED,"texture_additive_integrated");
+
 }

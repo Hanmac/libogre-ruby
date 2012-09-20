@@ -272,14 +272,8 @@ VALUE wrap< unsigned int >(const unsigned int &st );
 template <>
 unsigned int wrap< unsigned int >(const VALUE &val );
 
-
-/*
 template <>
-inline VALUE wrap< Ogre::StringVector >(const Ogre::StringVector &vec )
-{
-	return wrap((const Ogre::vector<Ogre::String>::type)vec);
-}
-*/
+VALUE wrap< Ogre::StringVector >(const Ogre::StringVector &vec );
 
 template <>
 VALUE wrap< Ogre::NameValuePairList >(const Ogre::NameValuePairList &map );

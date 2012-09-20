@@ -32,15 +32,15 @@ RubyFrameListener::~RubyFrameListener() {
 
 bool RubyFrameListener::frameStarted(const Ogre::FrameEvent& evt)
 {
-	return RTEST(rb_funcall(value,rb_intern("frame_started"),2,DBL2NUM(evt.timeSinceLastEvent),DBL2NUM(evt.timeSinceLastEvent)));
+	return RTEST(rb_funcall(value,rb_intern("frame_started"),2,DBL2NUM(evt.timeSinceLastEvent),DBL2NUM(evt.timeSinceLastFrame)));
 }
 
 bool RubyFrameListener::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
-	return RTEST(rb_funcall(value,rb_intern("frame_rendering_queued"),2,DBL2NUM(evt.timeSinceLastEvent),DBL2NUM(evt.timeSinceLastEvent)));
+	return RTEST(rb_funcall(value,rb_intern("frame_rendering_queued"),2,DBL2NUM(evt.timeSinceLastEvent),DBL2NUM(evt.timeSinceLastFrame)));
 }
 
 bool RubyFrameListener::frameEnded(const Ogre::FrameEvent& evt)
 {
-	return RTEST(rb_funcall(value,rb_intern("frame_ended"),2,DBL2NUM(evt.timeSinceLastEvent),DBL2NUM(evt.timeSinceLastEvent)));
+	return RTEST(rb_funcall(value,rb_intern("frame_ended"),2,DBL2NUM(evt.timeSinceLastEvent),DBL2NUM(evt.timeSinceLastFrame)));
 }

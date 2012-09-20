@@ -31,6 +31,8 @@ macro_attr(QueryFlags,uint)
 
 macro_attr(LightMask,uint)
 
+macro_attr(CastShadows,bool)
+
 macro_attr(Listener,Ogre::MovableObject::Listener*)
 
 singlereturn(getName)
@@ -43,6 +45,8 @@ singlereturn(getBoundingRadius)
 singlereturn(isAttached)
 singlereturn(isVisible)
 
+
+singlereturn(getAnimableValueNames)
 /*
 */
 VALUE _detach(VALUE self)
@@ -152,6 +156,8 @@ void Init_OgreMovableObject(VALUE rb_mOgre)
 	rb_define_method(rb_mOgreMovableObject,"remove_visibility_flags",RUBY_METHOD_FUNC(_removeVisibilityFlags),1);
 	
 	
+	rb_define_method(rb_mOgreMovableObject,"animable_values",RUBY_METHOD_FUNC(_getAnimableValueNames),0);
+
 	
 	rb_define_attr_method(rb_mOgreMovableObject,"rendering_distance",_getRenderingDistance,_setRenderingDistance);
 	

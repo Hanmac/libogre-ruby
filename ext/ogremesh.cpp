@@ -43,6 +43,17 @@ VALUE _each(VALUE self)
 }
 
 /*
+*/
+VALUE _each_pose(VALUE self)
+{
+	RETURN_ENUMERATOR(self,0,NULL);
+	wrap<Ogre::Pose*>(_self->getPoseIterator());
+	return self;
+}
+
+
+
+/*
  *
  */
 VALUE _export(int argc,VALUE *argv,VALUE self)
@@ -155,6 +166,8 @@ void Init_OgreMesh(VALUE rb_mOgre)
 
 	rb_define_method(rb_cOgreMesh,"each",RUBY_METHOD_FUNC(_each),0);
 	rb_include_module(rb_cOgreMesh,rb_mEnumerable);
+
+	rb_define_method(rb_cOgreMesh,"each_pose",RUBY_METHOD_FUNC(_each_pose),0);
 
 	rb_define_method(rb_cOgreMesh,"export",RUBY_METHOD_FUNC(_export),-1);
 

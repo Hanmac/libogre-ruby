@@ -1,6 +1,7 @@
 #include "ogrerendertarget.hpp"
 #include "ogreviewport.hpp"
 #include "ogrecamera.hpp"
+#include "ogrecolor.hpp"
 #include "ogreexception.hpp"
 #define _self wrap<Ogre::RenderTarget*>(self)
 VALUE rb_cOgreRenderTarget;
@@ -36,8 +37,9 @@ VALUE _each(VALUE self)
 */
 VALUE _addViewport(int argc,VALUE *argv,VALUE self)
 {
-	VALUE cam,ZOrder,left,top,width,height;
-	rb_scan_args(argc, argv, "15",&cam,&ZOrder,&left,&top,&width,&height);
+	VALUE cam,ZOrder,left,top,width,height,opts;
+	rb_scan_args(argc, argv, "16",&cam,&ZOrder,&left,&top,&width,&height,&opts);
+
 	if(NIL_P(ZOrder))
 		ZOrder = INT2NUM(0);
 	if(NIL_P(left))
@@ -49,7 +51,18 @@ VALUE _addViewport(int argc,VALUE *argv,VALUE self)
 	if(NIL_P(height))
 		height = DBL2NUM(1.0f);
 	
-return wrap(_self->addViewport(wrap<Ogre::Camera*>(cam), NUM2INT(ZOrder), NUM2DBL(left),NUM2DBL(top),NUM2DBL(width),NUM2DBL(height)));
+	Ogre::Viewport *result = _self->addViewport(wrap<Ogre::Camera*>(cam), NUM2INT(ZOrder), NUM2DBL(left),NUM2DBL(top),NUM2DBL(width),NUM2DBL(height));
+
+	if(rb_obj_is_kind_of(opts,rb_cHash))
+	{
+		VALUE temp;
+		if(!NIL_P(temp = rb_hash_aref(opts,ID2SYM(rb_intern("visibility_mask")))))
+			result->setVisibilityMask(NUM2ULONG(temp));
+		if(!NIL_P(temp = rb_hash_aref(opts,ID2SYM(rb_intern("background_color")))))
+			result->setBackgroundColour(wrap<Ogre::ColourValue>(temp));
+
+	}
+	return wrap(result);
 }
 
 VALUE _removeViewport(VALUE self,VALUE ZOrder)

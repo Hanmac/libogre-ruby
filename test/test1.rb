@@ -15,6 +15,7 @@ Ogre::ResourceGroup.initialise_group
 
 sm = Ogre.create_scene_manager("DefaultSceneManager")
 
+sm.shadow_technique = :stencil_additive
 sm.ambient_light = Ogre::Color.new(0,0,0)
 
 Ogre::Texture::create_manual("MyFirstRtt",:default,:type_2d,512,512,1,0,:r8g8b8,:rendertarget)
@@ -27,6 +28,8 @@ Ogre::Compositor.each{|i,c| p c}
 
 Ogre::Material::create("RTTMaterial",:default)[0][0].create.texture_name = "MyFirstRtt"
 
+cube = nil
+
 sm.root_scene_node.create_child.tap {|scene|
 	scene_mask = 0b010
 	
@@ -35,12 +38,12 @@ sm.root_scene_node.create_child.tap {|scene|
 		look_at: Ogre::Vector3.new(0,0,-10),
 		near_clip_distance: 5
 	)
-  
+	  
 	scene.attach(camera)
 
-	vp = rw.add_viewport(camera)
-	vp.visibility_mask = scene_mask
-	vp.background_color = Ogre::Color.new(0,0,0)
+	vp = rw.add_viewport(camera,nil,nil,nil,nil,nil,
+		visibility_mask: scene_mask,
+		background_color: Ogre::Color.new(0,0,0))
 
 	#(vp.compositor_chain << "B&W").each{|e| e.enable = true;p e.alive}
 	
@@ -53,9 +56,10 @@ sm.root_scene_node.create_child.tap {|scene|
 	}
 	
 	scene.create_child.tap {|c|
-		c.attach(sm.create_entity(:cube,"globe",material: "RTTMaterial",visibility_flags: scene_mask))
+		cube = c
+		c.attach(sm.create_entity(:cube,"cube",material: "RTTMaterial",visibility_flags: scene_mask))
 
-		c.position = Ogre::Vector3.new(0,10,0)
+		c.position = Ogre::Vector3.new(0,90,0)
 		#c.scale = Ogre::Vector3.new(1,1,1)
 		
 		c.roll Ogre::Degree.new(45)
@@ -63,16 +67,7 @@ sm.root_scene_node.create_child.tap {|scene|
 	}
 
 	#scene.create_child.tap {|c|
-		ps = sm.create_particle_system("Aureola","Examples/Aureola")
-		ps.visibility_flags = scene_mask
-
-		scene.attach(ps)
-		p "each_param"
-		ps.each_param {|k,v| p "#{k} => #{v} (#{v.class})"}
-		p "each_emitter"
-		ps.each_emitter {|e|p e.type; e.each_param {|k,v| p "#{k} => #{v} (#{v.class})"}}
-		p "each_affector"
-		ps.each_affector {|e|p e.type; e.each_param {|k,v| p "#{k} => #{v} (#{v.class})"}}
+	scene.attach(sm.create_particle_system("Aureola","Examples/Aureola",visibility_flags: scene_mask))
 		#c.attach(ps)
 		#c.position = Ogre::Vector3.new(5,5,0)
 		#c.scale = Ogre::Vector3.new(5,5,5)
@@ -81,34 +76,31 @@ sm.root_scene_node.create_child.tap {|scene|
 	scene.attach(sm.create_light("pointLight",
 		type: :point,
 		position: Ogre::Vector3.new(0, 150, 250),
-		diffuse_color: Ogre::Color.new(1.0, 1.0, 1.0),
+		diffuse_color: Ogre::Color.new(1.0, 0.80, 0.80),
 		#specular_color: Ogre::Color.new(0.75, 0.50, 0.0),
 		visibility_flags: scene_mask
 	))
 	
 	
-#	scene.attach(sm.create_light("directionalLight",
-#		type: :directional,
-#		diffuse_color: Ogre::Color.new(0.25, 0.5, 0),
-#		specular_color: Ogre::Color.new(0.75, 0.5, 0),
-#		direction: Ogre::Vector3.new( 0, -1, 1 ),
-#		visibility_flags: scene_mask
-#	))
+	scene.attach(sm.create_light("directionalLight",
+		type: :directional,
+		diffuse_color: Ogre::Color.new(0.85, 0.5, 0),
+		specular_color: Ogre::Color.new(0.75, 0.5, 0),
+		direction: Ogre::Vector3.new( 0, -1, 1 ),
+		visibility_flags: scene_mask
+	))
 
-#	
-#	spotLight = sm.create_light("spotLight",
-#		type: :spotlight,
-#		diffuse_color: Ogre::Color.new(0, 0, 1.0),
-#		specular_color: Ogre::Color.new(0, 0, 1.0),
-#		direction: Ogre::Vector3.new(-1, -1, 0),
-#		position: Ogre::Vector3.new(300, 300, 0)
-#	)
-#
-#	spotLight.spotlight_inner_angle = Ogre::Degree.new(35)
-#	spotLight.spotlight_outer_angle = Ogre::Degree.new(50)
-#
-#	
-#	scene.attach(spotLight)
+	
+	scene.attach(sm.create_light("spotLight",
+		type: :spotlight,
+		diffuse_color: Ogre::Color.new(0, 0, 1.0),
+		specular_color: Ogre::Color.new(0, 0, 1.0),
+		direction: Ogre::Vector3.new(-1, -1, 0),
+		position: Ogre::Vector3.new(300, 300, 0),
+		spotlight_inner_angle: Ogre::Degree.new(35),
+		spotlight_outer_angle: Ogre::Degree.new(50),
+		visibility_flags: scene_mask
+	))
 		
 }
 
@@ -126,7 +118,8 @@ sm.root_scene_node.create_child.tap {|scene|
 	vp.visibility_mask = scene_mask
 	vp.background_color = Ogre::Color.new(1,0,0)
 	
-	(vp.compositor_chain << "Old TV").each(&:enable)
+	#(vp.compositor_chain << "Old TV").each(&:enable)
+	(vp.compositor_chain << "Invert" << "Old TV").each(&:enable)
 	
 	scene.create_child.tap {|c|
 		c.attach(sm.create_entity(:sphere,material: "BumpyMetal",visibility_flags: scene_mask))
@@ -179,8 +172,9 @@ sm.root_scene_node.create_child.tap {|scene|
 #.create.texture_name = "MyFirstRtt"
 
 class FL
-	def initialize(window)
+	def initialize(window,cube)
 		@window = window
+		@cube = cube
 	end
 	def frame_started(*args)
 		#@window.removeViewport(nil)
@@ -188,7 +182,8 @@ class FL
 #		sleep(0.0010)
 		return true
 	end
-	def frame_rendering_queued(*args)
+	def frame_rendering_queued(lastevent,lastframe)
+		@cube.yaw(Ogre::Degree.new(10) * lastframe)
 		return true
 	end
 	def frame_ended(*args)
@@ -197,7 +192,7 @@ class FL
 	end
 end
 
-Ogre.add_frame_listener(FL.new(rw))
+Ogre.add_frame_listener(FL.new(rw,cube))
 #exit
 
 Ogre.start_rendering
